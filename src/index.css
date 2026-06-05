@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+/* Largest first so smaller breakpoints win by source order (mobile-last cascade) */
+@custom-variant mq1350 (@media (max-width: 1350px));
+@custom-variant mq1125 (@media (max-width: 1125px));
+@custom-variant mq800 (@media (max-width: 800px));
+@custom-variant mq450 (@media (max-width: 450px));
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}

@@ -1,108 +1,134 @@
+import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 
+const items = [
+  { num: "01", label: "Engaging Post" },
+  { num: "02", label: "Viral Reel" },
+  { num: "03", label: "Compelling Post" },
+  { num: "04", label: "Creative Carousel" },
+  { num: "05", label: "Captivating Reel" },
+  { num: "06", label: "Insightful Carousel" },
+];
+
 const ChallengeCard = ({ className = "" }) => {
+  const [active, setActive] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+  const cardRef = useRef(null);
+
+  // Track mobile viewport (≤450px) to switch tabs to vertical
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 450px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  // Click outside → reset to default (0)
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (cardRef.current && !cardRef.current.contains(e.target)) {
+        setActive(0);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
   return (
     <section
-      className={`self-stretch [backdrop-filter:blur(80px)] rounded-[30px] [background:linear-gradient(180deg,_#f2f7ff,_#dceaff)] border-[rgba(1,49,134,0.2)] border-solid border-[1px] box-border flex flex-col items-start pt-[19px] pb-6 pl-12 pr-[39px] gap-[37px] max-w-full text-left text-[31px] text-[#000] font-[Montserrat] mq1350:pl-6 mq1350:box-border mq800:gap-[18px] ${className}`}
+      ref={cardRef}
+      className={`w-full rounded-[24px] font-[Montserrat] p-[36px_40px_0_40px] mq800:p-[24px_20px_0_20px] ${className}`}
+      style={{
+        background: "linear-gradient(180deg, #F2F7FF 0%, #EAF2FF 100%)",
+        border: "1px solid rgba(1, 49, 134, 0.12)",
+        overflow: "hidden",
+      }}
     >
-      <div className="w-[1313px] h-[246px] relative [backdrop-filter:blur(80px)] rounded-[30px] [background:linear-gradient(180deg,_#f2f7ff,_#dceaff)] border-[rgba(1,49,134,0.2)] border-solid border-[1px] box-border hidden max-w-full shrink-0" />
-      <div className="self-stretch flex flex-col items-start gap-2.5 max-w-full shrink-0">
-        <div className="self-stretch flex items-start justify-between gap-5 max-w-full mq1125:flex-wrap mq1125:gap-5">
-          <h2 className="m-0 relative text-[length:inherit] font-bold font-[inherit] inline-block max-w-full z-[1] mq800:text-[25px] mq450:text-[19px]">
-            Get Results in Just 2 weeks – Risk-Free!
-          </h2>
-          <div className="flex flex-col items-start pt-[7px] px-0 pb-0 text-xs text-[#797979]">
-            <div className="relative font-semibold inline-block min-w-[110px] z-[1]">
-              <span>the</span>
-              <span className="text-xl">Social99</span>
-            </div>
-          </div>
-        </div>
-        <div className="flex items-start py-0 px-px box-border max-w-full text-[15px] text-[rgba(0,0,0,0.6)]">
-          <div className="h-5 w-[554px] relative inline-block">
-            <span className="font-semibold">
-              Experience amazing results or your money back—
-            </span>
-            <b className="text-[#000]">no questions asked.*</b>
-          </div>
-        </div>
+      {/* Top row: heading + brand */}
+      <div className="flex items-start justify-between gap-4 mb-3">
+        <h2
+          className="m-0 text-[#111] font-bold leading-tight"
+          style={{ fontSize: "clamp(20px, 2.2vw, 30px)" }}
+        >
+          Get Results in Just 7 Days – Risk-Free!
+        </h2>
+        <span className="text-[13px] font-semibold text-[rgba(0,0,0,0.4)] whitespace-nowrap mt-1">
+          the<span className="text-[#013186] font-bold">Social99</span>
+        </span>
       </div>
-      <div className="self-stretch h-[94px] flex items-end justify-between gap-5 max-w-full shrink-0 text-[22px] mq1350:flex-wrap mq1350:gap-5">
-        <button className="cursor-pointer [border:none] pt-0 px-0 pb-[7px] bg-[transparent] h-[50px] w-[223px] flex flex-col items-start justify-end box-border">
-          <div className="self-stretch flex-1 rounded-[25.5px] bg-[rgba(188,214,255,0.37)] border-[rgba(1,49,134,0.07)] border-solid border-[1px] flex items-start justify-between py-0.5 pl-7 pr-[9px] gap-5 z-[1]">
-            <div className="h-[43px] w-[223px] relative rounded-[25.5px] bg-[rgba(188,214,255,0.37)] border-[rgba(1,49,134,0.07)] border-solid border-[1px] box-border hidden shrink-0" />
-            <div className="flex flex-col items-start pt-[9px] px-0 pb-0 shrink-0">
-              <b className="relative text-[15px] font-[Montserrat] text-[#000] text-left z-[1]">
-                Explore Now
-              </b>
-            </div>
-            <div className="h-[35px] w-[35px] relative rounded-[21px] bg-[rgba(158,202,255,0.39)] z-[1] shrink-0">
-              <div className="absolute top-[0px] left-[0px] rounded-[21px] bg-[rgba(158,202,255,0.39)] w-full h-full hidden" />
-              <img
-                className="absolute top-[9px] left-[9px] w-[18px] h-[18px] object-contain z-[2]"
-                alt=""
-                src="/image-1@2x.png"
-              />
-            </div>
-          </div>
-        </button>
-        <div className="self-stretch w-[855px] flex items-end gap-[0.1px] max-w-full z-[1] mq800:flex-wrap">
-          <div className="h-[64.6px] flex-1 shadow-[3px_3px_0.5px_-3.5px_#fff_inset,_2px_2px_0.5px_-2px_#262626_inset,_-2px_-2px_0.5px_-2px_#262626_inset,_0px_0px_0px_1px_#a6a6a6_inset,_0px_0px_2px_rgba(0,_0,_0,_0.1),_0px_1px_8px_rgba(0,_0,_0,_0.1)] [backdrop-filter:blur(12px)] rounded-t-[20px] rounded-b-none [background:#171717,_rgba(172,_172,_172,_0.2)] overflow-hidden flex flex-col items-start justify-center pt-3.5 pb-0 pl-[21px] pr-5 box-border gap-px mq450:flex-1">
-            <h3 className="m-0 relative text-[length:inherit] tracking-[-0.1px] leading-5 font-bold font-[inherit] mq450:text-lg mq450:leading-4">
-              01
-            </h3>
-            <div className="relative text-[10px] tracking-[-0.1px] leading-5 font-semibold text-[#5e6266]">
-              Engaging Post
-            </div>
-          </div>
-          <div className="self-stretch flex-1 shadow-[3px_3px_0.5px_-3.5px_#fff_inset,_2px_2px_0.5px_-2px_#262626_inset,_-2px_-2px_0.5px_-2px_#262626_inset,_0px_0px_0px_1px_#a6a6a6_inset,_0px_0px_8px_#f2f2f2_inset,_0px_0px_2px_rgba(0,_0,_0,_0.1),_0px_1px_8px_rgba(0,_0,_0,_0.1)] [backdrop-filter:blur(12px)] rounded-t-[20px] rounded-b-none [background:#1e3555,_#acacac] overflow-hidden flex flex-col items-start justify-center pt-3.5 pb-0 pl-[21px] pr-5 gap-2 z-[7] text-[35px] mq450:flex-1">
-            <h2 className="m-0 relative text-[length:inherit] tracking-[-0.1px] leading-5 font-bold font-[inherit] mq800:text-[28px] mq800:leading-4 mq450:text-[21px] mq450:leading-3">
-              02
-            </h2>
-            <div className="w-[49px] h-[13px] relative text-[10px] tracking-[-0.1px] leading-5 font-semibold text-[#5e6266] inline-block shrink-0">
-              Viral Reel
-            </div>
-          </div>
-          <div className="flex-[1.111] shadow-[3px_3px_0.5px_-3.5px_#fff_inset,_2px_2px_0.5px_-2px_#262626_inset,_-2px_-2px_0.5px_-2px_#262626_inset,_0px_0px_0px_1px_#a6a6a6_inset,_0px_0px_2px_rgba(0,_0,_0,_0.1),_0px_1px_8px_rgba(0,_0,_0,_0.1)] [backdrop-filter:blur(12px)] rounded-t-[20px] rounded-b-none [background:#171717,_rgba(172,_172,_172,_0.2)] overflow-hidden flex flex-col items-start pt-3.5 px-4 pb-[9.6px] gap-px mq450:flex-1">
-            <h3 className="m-0 relative text-[length:inherit] tracking-[-0.1px] leading-5 font-bold font-[inherit] mq450:text-lg mq450:leading-4">
-              03
-            </h3>
-            <div className="relative text-[10px] tracking-[-0.1px] leading-5 font-semibold text-[#5e6266]">
-              Compelling Post
-            </div>
-          </div>
-          <div className="flex-[1.2096] shadow-[3px_3px_0.5px_-3.5px_#fff_inset,_2px_2px_0.5px_-2px_#262626_inset,_-2px_-2px_0.5px_-2px_#262626_inset,_0px_0px_0px_1px_#a6a6a6_inset,_0px_0px_2px_rgba(0,_0,_0,_0.1),_0px_1px_8px_rgba(0,_0,_0,_0.1)] [backdrop-filter:blur(12px)] rounded-t-[20px] rounded-b-none [background:#171717,_rgba(172,_172,_172,_0.2)] overflow-hidden flex flex-col items-start pt-3.5 px-3 pb-[9.6px] gap-px">
-            <h3 className="m-0 relative text-[length:inherit] tracking-[-0.1px] leading-5 font-bold font-[inherit] mq450:text-lg mq450:leading-4">
-              04
-            </h3>
-            <div className="relative text-[10px] tracking-[-0.1px] leading-5 font-semibold text-[#5e6266]">
-              Creative Carousel
-            </div>
-          </div>
-          <div className="flex-[1.111] shadow-[3px_3px_0.5px_-3.5px_#fff_inset,_2px_2px_0.5px_-2px_#262626_inset,_-2px_-2px_0.5px_-2px_#262626_inset,_0px_0px_0px_1px_#a6a6a6_inset,_0px_0px_2px_rgba(0,_0,_0,_0.1),_0px_1px_8px_rgba(0,_0,_0,_0.1)] [backdrop-filter:blur(12px)] rounded-t-[20px] rounded-b-none [background:#171717,_rgba(172,_172,_172,_0.2)] overflow-hidden flex flex-col items-start pt-3.5 px-4 pb-[9.6px] gap-px mq450:flex-1">
-            <h3 className="m-0 relative text-[length:inherit] tracking-[-0.1px] leading-5 font-bold font-[inherit] mq450:text-lg mq450:leading-4">
-              05
-            </h3>
-            <div className="relative text-[10px] tracking-[-0.1px] leading-5 font-semibold text-[#5e6266]">
-              Captivating Reel
-            </div>
-          </div>
-          <div className="flex-[1.2096] shadow-[3px_3px_0.5px_-3.5px_#fff_inset,_2px_2px_0.5px_-2px_#262626_inset,_-2px_-2px_0.5px_-2px_#262626_inset,_0px_0px_0px_1px_#a6a6a6_inset,_0px_0px_2px_rgba(0,_0,_0,_0.1),_0px_1px_8px_rgba(0,_0,_0,_0.1)] [backdrop-filter:blur(12px)] rounded-t-[20px] rounded-b-none [background:#171717,_rgba(172,_172,_172,_0.2)] overflow-hidden flex flex-col items-start pt-3.5 px-3 pb-[9.6px] gap-px">
-            <h3 className="m-0 relative text-[length:inherit] tracking-[-0.1px] leading-5 font-bold font-[inherit] mq450:text-lg mq450:leading-4">
-              06
-            </h3>
-            <div className="relative text-[10px] tracking-[-0.1px] leading-5 font-semibold text-[#5e6266]">
-              Insightful Carousel
-            </div>
-          </div>
-          <div className="flex-[1.1603] shadow-[3px_3px_0.5px_-3.5px_#fff_inset,_2px_2px_0.5px_-2px_#262626_inset,_-2px_-2px_0.5px_-2px_#262626_inset,_0px_0px_0px_1px_#a6a6a6_inset,_0px_0px_2px_rgba(0,_0,_0,_0.1),_0px_1px_8px_rgba(0,_0,_0,_0.1)] [backdrop-filter:blur(12px)] rounded-t-[20px] rounded-b-none [background:#171717,_rgba(172,_172,_172,_0.2)] overflow-hidden flex flex-col items-start pt-3.5 px-3.5 pb-[9.6px] gap-px mq450:flex-1">
-            <h3 className="m-0 relative text-[length:inherit] tracking-[-0.1px] leading-5 font-bold font-[inherit] mq450:text-lg mq450:leading-4">
-              07
-            </h3>
-            <div className="relative text-[10px] tracking-[-0.1px] leading-5 font-semibold text-[#5e6266]">
-              Targeted Emails
-            </div>
-          </div>
+
+      {/* Subtitle */}
+      <p className="m-0 mb-6 text-[14px] text-[rgba(0,0,0,0.55)] font-medium">
+        Experience amazing results or get your money back,{" "}
+        <b className="text-[#111] font-bold">no questions asked!</b>
+      </p>
+
+      {/* Bottom row: Try Now + animated tabs */}
+      <div className="flex items-end gap-3 mq450:flex-col mq450:items-stretch">
+
+        {/* Try Now button */}
+        <div className="flex-shrink-0 pb-4 mq450:pb-0 mq450:mb-3">
+          <button className="flex items-center gap-2 bg-white border border-[rgba(1,49,134,0.15)] rounded-full px-5 py-3 cursor-pointer hover:shadow-md transition-all whitespace-nowrap">
+            <span className="text-[14px] font-bold text-[#000]">Try Now</span>
+            <span className="w-[26px] h-[26px] rounded-full bg-[#f0f4ff] border border-[rgba(1,49,134,0.1)] flex items-center justify-center">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#013186" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M7 17L17 7M17 7H7M17 7V17"/>
+              </svg>
+            </span>
+          </button>
+        </div>
+
+        {/* Animated number tabs — horizontal on desktop, vertical list on mobile */}
+        <div
+          className="flex flex-1 w-full"
+          style={{
+            flexDirection: isMobile ? "column" : "row",
+            alignItems: isMobile ? "stretch" : "flex-end",
+            gap: isMobile ? 8 : 4,
+          }}
+        >
+          {items.map((item, i) => {
+            const isActive = active === i;
+            return (
+              <div
+                key={item.num}
+                className="cursor-pointer"
+                style={{
+                  flex: isMobile ? "none" : 1,
+                  height: isMobile ? "auto" : isActive ? "120px" : "72px",
+                  transition: "all 0.3s cubic-bezier(0.4,0,0.2,1)",
+                  background: isActive ? "rgba(1, 49, 134, 0.08)" : "rgba(1, 49, 134, 0.04)",
+                  borderRadius: isMobile ? "12px" : "14px 14px 0 0",
+                  display: "flex",
+                  flexDirection: isMobile ? "row" : "column",
+                  alignItems: isMobile ? "center" : "flex-start",
+                  justifyContent: isMobile ? "flex-start" : "flex-end",
+                  gap: isMobile ? 12 : 0,
+                  padding: isMobile ? "12px 16px" : "0 16px 14px 16px",
+                }}
+                onMouseEnter={() => !isMobile && setActive(i)}
+                onClick={() => setActive(i)}
+              >
+                <span
+                  className="font-bold text-[#111] leading-none transition-all duration-300"
+                  style={{ fontSize: isMobile ? "22px" : isActive ? "32px" : "20px" }}
+                >
+                  {item.num}
+                </span>
+                <span
+                  className="text-[rgba(0,0,0,0.5)] font-medium whitespace-nowrap overflow-hidden transition-all duration-300"
+                  style={{
+                    fontSize: isMobile ? "13px" : "12px",
+                    marginTop: isMobile ? 0 : 4,
+                    opacity: isMobile ? 1 : isActive ? 1 : 0.7,
+                  }}
+                >
+                  {item.label}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

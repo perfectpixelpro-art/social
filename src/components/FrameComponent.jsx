@@ -1,118 +1,52 @@
+import { useState } from "react";
 import PropTypes from "prop-types";
 
+const FAQS = [
+  { q: "How do I get started with Social 99?", a: "Getting started is simple. Choose a social media management plan and complete the onboarding form where we collect key brand and business details. Once submitted, our team reviews everything and begins execution shortly after." },
+  { q: "Which platforms do you manage?", a: "Our affordable social media marketing services currently support major platforms including Instagram, Facebook, LinkedIn, YouTube, and others depending on your plan and audience." },
+  { q: "Is the content tailored to my business?", a: "Yes, every piece of content in our affordable social media marketing services is created specifically for your brand, industry, and goals. We don't reuse templates or generic assets. Your messaging, tone, and positioning are considered before anything is produced." },
+  { q: "Is there a setup or onboarding fee?", a: "No, there are no setup or onboarding fees. You pay a simple monthly subscription with no hidden costs." },
+  { q: "Can I review content before it goes live?", a: "All content within our social media marketing packages is shared with you for review prior to publishing. We ensure alignment through clear communication and collaborative feedback." },
+  { q: "What is your cancellation policy?", a: "The Social 99 is a month-to-month service. You can cancel anytime before the next billing cycle with no long-term commitment." },
+  { q: "Do you offer revisions?", a: "Yes, revisions are included in our social media management pricing plans to ensure the content accurately reflects your brand and expectations. We keep the process streamlined while maintaining quality and consistency." },
+  { q: "Can I upgrade, downgrade, or cancel my plan?", a: "Yes, The Social 99 offers flexible social media management pricing on a month-to-month basis." },
+];
+
 const FrameComponent = ({ className = "" }) => {
+  const [open, setOpen] = useState(null);
+
   return (
-    <section
-      className={`flex items-start py-0 px-[66px] box-border max-w-full text-left text-[20.5px] text-[#000] font-[Montserrat] mq1350:pl-[33px] mq1350:pr-[33px] mq1350:box-border ${className}`}
-    >
-      <div className="flex-1 flex flex-col items-end gap-[38px] max-w-full mq800:gap-[19px]">
-        <div className="self-stretch flex items-start justify-between gap-5 max-w-full mq1125:flex-wrap mq1125:gap-5">
-          <div className="w-[861px] flex flex-col items-start pt-1.5 px-0 pb-0 box-border max-w-full">
-            <div className="self-stretch flex items-start justify-between gap-5 max-w-full mq1125:flex-wrap mq1125:gap-5">
-              <div className="relative leading-[38px] font-semibold inline-block max-w-full mq450:text-base mq450:leading-[30px]">
-                Is the content unique to my business?
-              </div>
-              <button className="cursor-pointer [border:none] pt-0.5 pb-0 pl-0 pr-[9px] bg-[transparent] flex flex-col items-start">
-                <img
-                  className="w-10 relative max-h-full"
-                  loading="lazy"
-                  alt=""
-                  src="/ic-baseline-plus.svg"
-                />
+    <section className={`w-full flex justify-center px-2 font-[Montserrat] ${className}`}>
+      <div className="w-full max-w-[1500px] grid grid-cols-2 gap-x-16 gap-y-2 mq800:grid-cols-1 mq800:gap-x-0">
+        {FAQS.map((item, i) => {
+          const isOpen = open === i;
+          return (
+            <div key={item.q} className="border-b border-[rgba(0,0,0,0.08)]">
+              <button
+                onClick={() => setOpen(isOpen ? null : i)}
+                className="w-full flex items-center justify-between gap-4 py-6 text-left cursor-pointer bg-transparent border-none"
+              >
+                <span className="text-[20px] mq800:text-[17px] mq450:text-[15px] font-bold text-[#111]">
+                  {item.q}
+                </span>
+                <svg
+                  width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                  className="flex-shrink-0 transition-transform duration-300"
+                  style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
               </button>
-              <div className="relative leading-[38px] font-semibold mq450:text-base mq450:leading-[30px]">
-                Do you offer revisions?
-              </div>
-            </div>
-          </div>
-          <img
-            className="cursor-pointer [border:none] p-0 bg-[transparent] h-10 w-10 relative"
-            alt=""
-            src="/ic-baseline-plus.svg"
-          />
-        </div>
-        <div className="self-stretch flex flex-col items-start pt-0 px-0 pb-[7px] box-border gap-9 max-w-full mq800:gap-[18px]">
-          <div className="self-stretch flex items-start gap-[55px] max-w-full mq1350:flex-wrap mq800:gap-[27px]">
-            <div className="flex flex-col items-start pt-1.5 px-0 pb-0 box-border max-w-full">
-              <div className="relative leading-[38px] font-semibold mq450:text-base mq450:leading-[30px]">
-                Can I approve content before it's posted?
-              </div>
-            </div>
-            <div className="w-[570px] flex flex-col items-start pt-1.5 px-0 pb-0 box-border max-w-full">
-              <div className="w-[489px] flex items-start justify-between gap-5 max-w-full mq800:flex-wrap mq800:gap-5">
-                <button className="cursor-pointer [border:none] pt-1 px-0 pb-0 bg-[transparent] flex flex-col items-start">
-                  <img
-                    className="w-10 relative max-h-full"
-                    alt=""
-                    src="/ic-baseline-plus.svg"
-                  />
-                </button>
-                <div className="relative leading-[38px] font-semibold inline-block max-w-full mq450:text-base mq450:leading-[30px]">
-                  Which platforms do you support?
+              <div className="grid transition-all duration-300 ease-in-out" style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}>
+                <div className="overflow-hidden">
+                  <p className="pb-6 m-0 text-[15px] text-[rgba(0,0,0,0.6)] font-medium leading-relaxed">
+                    {item.a}
+                  </p>
                 </div>
               </div>
             </div>
-            <img
-              className="cursor-pointer [border:none] p-0 bg-[transparent] h-10 w-10 relative"
-              alt=""
-              src="/ic-baseline-plus.svg"
-            />
-          </div>
-          <div className="self-stretch flex items-start justify-between gap-5 max-w-full mq1125:flex-wrap mq1125:gap-5">
-            <div className="flex flex-col items-start pt-1.5 px-0 pb-0">
-              <div className="relative leading-[38px] font-semibold mq450:text-base mq450:leading-[30px]">
-                What if I want to cancel?
-              </div>
-            </div>
-            <div className="w-[665px] flex items-start gap-[170px] max-w-full mq800:gap-[85px] mq800:flex-wrap mq450:gap-[42px]">
-              <div className="flex-1 flex flex-col items-start pt-[3px] px-0 pb-0 box-border min-w-[296px] max-w-full">
-                <div className="self-stretch flex items-start justify-between gap-5 max-w-full mq800:flex-wrap mq800:gap-5">
-                  <img
-                    className="w-10 relative max-h-full"
-                    alt=""
-                    src="/ic-baseline-plus.svg"
-                  />
-                  <div className="flex flex-col items-start pt-[3px] px-0 pb-0 box-border max-w-full">
-                    <div className="relative leading-[38px] font-semibold mq450:text-base mq450:leading-[30px]">
-                      Do I own the content created?
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <img
-                className="cursor-pointer [border:none] p-0 bg-[transparent] h-10 w-10 relative"
-                alt=""
-                src="/ic-baseline-plus.svg"
-              />
-            </div>
-          </div>
-        </div>
-        <div className="self-stretch flex items-start justify-between gap-5 max-w-full mq1125:flex-wrap mq1125:gap-5">
-          <div className="flex flex-col items-start pt-1.5 px-0 pb-0">
-            <div className="relative leading-[38px] font-semibold mq450:text-base mq450:leading-[30px]">
-              How soon will I see results?
-            </div>
-          </div>
-          <div className="w-[426px] flex flex-col items-start pt-1.5 px-0 pb-0 box-border max-w-full">
-            <div className="w-[353px] flex items-start justify-between gap-5 max-w-full mq450:flex-wrap mq450:gap-5">
-              <div className="flex flex-col items-start pt-1.5 px-0 pb-0">
-                <img
-                  className="w-10 relative max-h-full"
-                  alt=""
-                  src="/ic-baseline-plus.svg"
-                />
-              </div>
-              <div className="relative leading-[38px] font-semibold mq450:text-base mq450:leading-[30px]">
-                Is there a setup fee?
-              </div>
-            </div>
-          </div>
-          <img
-            className="cursor-pointer [border:none] p-0 bg-[transparent] h-10 w-10 relative"
-            alt=""
-            src="/ic-baseline-plus.svg"
-          />
-        </div>
+          );
+        })}
       </div>
     </section>
   );
