@@ -19,6 +19,14 @@ import RefundPolicy from "./pages/RefundPolicy";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Careers from "./pages/Careers";
 import Bookacall from "./pages/Bookacall";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import DashboardLayout from "./components/DashboardLayout";
+import DashboardHome from "./pages/dashboard/Home";
+import DashboardChat from "./pages/dashboard/Chat";
+import DashboardProfile from "./pages/dashboard/Profile";
+import DashboardTickets from "./pages/dashboard/Tickets";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -42,6 +50,26 @@ ReactDOM.createRoot(document.getElementById("root")).render(
               <Route path="/careers" element={<Careers />} />
                <Route path="/book-a-call" element={<Bookacall />} />
 
+        </Route>
+
+        {/* Auth pages — full-screen, no navbar/footer */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+
+        {/* Protected dashboard — redirects to /login if not authenticated */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<DashboardHome />} />
+          <Route path="chat" element={<DashboardChat />} />
+          <Route path="profile" element={<DashboardProfile />} />
+          <Route path="tickets" element={<DashboardTickets />} />
+          <Route path="*" element={<div className="p-8 text-[#7a8499] font-semibold">Coming soon…</div>} />
         </Route>
       </Routes>
     </BrowserRouter>

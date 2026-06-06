@@ -77,7 +77,7 @@ const FrameComponent1 = ({ className = "" }) => {
       <img
         className="cursor-pointer [border:none] p-0 bg-[transparent] h-[39px] w-[33.1px] absolute !!m-[0 important] bottom-[33px] left-[0px] object-cover shrink-0"
         alt=""
-        src="/Logo2@2x.png"
+        src="/Logo@2x.png"
       />
     </footer>
   );

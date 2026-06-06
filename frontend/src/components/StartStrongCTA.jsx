@@ -1,7 +1,7 @@
 const StartStrongCTA = () => {
   return (
     <section className="w-full px-[100px] mq800:px-10 mq450:px-5 py-16 flex flex-col items-center text-center font-[Montserrat]">
-      <img src="/Logo2@2x.png" alt="The Social 99" className="h-[56px] w-auto object-contain mq450:h-[44px]" onError={(e) => { e.target.src = "/Logo@2x.png"; }} />
+      <img src="/Logo@2x.png" alt="The Social 99" className="h-[56px] w-auto object-contain mq450:h-[44px]" onError={(e) => { e.target.src = "/Logo@2x.png"; }} />
       <h2 className="mt-5 text-black font-bold" style={{ fontSize: "clamp(22px, 3vw, 36px)" }}>
         Start Strong. Just $99.
       </h2>

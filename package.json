@@ -1,0 +1,12 @@
+{
+  "name": "social99-mern",
+  "version": "1.0.0",
+  "description": "The Social 99 — MERN stack (frontend + backend)",
+  "private": true,
+  "scripts": {
+    "frontend": "npm --prefix frontend run dev",
+    "backend": "npm --prefix backend run dev",
+    "seed": "npm --prefix backend run seed",
+    "install:all": "npm --prefix frontend install && npm --prefix backend install"
+  }
+}
