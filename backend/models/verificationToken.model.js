@@ -4,7 +4,7 @@ const verificationTokenSchema = new mongoose.Schema(
   {
     token: { type: String, required: true, unique: true },
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    purpose: { type: String, enum: ["signup", "login"], default: "signup" },
+    purpose: { type: String, enum: ["signup", "login", "reset"], default: "signup" },
     expiresAt: { type: Date, required: true },
   },
   { timestamps: true }

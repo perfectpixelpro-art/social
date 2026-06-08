@@ -77,7 +77,10 @@ export default function Login() {
           <input type="email" required value={form.email} onChange={upd("email")} placeholder="you@example.com" className={inputCls} />
         </div>
         <div>
-          <label className={labelCls}>Password</label>
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-[14px] font-bold text-[#111]">Password</label>
+            <Link to="/forgot-password" className="text-[13px] font-semibold text-[#013186] no-underline hover:underline">Forgot password?</Link>
+          </div>
           <input type="password" required value={form.password} onChange={upd("password")} placeholder="Enter your password" className={inputCls} />
         </div>
 

@@ -21,12 +21,19 @@ import Careers from "./pages/Careers";
 import Bookacall from "./pages/Bookacall";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import DashboardLayout from "./components/DashboardLayout";
 import DashboardHome from "./pages/dashboard/Home";
 import DashboardChat from "./pages/dashboard/Chat";
 import DashboardProfile from "./pages/dashboard/Profile";
 import DashboardTickets from "./pages/dashboard/Tickets";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
+import AdminLayout from "./components/AdminLayout";
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminHome from "./pages/admin/Home";
+import AdminChat from "./pages/admin/Chat";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -55,6 +62,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         {/* Auth pages — full-screen, no navbar/footer */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* Protected dashboard — redirects to /login if not authenticated */}
         <Route
@@ -69,6 +78,21 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route path="chat" element={<DashboardChat />} />
           <Route path="profile" element={<DashboardProfile />} />
           <Route path="tickets" element={<DashboardTickets />} />
+          <Route path="*" element={<div className="p-8 text-[#7a8499] font-semibold">Coming soon…</div>} />
+        </Route>
+
+        {/* ── Admin (separate auth, no signup) ── */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route
+          path="/admin"
+          element={
+            <AdminProtectedRoute>
+              <AdminLayout />
+            </AdminProtectedRoute>
+          }
+        >
+          <Route index element={<AdminHome />} />
+          <Route path="chat" element={<AdminChat />} />
           <Route path="*" element={<div className="p-8 text-[#7a8499] font-semibold">Coming soon…</div>} />
         </Route>
       </Routes>

@@ -9,6 +9,7 @@ import contactRoutes from "./routes/contactRoutes.js";
 import subscriberRoutes from "./routes/subscriberRoutes.js";
 import blogRoutes from "./routes/blogRoutes.js";
 import authRoutes from "./routes/auth.routes.js";
+import messageRoutes from "./routes/message.routes.js";
 
 dotenv.config();
 connectDB();
@@ -31,6 +32,7 @@ app.get("/", (req, res) => res.json({ message: "The Social 99 API is running ğŸš
 
 // API routes
 app.use("/api/auth", authRoutes);
+app.use("/api/messages", messageRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/subscribe", subscriberRoutes);
 app.use("/api/blogs", blogRoutes);

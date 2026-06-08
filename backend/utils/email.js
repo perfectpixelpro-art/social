@@ -51,3 +51,15 @@ export async function sendLoginVerificationEmail(to, name, link) {
   );
   return getResend().emails.send({ from: FROM(), to, subject: "New sign-in to your account · The Social 99", html });
 }
+
+// Sent when a user requests a password reset
+export async function sendPasswordResetEmail(to, name, link) {
+  const html = wrap(
+    "Reset your password",
+    `<p>Hi ${name || "there"},</p>
+     <p>We received a request to reset your password. Click the button below to choose a new one.</p>
+     ${button(link, "Reset Password →")}
+     <p style="font-size:13px;color:#7c7f81;">This link expires in 1 hour. If you didn't request this, you can safely ignore this email — your password won't change.</p>`
+  );
+  return getResend().emails.send({ from: FROM(), to, subject: "Reset your password · The Social 99", html });
+}
