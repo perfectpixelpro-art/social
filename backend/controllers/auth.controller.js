@@ -74,6 +74,15 @@ export const signup = async (req, res) => {
     const hashed = await bcrypt.hash(password, 12);
     const user = await User.create({ name, email, mobile, password: hashed, role: "client" });
 
+    // Auto-create the client's Google Drive folder structure (don't block signup if it fails)
+    try {
+      const { createClientFolders } = await import("../utils/googleDrive.js");
+      user.driveFolders = await createClientFolders(user._id.toString(), name);
+      await user.save();
+    } catch (e) {
+      console.error("Drive folder creation failed:", e.message);
+    }
+
     // Send the verification email (don't fail signup if email send hiccups)
     try {
       const link = await createVerificationLink(user._id, "signup");
@@ -166,8 +175,8 @@ export const adminLogin = async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email: email.toLowerCase() });
-    // Must exist AND be an admin — otherwise generic error (never reveal which)
-    if (!user || user.role !== "admin") {
+    // Must exist AND be staff (admin or manager) — otherwise generic error
+    if (!user || (user.role !== "admin" && user.role !== "manager")) {
       return res.status(401).json({ success: false, error: GENERIC_CREDENTIALS_ERROR });
     }
 
@@ -179,7 +188,7 @@ export const adminLogin = async (req, res) => {
     user.lastLoginAt = new Date();
     await user.save();
 
-    const accessToken = signAccessToken(user._id.toString(), "admin");
+    const accessToken = signAccessToken(user._id.toString(), user.role);
     const refreshToken = signRefreshToken(user._id.toString());
     await persistRefreshToken(refreshToken, user._id);
 
@@ -216,10 +225,10 @@ export const adminRefresh = async (req, res) => {
     await RefreshToken.deleteOne({ token });
     const userId = decoded.sub;
     const dbUser = await User.findById(userId).select("role");
-    if (!dbUser || dbUser.role !== "admin") {
+    if (!dbUser || (dbUser.role !== "admin" && dbUser.role !== "manager")) {
       return res.status(401).json({ success: false, error: "Invalid session" });
     }
-    const newAccessToken = signAccessToken(userId, "admin");
+    const newAccessToken = signAccessToken(userId, dbUser.role);
     const newRefreshToken = signRefreshToken(userId);
     await persistRefreshToken(newRefreshToken, userId);
 
@@ -372,18 +381,18 @@ export const verifyEmail = async (req, res) => {
   const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
   try {
     const { token } = req.query;
-    if (!token) return res.redirect(`${clientUrl}/login?verified=0`);
+    if (!token) return res.redirect(`${clientUrl}/verified?ok=0`);
 
     const record = await VerificationToken.findOne({ token });
-    if (!record) return res.redirect(`${clientUrl}/login?verified=0`);
+    if (!record) return res.redirect(`${clientUrl}/verified?ok=0`);
 
     // Mark the user verified and consume the token
     await User.findByIdAndUpdate(record.user, { isVerified: true });
     await VerificationToken.deleteOne({ _id: record._id });
 
-    return res.redirect(`${clientUrl}/login?verified=1`);
+    return res.redirect(`${clientUrl}/verified?ok=1`);
   } catch {
-    return res.redirect(`${clientUrl}/login?verified=0`);
+    return res.redirect(`${clientUrl}/verified?ok=0`);
   }
 };
 

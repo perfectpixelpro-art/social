@@ -6,7 +6,7 @@ const StartStrongCTA = () => {
         Start Strong. Just $99.
       </h2>
       <a
-        href="/contact"
+        href="/signup?plan=Starter"
         className="mt-6 flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[48px] rounded-[25.5px] pl-6 pr-[6px]"
       >
         <b className="text-base text-[#000]">Join 760+ Others</b>

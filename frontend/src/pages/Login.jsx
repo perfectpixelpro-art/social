@@ -11,6 +11,7 @@ export default function Login() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const verified = searchParams.get("verified"); // "1" success, "0" failed
+  const purchased = searchParams.get("purchased"); // "1" after checkout
   const [form, setForm] = useState({ email: "", password: "" });
   const [status, setStatus] = useState({ loading: false, ok: null, msg: "" });
   const [needsVerify, setNeedsVerify] = useState(false); // show resend button
@@ -60,6 +61,11 @@ export default function Login() {
         Sign in to your account to continue.
       </p>
 
+      {purchased === "1" && (
+        <div className="mb-6 rounded-[12px] bg-[#e8fbe8] border border-[#b7e8b7] px-4 py-3 text-[14px] font-semibold text-[#1a8f00]">
+          🎉 Purchase complete! Log in to access your dashboard.
+        </div>
+      )}
       {verified === "1" && (
         <div className="mb-6 rounded-[12px] bg-[#e8fbe8] border border-[#b7e8b7] px-4 py-3 text-[14px] font-semibold text-[#1a8f00]">
           ✓ Email verified! You can now sign in.

@@ -24,3 +24,13 @@ export const requireAdmin = (req, res, next) => {
     next();
   });
 };
+
+// Must be authenticated AND staff (admin or manager).
+export const requireStaff = (req, res, next) => {
+  requireAuth(req, res, () => {
+    if (req.user.role !== "admin" && req.user.role !== "manager") {
+      return res.status(403).json({ success: false, error: "Staff access required" });
+    }
+    next();
+  });
+};

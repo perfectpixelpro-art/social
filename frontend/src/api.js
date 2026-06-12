@@ -131,10 +131,15 @@ export const authedRequest = (path, options = {}) => request(path, options, { au
 // so both sessions can run in the same browser without clashing.
 async function roleFetch(path, role, options = {}, _retried = false) {
   const token = role === "admin" ? getAdminToken() : getAccessToken();
+  const isForm = options.body instanceof FormData;
   const res = await fetch(`${API_URL}${path}`, {
     credentials: "include",
     ...options,
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`, ...(options.headers || {}) },
+    headers: {
+      ...(isForm ? {} : { "Content-Type": "application/json" }), // let browser set multipart boundary
+      Authorization: `Bearer ${token}`,
+      ...(options.headers || {}),
+    },
   });
 
   if (res.status === 401 && !_retried) {
@@ -154,16 +159,80 @@ async function roleFetch(path, role, options = {}, _retried = false) {
   return data;
 }
 
+// ── Profile (client) ──
+export const getProfile = () => roleFetch("/users/me", "client");
+export const updateProfile = (payload) =>
+  roleFetch("/users/me", "client", { method: "PUT", body: JSON.stringify(payload) });
+
+// avatar upload — multipart, so we bypass the JSON content-type
+export const uploadAvatar = async (file) => {
+  const fd = new FormData();
+  fd.append("avatar", file);
+  const res = await fetch(`${API_URL}/users/me/avatar`, {
+    method: "POST",
+    credentials: "include",
+    headers: { Authorization: `Bearer ${getAccessToken()}` }, // no Content-Type → browser sets multipart boundary
+    body: fd,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || "Upload failed");
+  return data;
+};
+
+// helper: build the request body (FormData if a file is attached, else JSON)
+const chatBody = (text, file) => {
+  if (file) {
+    const fd = new FormData();
+    if (text) fd.append("text", text);
+    fd.append("file", file);
+    return fd;
+  }
+  return JSON.stringify({ text });
+};
+
+// ── Admin: managers & client assignment ──
+export const adminCreateManager = (payload) =>
+  roleFetch("/admin/managers", "admin", { method: "POST", body: JSON.stringify(payload) });
+export const adminListManagers = () => roleFetch("/admin/managers", "admin");
+export const adminListClients = () => roleFetch("/admin/clients", "admin");
+export const adminAssignClient = (clientId, managerId) =>
+  roleFetch(`/admin/clients/${clientId}/assign`, "admin", { method: "PUT", body: JSON.stringify({ managerId }) });
+export const adminResetManagerPassword = (id, password) =>
+  roleFetch(`/admin/managers/${id}/password`, "admin", { method: "PUT", body: JSON.stringify({ password }) });
+export const adminDeleteManager = (id) =>
+  roleFetch(`/admin/managers/${id}`, "admin", { method: "DELETE" });
+
+// ── Files (Google Drive) ──
+export const uploadClientFile = (file, folderType) => {
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("folderType", folderType);
+  return roleFetch("/files", "client", { method: "POST", body: fd });
+};
+export const getMyFiles = () => roleFetch("/files/me", "client");
+export const adminGetAllFiles = () => roleFetch("/files/all", "admin");
+export const adminUploadForClient = (clientId, file, folderType) => {
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("folderType", folderType);
+  return roleFetch(`/files/admin/${clientId}`, "admin", { method: "POST", body: fd });
+};
+
 // ── Chat: client side ──
 export const clientGetMessages = () => roleFetch("/messages/me", "client");
-export const clientSendMessage = (text) =>
-  roleFetch("/messages/me", "client", { method: "POST", body: JSON.stringify({ text }) });
+export const clientSendMessage = (text, file) =>
+  roleFetch("/messages/me", "client", { method: "POST", body: chatBody(text, file) });
+
+export const clientScheduleMeeting = (payload) =>
+  roleFetch("/messages/me/meeting", "client", { method: "POST", body: JSON.stringify(payload) });
 
 // ── Chat: admin side ──
 export const adminGetConversations = () => roleFetch("/messages/conversations", "admin");
 export const adminGetMessages = (clientId) => roleFetch(`/messages/${clientId}`, "admin");
-export const adminSendMessage = (clientId, text) =>
-  roleFetch(`/messages/${clientId}`, "admin", { method: "POST", body: JSON.stringify({ text }) });
+export const adminSendMessage = (clientId, text, file) =>
+  roleFetch(`/messages/${clientId}`, "admin", { method: "POST", body: chatBody(text, file) });
+export const adminScheduleMeeting = (clientId, payload) =>
+  roleFetch(`/messages/${clientId}/meeting`, "admin", { method: "POST", body: JSON.stringify(payload) });
 
 export default {
   submitContact, subscribeNewsletter, fetchBlogs, fetchBlogBySlug,
@@ -172,4 +241,9 @@ export default {
   adminLogin, adminLogout, getAdminToken, clearAdminAuth,
   clientGetMessages, clientSendMessage,
   adminGetConversations, adminGetMessages, adminSendMessage,
+  getProfile, updateProfile, uploadAvatar,
+  clientScheduleMeeting, adminScheduleMeeting,
+  uploadClientFile, getMyFiles, adminGetAllFiles, adminUploadForClient,
+  adminCreateManager, adminListManagers, adminListClients, adminAssignClient,
+  adminResetManagerPassword, adminDeleteManager,
 };

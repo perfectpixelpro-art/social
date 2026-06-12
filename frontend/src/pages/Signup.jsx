@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import AuthShell from "../components/AuthShell";
 import { signupUser } from "../api";
 
@@ -9,6 +9,17 @@ const labelCls = "text-[14px] font-bold text-[#111] mb-2 block";
 
 export default function Signup() {
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+
+  // If the user came from a "Buy Now" button, remember the plan so we can
+  // send them to checkout right after they verify their email.
+  useEffect(() => {
+    const plan = params.get("plan");
+    if (plan) {
+      localStorage.setItem("pendingCheckout", JSON.stringify({ tab: params.get("tab") || "Marketing", plan }));
+    }
+  }, [params]);
+
   const [form, setForm] = useState({ name: "", email: "", mobile: "", password: "", agree: false });
   const [status, setStatus] = useState({ loading: false, ok: null, msg: "" });
   const upd = (k) => (e) => setForm((f) => ({ ...f, [k]: k === "agree" ? e.target.checked : e.target.value }));

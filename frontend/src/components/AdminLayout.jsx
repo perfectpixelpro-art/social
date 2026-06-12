@@ -3,10 +3,11 @@ import { useNavigate, NavLink, Outlet, useLocation } from "react-router-dom";
 import { adminLogout } from "../api";
 import { Icon, icons } from "./DashboardLayout";
 
-const nav = [
+const baseNav = [
   { key: "home", label: "Home", to: "/admin", end: true },
   { key: "calendar", label: "Scheduling", to: "/admin/scheduling" },
-  { key: "profile", label: "Profile", to: "/admin/profile" },
+  { key: "team", label: "Team & Clients", to: "/admin/team", adminOnly: true },
+  { key: "files", label: "Files", to: "/admin/files" },
   { key: "chat", label: "Chat", to: "/admin/chat" },
   { key: "ticket", label: "Ticket Support", to: "/admin/tickets" },
   { key: "support", label: "Support", to: "/admin/support" },
@@ -16,6 +17,8 @@ const nav = [
 const titleByPath = {
   "/admin": "Admin Panel",
   "/admin/scheduling": "Scheduling",
+  "/admin/team": "Team & Clients",
+  "/admin/files": "Files",
   "/admin/profile": "Profile",
   "/admin/chat": "Chat",
   "/admin/tickets": "Ticket Support",
@@ -46,7 +49,9 @@ export default function AdminLayout() {
   const admin = (() => {
     try { return JSON.parse(localStorage.getItem("adminUser")) || {}; } catch { return {}; }
   })();
-  const name = admin.name || "Admin";
+  const role = admin.role || "admin";
+  const nav = baseNav.filter((item) => !item.adminOnly || role === "admin");
+  const name = admin.name || (role === "manager" ? "Manager" : "Admin");
   const initials = name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
   const crumb = titleByPath[location.pathname] || "Admin Panel";
 
@@ -89,7 +94,7 @@ export default function AdminLayout() {
           <span className="w-9 h-9 rounded-full bg-[#013186] text-white flex items-center justify-center text-[13px] font-bold">{initials}</span>
           <div className="leading-tight">
             <p className="m-0 text-[13px] font-bold text-[#0b1f44]">{name}</p>
-            <p className="m-0 text-[11px] text-[#9aa3b2]">Administrator</p>
+            <p className="m-0 text-[11px] text-[#9aa3b2]">{role === "manager" ? "Manager" : "Administrator"}</p>
           </div>
         </div>
       </aside>
@@ -117,7 +122,7 @@ export default function AdminLayout() {
                 <span className="w-9 h-9 rounded-full bg-[#013186] text-white flex items-center justify-center text-[13px] font-bold">{initials}</span>
                 <div className="leading-tight text-left mq450:hidden">
                   <p className="m-0 text-[13px] font-bold text-[#0b1f44]">{name}</p>
-                  <p className="m-0 text-[11px] text-[#9aa3b2]">Administrator</p>
+                  <p className="m-0 text-[11px] text-[#9aa3b2]">{role === "manager" ? "Manager" : "Administrator"}</p>
                 </div>
                 <span className={`text-[#9aa3b2] text-xs transition-transform ${menuOpen ? "rotate-180" : ""}`}>▾</span>
               </button>

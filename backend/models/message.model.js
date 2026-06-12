@@ -6,7 +6,20 @@ const messageSchema = new mongoose.Schema(
   {
     client: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, index: true },
     sender: { type: String, enum: ["client", "admin"], required: true },
-    text: { type: String, required: true, trim: true },
+    senderName: { type: String, default: "" }, // staff member's name (or client name)
+    text: { type: String, default: "", trim: true },
+    // optional file attachment
+    fileUrl: { type: String, default: "" },
+    fileName: { type: String, default: "" },
+    fileType: { type: String, default: "" }, // "image" | "video" | "file"
+    // optional Zoom meeting
+    meeting: {
+      topic: String,
+      startTime: Date,
+      duration: Number,
+      joinUrl: String,
+      meetingId: String,
+    },
     readByAdmin: { type: Boolean, default: false },
     readByClient: { type: Boolean, default: false },
   },

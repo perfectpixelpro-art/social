@@ -19,12 +19,15 @@ export const icons = {
   bell: <><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></>,
   menu: <><path d="M3 6h18M3 12h18M3 18h18" /></>,
   logout: <><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" /></>,
+  files: <><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></>,
+  team: <><circle cx="9" cy="8" r="3.5" /><path d="M2 21c0-3.5 3-5.5 7-5.5" /><circle cx="17" cy="9" r="2.5" /><path d="M22 21c0-3-2-4.5-5-4.5" /></>,
 };
 
 const nav = [
   { key: "home", label: "Home", to: "/dashboard", end: true },
   { key: "calendar", label: "Scheduling", to: "/dashboard/scheduling" },
   { key: "profile", label: "Profile", to: "/dashboard/profile" },
+  { key: "files", label: "Files", to: "/dashboard/files" },
   { key: "chat", label: "Chat", to: "/dashboard/chat" },
   { key: "ticket", label: "Ticket Support", to: "/dashboard/tickets" },
   { key: "support", label: "Support", to: "/dashboard/support" },
@@ -36,6 +39,7 @@ const titleByPath = {
   "/dashboard/chat": "Chat",
   "/dashboard/scheduling": "Scheduling",
   "/dashboard/profile": "Profile",
+  "/dashboard/files": "Files",
   "/dashboard/tickets": "Ticket Support",
   "/dashboard/support": "Support",
   "/dashboard/help": "Help",
@@ -69,9 +73,15 @@ export default function DashboardLayout() {
   // close mobile sidebar on route change
   useEffect(() => { setSidebarOpen(false); }, [location.pathname]);
 
-  const user = (() => {
-    try { return JSON.parse(localStorage.getItem("user")) || {}; } catch { return {}; }
-  })();
+  // user kept in state so profile edits reflect live in sidebar + topbar
+  const readUser = () => { try { return JSON.parse(localStorage.getItem("user")) || {}; } catch { return {}; } };
+  const [user, setUser] = useState(readUser);
+  useEffect(() => {
+    const refresh = () => setUser(readUser());
+    window.addEventListener("profile-updated", refresh);
+    return () => window.removeEventListener("profile-updated", refresh);
+  }, []);
+
   const name = user.name || "James Brown";
   const initials = name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
   const crumb = titleByPath[location.pathname] || "Dashboard";
@@ -124,7 +134,11 @@ export default function DashboardLayout() {
         </nav>
 
         <div className="px-4 py-4 border-t border-[#eef1f6] flex items-center gap-3">
-          <span className="w-9 h-9 rounded-full bg-[#013186] text-white flex items-center justify-center text-[13px] font-bold">{initials}</span>
+          {user.avatar ? (
+            <img src={user.avatar} alt="" className="w-9 h-9 rounded-full object-cover" />
+          ) : (
+            <span className="w-9 h-9 rounded-full bg-[#013186] text-white flex items-center justify-center text-[13px] font-bold">{initials}</span>
+          )}
           <div className="leading-tight">
             <p className="m-0 text-[13px] font-bold text-[#0b1f44]">{name}</p>
             <p className="m-0 text-[11px] text-[#9aa3b2]">Standard</p>
@@ -157,7 +171,11 @@ export default function DashboardLayout() {
             </button>
             <div className="relative" ref={menuRef}>
               <button onClick={() => setMenuOpen((o) => !o)} className="flex items-center gap-2 cursor-pointer">
-                <span className="w-9 h-9 rounded-full bg-[#013186] text-white flex items-center justify-center text-[13px] font-bold">{initials}</span>
+                {user.avatar ? (
+            <img src={user.avatar} alt="" className="w-9 h-9 rounded-full object-cover" />
+          ) : (
+            <span className="w-9 h-9 rounded-full bg-[#013186] text-white flex items-center justify-center text-[13px] font-bold">{initials}</span>
+          )}
                 <div className="leading-tight text-left mq450:hidden">
                   <p className="m-0 text-[13px] font-bold text-[#0b1f44]">{name}</p>
                   <p className="m-0 text-[11px] text-[#9aa3b2]">Standard</p>

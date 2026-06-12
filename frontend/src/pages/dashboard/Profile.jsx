@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useOutletContext } from "react-router-dom";
+import { getProfile, updateProfile, uploadAvatar } from "../../api";
 
 const labelCls = "text-[13px] font-bold text-[#0b1f44] mb-2 block";
 const inputCls =
@@ -20,7 +21,74 @@ export default function Profile() {
     company: "",
     website: "",
   });
+  const [status, setStatus] = useState({ loading: false, ok: null, msg: "" });
+  const [avatar, setAvatar] = useState(user.avatar || "");
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef(null);
   const upd = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  // Load the latest profile from the database
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await getProfile();
+        const d = res.data || {};
+        setForm({
+          fullName: d.name || "",
+          email: d.email || "",
+          phone: d.mobile || "",
+          company: d.company || "",
+          website: d.website || "",
+        });
+        setAvatar(d.avatar || "");
+      } catch { /* ignore */ }
+    })();
+  }, []);
+
+  const cacheUser = (patch) => {
+    const cached = JSON.parse(localStorage.getItem("user") || "{}");
+    localStorage.setItem("user", JSON.stringify({ ...cached, ...patch }));
+    window.dispatchEvent(new Event("profile-updated"));
+  };
+
+  const handlePhoto = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const res = await uploadAvatar(file);
+      const url = res.data?.avatar || "";
+      setAvatar(url);
+      cacheUser({ avatar: url });
+      setStatus({ loading: false, ok: true, msg: "Photo updated!" });
+    } catch (err) {
+      setStatus({ loading: false, ok: false, msg: err.message || "Upload failed." });
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    setStatus({ loading: true, ok: null, msg: "" });
+    try {
+      const res = await updateProfile({
+        name: form.fullName,
+        mobile: form.phone,
+        company: form.company,
+        website: form.website,
+      });
+      const d = res.data || {};
+      // update the cached user so the sidebar/topbar reflect the new name instantly
+      const cached = JSON.parse(localStorage.getItem("user") || "{}");
+      localStorage.setItem("user", JSON.stringify({ ...cached, name: d.name, email: d.email, mobile: d.mobile }));
+      window.dispatchEvent(new Event("profile-updated"));
+      setStatus({ loading: false, ok: true, msg: "Profile saved successfully!" });
+    } catch (err) {
+      setStatus({ loading: false, ok: false, msg: err.message || "Could not save." });
+    }
+  };
 
   return (
     <main className="h-full overflow-y-auto p-6 mq450:p-4">
@@ -40,18 +108,25 @@ export default function Profile() {
           </div>
 
           <div className="flex items-center justify-between mb-6">
-            <span className="w-[72px] h-[72px] rounded-full bg-[#013186] text-white flex items-center justify-center text-[26px] font-bold">{initials}</span>
-            <button className="text-[13px] font-bold text-[#0b1f44] border border-[#e3e9f5] rounded-[10px] px-4 py-2.5 hover:bg-[#f5f7fb] transition-colors cursor-pointer">Change Photo</button>
+            {avatar ? (
+              <img src={avatar} alt="avatar" className="w-[72px] h-[72px] rounded-full object-cover border border-[#e3e9f5]" />
+            ) : (
+              <span className="w-[72px] h-[72px] rounded-full bg-[#013186] text-white flex items-center justify-center text-[26px] font-bold">{initials}</span>
+            )}
+            <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handlePhoto} />
+            <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading} className="text-[13px] font-bold text-[#0b1f44] border border-[#e3e9f5] rounded-[10px] px-4 py-2.5 hover:bg-[#f5f7fb] transition-colors cursor-pointer disabled:opacity-60">
+              {uploading ? "Uploading..." : "Change Photo"}
+            </button>
           </div>
 
-          <div className="flex flex-col gap-4">
+          <form onSubmit={handleSave} className="flex flex-col gap-4">
             <div>
               <label className={labelCls}>Full Name</label>
               <input value={form.fullName} onChange={upd("fullName")} className={inputCls} placeholder="Your name" />
             </div>
             <div>
               <label className={labelCls}>Email Address</label>
-              <input value={form.email} onChange={upd("email")} className={inputCls} placeholder="you@example.com" />
+              <input value={form.email} disabled className={`${inputCls} bg-[#eef1f6] text-[#9aa3b2] cursor-not-allowed`} placeholder="you@example.com" />
             </div>
             <div className="grid grid-cols-2 mq450:grid-cols-1 gap-4">
               <div>
@@ -67,10 +142,13 @@ export default function Profile() {
               <label className={labelCls}>Business Website</label>
               <input value={form.website} onChange={upd("website")} className={inputCls} placeholder="https://..." />
             </div>
-            <button className="mt-2 h-[48px] rounded-[10px] bg-[#1463ff] text-white font-bold text-[15px] hover:bg-[#0d50d8] transition-colors cursor-pointer">
-              Save Changes
+            <button type="submit" disabled={status.loading} className="mt-2 h-[48px] rounded-[10px] bg-[#1463ff] text-white font-bold text-[15px] hover:bg-[#0d50d8] transition-colors cursor-pointer disabled:opacity-60">
+              {status.loading ? "Saving..." : "Save Changes"}
             </button>
-          </div>
+            {status.msg && (
+              <p className={`text-[13px] font-semibold text-center m-0 ${status.ok ? "text-[#16a34a]" : "text-[#dc2626]"}`}>{status.msg}</p>
+            )}
+          </form>
         </section>
 
         {/* ── Right column ── */}

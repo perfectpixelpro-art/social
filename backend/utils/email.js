@@ -63,3 +63,22 @@ export async function sendPasswordResetEmail(to, name, link) {
   );
   return getResend().emails.send({ from: FROM(), to, subject: "Reset your password · The Social 99", html });
 }
+
+// Sent to both parties when a Zoom meeting is scheduled
+export async function sendMeetingEmail(to, name, meeting) {
+  const dt = new Date(meeting.startTime);
+  const when = dt.toLocaleString("en-US", { dateStyle: "full", timeStyle: "short" });
+  const html = wrap(
+    "Your Zoom meeting is scheduled",
+    `<p>Hi ${name || "there"},</p>
+     <p>A Zoom meeting has been scheduled. Here are the details:</p>
+     <div style="background:#f5f8ff;border:1px solid #e0e8f5;border-radius:10px;padding:16px;margin:16px 0;">
+       <p style="margin:0 0 6px;"><strong>Topic:</strong> ${meeting.topic || "Meeting"}</p>
+       <p style="margin:0 0 6px;"><strong>When:</strong> ${when}</p>
+       <p style="margin:0;"><strong>Duration:</strong> ${meeting.duration} minutes</p>
+     </div>
+     ${button(meeting.joinUrl, "Join Meeting →")}
+     <p style="font-size:13px;color:#7c7f81;">Or copy this link: <br>${meeting.joinUrl}</p>`
+  );
+  return getResend().emails.send({ from: FROM(), to, subject: `Zoom meeting scheduled · ${meeting.topic || "The Social 99"}`, html });
+}

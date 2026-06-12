@@ -160,7 +160,7 @@ export default function SocialMediaManagement() {
 
           {/* Start for $99 button */}
           <a
-            href="/contact"
+            href="/signup?plan=Starter"
             className="mt-8 flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[50px] rounded-[25.5px] pl-6 pr-[6px]"
           >
             <b className="text-base text-[#000]">Start for $99</b>
@@ -343,7 +343,7 @@ export default function SocialMediaManagement() {
 
         {/* Start for $99 button */}
         <a
-          href="/contact"
+          href="/signup?plan=Starter"
           className="mt-12 flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[50px] rounded-[25.5px] pl-6 pr-[6px]"
         >
           <b className="text-base text-[#000]">Start for $99</b>
@@ -444,7 +444,7 @@ export default function SocialMediaManagement() {
               We bring your brand to life on every platform, in every post. At The Social 99, you're not just outsourcing content; you're gaining a creative partner who sharpens your voice and positions you for real growth through expert social media management services.
             </p>
             <a
-              href="/contact"
+              href="/signup?plan=Starter"
               className="mt-8 flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[50px] rounded-[25.5px] pl-6 pr-[6px]"
             >
               <b className="text-base text-[#000]">Start for $99</b>
@@ -502,7 +502,7 @@ export default function SocialMediaManagement() {
               ))}
             </ul>
             <a
-              href="/contact"
+              href={`/signup?plan=${encodeURIComponent(plans[activePlan].name)}`}
               className="self-end mt-8 flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[48px] rounded-[25.5px] pl-6 pr-[6px]"
             >
               <b className="text-base text-[#000]">Buy Now</b>

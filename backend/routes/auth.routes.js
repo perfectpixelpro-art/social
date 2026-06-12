@@ -18,6 +18,7 @@ const loginValidators = [
 ];
 
 router.post("/signup", signupValidators, signup);
+// Brute-force protection: 5 attempts / 15 min per IP
 router.post("/login", loginLimiter, loginValidators, login);
 router.post("/admin/login", loginLimiter, loginValidators, adminLogin);
 router.post("/admin/refresh", adminRefresh);

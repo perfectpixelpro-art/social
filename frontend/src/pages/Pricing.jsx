@@ -1,111 +1,8 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import QuestionsLayout from "../components/QuestionsLayout";
 import FrameComponent from "../components/FrameComponent";
-
-const tabs = ["Marketing", "Videos", "Website"];
-
-const pricing = {
-  Marketing: [
-    {
-      tier: "BASIC", name: "Starter", desc: "Get consistent, professional content posted every month.",
-      price: "99", period: "per month",
-      features: [
-        ["4 custom graphics / month", true], ["2 custom videos / month", true],
-        ["1 revision per deliverable", true], ["Creative execution", true],
-        ["Content strategy", true], ["Reliable turnaround", true],
-        ["Captions", false], ["Content strategy",false], ["Weekly report", false], ["Scheduling", false],
-      ],
-    },
-    {
-      tier: "STANDARD", name: "Growth", desc: "Strategy-driven content with captions and a plan behind every post.",
-      price: "199", period: "per month", featured: true,
-      features: [
-        ["8 custom graphics / month", true], ["4 custom videos / month", true],
-        ["2 revisions per deliverable", true], ["Creative execution", true],
-        ["Consistent brand presence", true], ["Captions", true],
-        ["Scheduling", true], ["Content strategy", true],
-        ["Reliable turnaround", true], ["Weekly report", false],
-      ],
-    },
-    {
-      tier: "PREMIUM", name: "Pro", desc: "Full-service management with analytics, scheduling, and competitor insights.",
-      price: "299", period: "per month",
-      features: [
-        ["12 custom graphics / month", true], ["4 carousels (up to 3 slides)", true],
-        ["6 custom videos / month", true], ["Unlimited revisions", true],
-        ["Creative execution", true], ["Consistent brand presence", true],
-        ["Captions", true], ["Scheduling", true],
-        ["Weekly report", true], ["Competitor analysis", true],
-      ],
-    },
-  ],
-  Videos: [
-    {
-      tier: "BASIC", name: "Starter ", desc: "Short-form videos to get your brand seen on Reels, Shorts, and TikTok.",
-      price: "99", period: "per month",
-      features: [
-        ["4 short-form videos / month", true], ["1 revision per video", true],
-        ["Professional editing", true], ["Creative execution", true],
-        ["Reliable turnaround ", true], ["Clear deliverables", true],
-        ["Storyboarding", false], ["Captions", false], ["Weekly report", false], ["Scheduling",false],
-      ],
-    },
-    {
-      tier: "STANDARD", name: "Growth", desc: "Strategy-backed videos with structured storytelling and captions.",
-      price: "199", period: "per month", featured: true,
-features: [
-        ["8 short-form videos / month", true], ["2 revisions per video", true],
-        ["Professional editing", true], ["Storyboarding", true],
-        ["Captions", true], ["Scheduling", true],
-        ["Structured storytelling", true], ["Message clarity", true],
-        ["Reliable turnaround", true], ["Weekly report", false],
-      ],
-    },
-    {
-      tier: "PREMIUM", name: "Pro", desc: "Complete video management with scheduling, community, and analytics.",
-      price: "299", period: "per month",
-      features: [
-        ["12 short-form videos / month", true], ["Unlimited revisions", true],
-        ["Professional editing", true], ["Storyboarding", true],
-        ["Captions", true], ["Scheduling", true],
-        ["Community management", true], ["Competitor analysis", true],
-        ["Weekly report", true],
-      ],
-    },
-  ],
-  Website: [
-    {
-      tier: "BASIC", name: "Starter", desc: "A clean, professional single-page site to establish your online presence.",
-      price: "99", period: "per month",
-      features: [
-        ["Single page website", true], ["1 revision included", true],
-        ["Content writing", true], ["Focused messaging", true],
-        ["Simple page layout", true], ["Foundational web presence", true],
-        ["Reliable turnaround", true], ["Premium stock assets", false],
-      ],
-    },
-    {
-      tier: "STANDARD", name: "Growth", desc: "A multi-page site built to rank, convert, and grow your business.",
-      price: "199", period: "per month", featured: true,
-      features: [
-        ["Two-page website", true], ["2 revisions included", true],
-        ["Content writing", true], ["SEO-optimized keywords", true],
-        ["Keyword-aligned content", true], ["Search visibility foundation", true],
-        ["Focused messaging", true], ["Reliable turnaround", true], ["Premium stock assets", false], 
-      ],
-    },
-    {
-      tier: "PREMIUM", name: "Pro", desc: "A full five-page site with premium assets, SEO, and unlimited revisions.",
-      price: "299", period: "per month",
-      features: [
-        ["Five-page website", true], ["Unlimited revisions", true],
-        ["Content writing", true], ["SEO-optimized keywords", true],
-        ["Keyword-aligned content", true], ["Search visibility foundation", true],
-        ["Premium stock images", true], ["Premium stock videos", true],
-      ],
-    },
-  ],
-};
+import { tabs, pricing } from "../data/plans";
 
 function Check({ on, dark }) {
   if (on) {
@@ -118,8 +15,9 @@ function Check({ on, dark }) {
   return <span className="shrink-0 text-[rgba(0,0,0,0.25)] text-[14px] tracking-tighter">····</span>;
 }
 
-function PlanCard({ plan }) {
+function PlanCard({ plan, tab }) {
   const f = plan.featured;
+  const navigate = useNavigate();
   return (
     <div
       className={`rounded-[20px] border p-8 mq450:p-6 flex flex-col ${
@@ -152,14 +50,14 @@ function PlanCard({ plan }) {
         ))}
       </ul>
 
-      <a
-        href="/contact"
-        className={`mt-8 h-[52px] rounded-[12px] flex items-center justify-center font-bold text-[16px] no-underline transition-colors ${
+      <button
+        onClick={() => navigate(`/signup?tab=${encodeURIComponent(tab)}&plan=${encodeURIComponent(plan.name)}`)}
+        className={`mt-8 h-[52px] rounded-[12px] flex items-center justify-center font-bold text-[16px] cursor-pointer transition-colors ${
           f ? "bg-white text-[#013186] hover:bg-[#e6f0ff]" : "bg-[#013186] text-white hover:bg-[#012270]"
         }`}
       >
         Buy Now
-      </a>
+      </button>
     </div>
   );
 }
@@ -205,7 +103,7 @@ export default function Pricing() {
       <div className="w-full px-[100px] mq800:px-10 mq450:px-5 pb-16">
         <div className="grid grid-cols-3 gap-8 mq1125:grid-cols-1 w-full max-w-[1500px] mx-auto items-start">
           {pricing[active].map((plan) => (
-            <PlanCard key={plan.name} plan={plan} />
+            <PlanCard key={plan.name} plan={plan} tab={active} />
           ))}
         </div>
         

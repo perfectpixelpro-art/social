@@ -28,12 +28,18 @@ import DashboardHome from "./pages/dashboard/Home";
 import DashboardChat from "./pages/dashboard/Chat";
 import DashboardProfile from "./pages/dashboard/Profile";
 import DashboardTickets from "./pages/dashboard/Tickets";
+import DashboardFiles from "./pages/dashboard/Files";
 import ProtectedRoute from "./components/ProtectedRoute";
+import NotFound from "./pages/NotFound";
+import Checkout from "./pages/Checkout";
+import Verified from "./pages/Verified";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import AdminLayout from "./components/AdminLayout";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminHome from "./pages/admin/Home";
 import AdminChat from "./pages/admin/Chat";
+import AdminFiles from "./pages/admin/Files";
+import AdminManagers from "./pages/admin/Managers";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -64,6 +70,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/verified" element={<Verified />} />
 
         {/* Protected dashboard — redirects to /login if not authenticated */}
         <Route
@@ -77,6 +85,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route index element={<DashboardHome />} />
           <Route path="chat" element={<DashboardChat />} />
           <Route path="profile" element={<DashboardProfile />} />
+          <Route path="files" element={<DashboardFiles />} />
           <Route path="tickets" element={<DashboardTickets />} />
           <Route path="*" element={<div className="p-8 text-[#7a8499] font-semibold">Coming soon…</div>} />
         </Route>
@@ -93,8 +102,13 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         >
           <Route index element={<AdminHome />} />
           <Route path="chat" element={<AdminChat />} />
+          <Route path="files" element={<AdminFiles />} />
+          <Route path="team" element={<AdminManagers />} />
           <Route path="*" element={<div className="p-8 text-[#7a8499] font-semibold">Coming soon…</div>} />
         </Route>
+
+        {/* Catch-all 404 for any unknown route */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
