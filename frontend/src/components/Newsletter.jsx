@@ -3,19 +3,18 @@ import { subscribeNewsletter } from "../api";
 
 const Newsletter = () => {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState({ loading: false, ok: null, msg: "" });
+  const [status, setStatus] = useState({ ok: null, text: "" });
+  const [loading, setLoading] = useState(false);
 
-  const handleSubscribe = async (e) => {
-    e.preventDefault();
-    if (!email) return;
-    setStatus({ loading: true, ok: null, msg: "" });
+  const submit = async () => {
+    if (!email.trim()) { setStatus({ ok: false, text: "Please enter your email." }); return; }
+    setLoading(true); setStatus({ ok: null, text: "" });
     try {
-      const res = await subscribeNewsletter(email);
-      setStatus({ loading: false, ok: true, msg: res.message || "Subscribed!" });
+      const r = await subscribeNewsletter(email.trim());
+      setStatus({ ok: true, text: r.message || "Subscribed! You'll hear from us soon." });
       setEmail("");
-    } catch (err) {
-      setStatus({ loading: false, ok: false, msg: err.message || "Failed to subscribe." });
-    }
+    } catch (e) { setStatus({ ok: false, text: e.message || "Could not subscribe." }); }
+    finally { setLoading(false); }
   };
 
   return (
@@ -42,23 +41,25 @@ const Newsletter = () => {
         </p>
 
         {/* Input pill — stacks on mobile so nothing is cut off */}
-        <form onSubmit={handleSubscribe} className="w-full max-w-[680px] flex items-center rounded-[32px] border border-[rgba(1,49,134,0.15)] bg-white shadow-[0_2px_16px_rgba(1,49,134,0.08)] overflow-hidden pl-6 pr-1.5 py-1.5 mt-2 mq450:flex-col mq450:rounded-[20px] mq450:p-2 mq450:gap-2">
+        <div className="w-full max-w-[680px] flex items-center rounded-[32px] border border-[rgba(1,49,134,0.15)] bg-white shadow-[0_2px_16px_rgba(1,49,134,0.08)] overflow-hidden pl-6 pr-1.5 py-1.5 mt-2 mq450:flex-col mq450:rounded-[20px] mq450:p-2 mq450:gap-2">
           <input
             type="email"
-            required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && submit()}
             placeholder="Email Address"
             className="flex-1 w-full bg-transparent border-none outline-none text-base font-[Montserrat] text-[#000] placeholder-[rgba(0,0,0,0.35)] py-2 mq450:text-center"
           />
-          <button type="submit" disabled={status.loading} className="flex-shrink-0 cursor-pointer bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors border border-[rgba(1,49,134,0.1)] text-[#000] font-bold text-base rounded-[28px] h-[46px] px-6 flex items-center justify-center gap-2 whitespace-nowrap mq450:w-full mq450:rounded-[16px] disabled:opacity-60">
-            {status.loading ? "..." : "Subscribe Now"}
-            <span className="text-base">↗</span>
-          </button>
-        </form>
-        {status.msg && (
-          <p className={`text-sm font-semibold m-0 ${status.ok ? "text-[#1a8f00]" : "text-[#c0392b]"}`}>{status.msg}</p>
-        )}
+          <button
+  onClick={submit}
+  disabled={loading}
+  className="flex-shrink-0 cursor-pointer bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors border border-[rgba(1,49,134,0.1)] text-[#000] font-bold text-base rounded-[28px] h-[46px] px-6 flex items-center justify-center gap-2 whitespace-nowrap mq450:w-full mq450:rounded-[16px] disabled:opacity-60"
+>
+  {loading ? "Subscribing…" : "Subscribe Now"}
+  <span className="text-base">↗</span>
+</button>
+        </div>
+        {status.text && <p className={`m-0 text-[14px] font-semibold ${status.ok ? "text-[#16a34a]" : "text-[#dc2626]"}`}>{status.text}</p>}
       </div>
     </section>
   );

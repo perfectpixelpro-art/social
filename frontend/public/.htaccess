@@ -1,0 +1,10 @@
+# SPA fallback for Hostinger (Apache) — sends all non-file routes to index.html
+# so deep links like /dashboard or /admin work on refresh. Copied into dist on build.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>

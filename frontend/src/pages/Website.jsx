@@ -34,10 +34,10 @@ const visionPoints = [
 ];
 
 const badges = [
-  { label: "User-Friendly Design", x: -10, y: 30, icon: "users" },
-  { label: "Fast Load Times", x: 112, y: 34, icon: "bolt" },
-  { label: "SEO Optimization", x: 78, y: 72, icon: "seo" },
-  { label: "Strong Security", x: 22, y: 72, icon: "shield" },
+  { label: "User-Friendly Design", x: 4, y: 4, icon: "users" },
+  { label: "Fast Load Times", x: 98, y: 4, icon: "bolt" },
+  { label: "SEO Optimization", x: 78, y: 88, icon: "seo" },
+  { label: "Strong Security", x: 24, y:88 , icon: "shield" },
 ];
 
 const projects = [p1, p2, p3, p4];
@@ -167,7 +167,7 @@ export default function Website() {
           backgroundRepeat: "no-repeat",
         }}
       >
-        <div className="w-full px-[100px] mq800:px-10 mq450:px-5 py-24 mq450:py-14 flex justify-center">
+        <div className="w-full px-[100px] mq800:px-10 mq450:px-5 py-24  mq450:py-0 flex justify-center">
           <div className="relative w-full max-w-[1300px] flex items-center justify-center" style={{ minHeight: "clamp(380px, 50vw, 560px)" }}>
 
             {/* Floating feature badges — hidden on mobile */}
@@ -188,7 +188,7 @@ export default function Website() {
                 Award-Winning Websites<br />that Drive Results
               </h1>
               <a
-                href="/contact"
+                href="/book-a-call"
                 className="mt-8 flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[50px] rounded-[25.5px] pl-6 pr-[6px]"
               >
                 <b className="text-base text-[#000]">Build To Convert</b>
@@ -205,7 +205,7 @@ export default function Website() {
       </div>
 
       {/* ── Understanding Your Vision ── */}
-      <div className="w-full px-[100px] mq800:px-10 mq450:px-5 py-16 flex justify-center">
+      <div className="w-full px-[100px] mq800:px-10 mq450:px-5 mq450:py-2 py-16 flex justify-center">
         <div className="w-full max-w-[1500px] flex items-stretch gap-8 mq1125:flex-col">
 
           {/* Left: team images */}
@@ -250,7 +250,7 @@ export default function Website() {
               ))}
             </div>
             <a
-              href="/contact"
+              href="/book-a-call"
               className="mt-8 self-start flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[50px] rounded-[25.5px] pl-6 pr-[6px]"
             >
               <b className="text-base text-[#000]">Grow Online</b>
@@ -265,7 +265,7 @@ export default function Website() {
       </div>
 
       {/* ── Custom-Built for Every Project ── */}
-      <div className="w-full px-[100px] mq800:px-10 mq450:px-5 py-16 flex justify-center">
+      <div className="w-full px-[100px] mq800:px-10 mq450:px-5 mq450:py-10 py-16 flex justify-center">
         <div
           className="w-full max-w-[1600px] rounded-[28px] border border-[rgba(1,49,134,0.12)] relative overflow-hidden"
           style={{ background: "linear-gradient(180deg, #f2f7ff 0%, #eaf2ff 100%)" }}
@@ -297,7 +297,7 @@ export default function Website() {
                 Custom-Built for<br />Every Project
               </h2>
               <a
-                href="/contact"
+                href="/book-a-call"
                 className="mt-7 flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[50px] rounded-[25.5px] pl-6 pr-[6px]"
               >
                 <b className="text-base text-[#000]">Go Live</b>

@@ -13,15 +13,15 @@ const colServices = [
   { to: "/short-form-videos", label: "Short-Form Videos" },
   { to: "/services/website", label: "Award Winning Website" },
   { to: "/privacy-policy", label: "Privacy Policy" },
-  { to: "/contact", label: "Book A Call" },
+  { to: "/book-a-call", label: "Book A Call" },
 ];
 
 const colIndustries = [
-  { to: "/", label: "Pet and grooming" },
-  { to: "/", label: "Med Spa" },
-  { to: "/", label: "Salons and beauty" },
-  { to: "/", label: "Restaurants" },
-  { to: "/", label: "Bars" },
+  { to: "/pet-and-grooming", label: "Pet and grooming" },
+  { to: "/med-spa", label: "Med Spa" },
+  { to: "/salons-and-beauty", label: "Salons and beauty" },
+  { to: "/restaurants", label: "Restaurants" },
+  { to: "/bars", label: "Bars" },
 ];
 
 const socials = [
@@ -41,7 +41,7 @@ const Footer = () => {
 
           {/* Brand col */}
           <div className="flex flex-col gap-4 min-w-[240px] mq450:min-w-full">
-            <Link to="/"><img className="h-[44px] w-auto object-contain" alt="The Social 99" src="/Logo@2x.png" /></Link>
+            <Link to="/"><img className="h-[44px] w-auto object-cover" alt="The Social 99" src="/FinalArrLogo.png" /></Link>
             <p className="text-[15px] font-semibold text-[#000] max-w-[240px] leading-relaxed m-0">
               Affordable Social Media Management for Small Business
             </p>

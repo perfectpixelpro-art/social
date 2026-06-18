@@ -14,3 +14,38 @@ body {
   margin: 0;
   padding: 0;
 }
+
+@keyframes slide-up {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@utility animate-slide-up {
+  animation: slide-up 0.4s ease-out forwards;
+}
+
+
+.video-play-area {
+  cursor: none;
+}
+
+.video-play-area .custom-cursor {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(1, 49, 134, 0.15);
+  border: 2px solid rgba(1, 49, 134, 0.4);
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s ease, opacity 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #013186;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  z-index: 20;
+}

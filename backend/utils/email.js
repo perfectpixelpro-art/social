@@ -28,6 +28,48 @@ const button = (link, label) => `
   <a href="${link}" style="display:inline-block;background:#013186;color:#fff;text-decoration:none;
      font-weight:bold;font-size:15px;padding:12px 28px;border-radius:10px;margin:18px 0;">${label}</a>`;
 
+// Send a raw HTML email (used by the automation engine + admin templates). Supports a {{name}} token.
+export async function sendRawEmail(to, subject, html, name = "") {
+  const fill = (s) => (s || "").replaceAll("{{name}}", name || "there");
+  return getResend().emails.send({ from: FROM(), to, subject: fill(subject), html: fill(html) });
+}
+
+// Default templates (used until an admin saves a custom one).
+export const defaultTemplates = {
+  newsletter: {
+    name: "Newsletter",
+    subject: "What's new at The Social 99 ✨",
+    html: wrap("This fortnight at The Social 99",
+      `<p>Hi {{name}},</p><p>Here's a quick roundup of tips, trends, and updates to grow your social presence.</p>
+       ${button((process.env.CLIENT_URL || "") + "/blogs", "Read our latest →")}
+       <p style="font-size:13px;color:#7c7f81;">You're receiving this because you subscribed to our newsletter.</p>`),
+  },
+  trial: {
+    name: "Free Trial (daily)",
+    subject: "Your free trial — make the most of it 🚀",
+    html: wrap("Your free trial is active",
+      `<p>Hi {{name}},</p><p>Your 7-day free trial is running. Connect your accounts and explore your analytics today.</p>
+       ${button((process.env.CLIENT_URL || "") + "/dashboard", "Open your dashboard →")}
+       <p style="font-size:13px;color:#7c7f81;">Upgrade anytime to unlock posting & scheduling.</p>`),
+  },
+  cart: {
+    name: "Abandoned Cart",
+    subject: "You left something behind 🛒",
+    html: wrap("Finish setting up your plan",
+      `<p>Hi {{name}},</p><p>You were almost there! Complete your checkout to start growing with The Social 99.</p>
+       ${button((process.env.CLIENT_URL || "") + "/pricing", "Complete checkout →")}
+       <p style="font-size:13px;color:#7c7f81;">Need help choosing a plan? Just reply to this email.</p>`),
+  },
+  plan_expiry: {
+    name: "Plan Expiring",
+    subject: "Your plan is about to expire ⏳",
+    html: wrap("Don't lose your momentum",
+      `<p>Hi {{name}},</p><p>Your plan is ending soon. Renew now to keep your scheduling, analytics, and content active.</p>
+       ${button((process.env.CLIENT_URL || "") + "/dashboard/store", "Renew now →")}
+       <p style="font-size:13px;color:#7c7f81;">Questions about your plan? We're here to help.</p>`),
+  },
+};
+
 // Sent on signup
 export async function sendVerificationEmail(to, name, link) {
   const html = wrap(

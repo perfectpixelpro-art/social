@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import { findPlan, addonsList } from "../data/plans";
+import { useSearchParams } from "react-router-dom";
+import { findPlan, serviceAddons } from "../data/plans";
+import { createCheckoutSession, recordCart } from "../api";
 
 const Check = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="#1463ff" className="shrink-0"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm-1.2 14.2l-3.5-3.5 1.4-1.4 2.1 2.1 4.6-4.6 1.4 1.4-6 6z" /></svg>
@@ -30,7 +31,6 @@ const Field = ({ icon, label, value, onChange, placeholder, type = "text" }) => 
 );
 
 export default function Checkout() {
-  const navigate = useNavigate();
   const [params] = useSearchParams();
   const [placing, setPlacing] = useState(false);
   const tab = params.get("tab") || "Marketing";
@@ -38,27 +38,47 @@ export default function Checkout() {
   const BASE = Number(plan.price) || 99;
   const includedFeatures = plan.features.filter(([, on]) => on).map(([label]) => label);
 
-  const [addons, setAddons] = useState(addonsList.map((a) => ({ ...a, on: false, qty: a.min })));
-  const [info, setInfo] = useState({ name: "", email: "", company: "", website: "" });
-  const [pay, setPay] = useState("paypal");
-  const [card, setCard] = useState({ number: "", expiry: "", cvc: "", name: "" });
+  // Prefill name/email if the user is already logged in
+  const loggedUser = (() => { try { return JSON.parse(localStorage.getItem("user")) || {}; } catch { return {}; } })();
+  const isLoggedIn = !!localStorage.getItem("accessToken");
+
+  const [addons, setAddons] = useState((serviceAddons[tab] || serviceAddons.Marketing).map((a) => ({ ...a, on: false, qty: a.min })));
+  const [info, setInfo] = useState({ name: loggedUser.name || "", email: loggedUser.email || "", company: "", website: "" });
 
   const toggle = (i) => setAddons((a) => a.map((x, idx) => (idx === i ? { ...x, on: !x.on } : x)));
   const setQty = (i, v) => setAddons((a) => a.map((x, idx) => (idx === i ? { ...x, qty: Math.max(x.min, Math.min(x.max, Number(v) || x.min)) } : x)));
   const upd = (k) => (e) => setInfo((f) => ({ ...f, [k]: e.target.value }));
-  const updCard = (k) => (e) => setCard((f) => ({ ...f, [k]: e.target.value }));
 
   const addonTotal = addons.reduce((sum, a) => (a.on ? sum + a.price * a.qty : sum), 0);
   const subtotal = BASE + addonTotal;
   const total = subtotal; // tax 0%
 
-  const handleProceed = () => {
-    // Frontend-only "payment" for now → on success continue to login.
+  const [error, setError] = useState("");
+
+  const handleProceed = async () => {
+    setError("");
+    const email = (info.email || "").trim();
+    // Guests must provide an email so we can prefill signup after payment.
+    if (!isLoggedIn && !email) {
+      setError("Please enter your email to continue.");
+      return;
+    }
     setPlacing(true);
-    setTimeout(() => {
-      localStorage.removeItem("pendingCheckout");
-      navigate("/login?purchased=1", { replace: true });
-    }, 900);
+    try {
+      // chosen add-ons → [{ key, qty }]
+      const chosenAddons = addons.filter((a) => a.on).map((a) => ({ key: a.key, qty: a.qty }));
+      // Map the pricing tab → tracker service key so the client's tracker matches their purchase.
+      const service = { Marketing: "marketing", Videos: "video", Website: "website" }[tab] || "marketing";
+      // Capture the cart so we can email if they abandon checkout (best-effort).
+      recordCart({ email, name: info.name, plan: plan.name, service });
+      // Logged-in → token attached automatically (success → dashboard).
+      // Guest → email used (success → signup with this email prefilled).
+      const res = await createCheckoutSession(email, plan.name, chosenAddons, service);
+      window.location.href = res.url; // Stripe-hosted secure payment
+    } catch (err) {
+      setPlacing(false);
+      setError(err.message || "Could not start payment. Please try again.");
+    }
   };
 
   return (
@@ -114,7 +134,7 @@ export default function Checkout() {
                   onChange={(e) => setQty(i, e.target.value)}
                   className="w-[52px] rounded-[8px] border border-[#e3e9f5] px-2 py-1.5 text-[13px] text-center outline-none focus:border-[#013186] disabled:bg-[#f5f7fb] disabled:text-[#9aa3b2]"
                 />
-                <span className="text-[13px] font-semibold text-[#0b1f44] w-[52px] text-right">${(a.price).toFixed(2)}</span>
+                <span className="text-[13px] font-semibold text-[#0b1f44] w-[64px] text-right">${(a.on ? a.price * a.qty : a.price).toFixed(2)}</span>
               </div>
             ))}
           </div>
@@ -151,56 +171,24 @@ export default function Checkout() {
               <Field label="Website" placeholder="www.smithandco.com" value={info.website} onChange={upd("website")} icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" /></svg>} />
             </div>
 
-            {/* Payment method */}
+            {/* Payment — handled securely on Stripe's hosted checkout */}
             <div className="flex items-center gap-2 mb-3">
               <h3 className="m-0 text-[16px] font-bold text-[#0b1f44]">Payment Method</h3>
               <span className="text-[11px] text-[#9aa3b2]">🔒 All payments are secure and encrypted.</span>
             </div>
-            <div className="grid grid-cols-2 mq450:grid-cols-1 gap-4 mb-6">
-              {[
-                { key: "paypal", name: "PayPal", desc: "Secure payment with PayPal", c: "#003087" },
-                { key: "stripe", name: "Stripe", desc: "Secure payment with Stripe", c: "#635bff" },
-              ].map((m) => (
-                <button key={m.key} onClick={() => setPay(m.key)} className={`flex items-center gap-3 rounded-[10px] border px-4 py-3 text-left transition-colors cursor-pointer ${pay === m.key ? "border-[#1463ff] bg-[#f5f9ff]" : "border-[#e3e9f5] hover:bg-[#fafbfd]"}`}>
-                  <span className="w-9 h-9 rounded-[8px] flex items-center justify-center text-white text-[13px] font-bold shrink-0" style={{ background: m.c }}>{m.name[0]}</span>
-                  <div className="min-w-0 flex-1">
-                    <p className="m-0 text-[14px] font-bold text-[#0b1f44]">{m.name}</p>
-                    <p className="m-0 text-[11px] text-[#9aa3b2]">{m.desc}</p>
-                  </div>
-                  <span className={`w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center ${pay === m.key ? "border-[#1463ff]" : "border-[#cfd8e6]"}`}>
-                    {pay === m.key && <span className="w-2.5 h-2.5 rounded-full bg-[#1463ff]" />}
-                  </span>
-                </button>
-              ))}
-            </div>
-
-            {/* Card details */}
-            <h3 className="m-0 text-[16px] font-bold text-[#0b1f44] mb-4">Card Details</h3>
-            <div className="flex flex-col gap-4 mb-3">
-              <div className="relative">
-                <span className={labelCls}>Card Number</span>
-                <input value={card.number} onChange={updCard("number")} placeholder="1234 1234 1234 1234" className="w-full rounded-[10px] border border-[#e3e9f5] px-4 py-3 text-[14px] outline-none focus:border-[#013186]" />
-              </div>
-              <div className="grid grid-cols-3 mq450:grid-cols-1 gap-4">
-                <div className="relative">
-                  <span className={labelCls}>Expiry Date</span>
-                  <input value={card.expiry} onChange={updCard("expiry")} placeholder="MM / YY" className="w-full rounded-[10px] border border-[#e3e9f5] px-4 py-3 text-[14px] outline-none focus:border-[#013186]" />
-                </div>
-                <div className="relative">
-                  <span className={labelCls}>CVC</span>
-                  <input value={card.cvc} onChange={updCard("cvc")} placeholder="CVC" className="w-full rounded-[10px] border border-[#e3e9f5] px-4 py-3 text-[14px] outline-none focus:border-[#013186]" />
-                </div>
-                <div className="relative">
-                  <span className={labelCls}>Name on Card</span>
-                  <input value={card.name} onChange={updCard("name")} placeholder="John Smith" className="w-full rounded-[10px] border border-[#e3e9f5] px-4 py-3 text-[14px] outline-none focus:border-[#013186]" />
-                </div>
+            <div className="flex items-center gap-3 rounded-[10px] border border-[#1463ff] bg-[#f5f9ff] px-4 py-3 mb-3">
+              <span className="w-9 h-9 rounded-[8px] flex items-center justify-center text-white text-[13px] font-bold shrink-0" style={{ background: "#635bff" }}>S</span>
+              <div className="min-w-0 flex-1">
+                <p className="m-0 text-[14px] font-bold text-[#0b1f44]">Stripe</p>
+                <p className="m-0 text-[11px] text-[#9aa3b2]">You'll enter your card securely on Stripe's checkout page.</p>
               </div>
             </div>
-            <p className="m-0 mb-5 text-[11px] text-[#9aa3b2]">🔒 Your payment information is 100% secure.</p>
+            <p className="m-0 mb-5 text-[11px] text-[#9aa3b2]">🔒 Your card details are entered on Stripe — we never see or store them.</p>
 
             <button onClick={handleProceed} disabled={placing} className="w-full h-[52px] rounded-[12px] bg-[#1463ff] text-white font-bold text-[16px] hover:bg-[#0d50d8] transition-colors cursor-pointer disabled:opacity-60">
-              {placing ? "Processing…" : "Proceed to Payment"}
+              {placing ? "Redirecting to secure checkout…" : "Proceed to Payment"}
             </button>
+            {error && <p className="mt-3 text-[13px] font-semibold text-[#dc2626] text-center m-0">{error}</p>}
           </div>
         </section>
       </div>

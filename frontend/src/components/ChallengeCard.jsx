@@ -11,11 +11,10 @@ const items = [
 ];
 
 const ChallengeCard = ({ className = "" }) => {
-  const [active, setActive] = useState(0);
+  const [active, setActive] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
   const cardRef = useRef(null);
 
-  // Track mobile viewport (≤450px) to switch tabs to vertical
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 450px)");
     const update = () => setIsMobile(mq.matches);
@@ -24,11 +23,10 @@ const ChallengeCard = ({ className = "" }) => {
     return () => mq.removeEventListener("change", update);
   }, []);
 
-  // Click outside → reset to default (0)
   useEffect(() => {
     const handleClick = (e) => {
       if (cardRef.current && !cardRef.current.contains(e.target)) {
-        setActive(0);
+        setActive(null);
       }
     };
     document.addEventListener("mousedown", handleClick);
@@ -64,13 +62,13 @@ const ChallengeCard = ({ className = "" }) => {
         <b className="text-[#111] font-bold">no questions asked!</b>
       </p>
 
-      {/* Bottom row: Try Now + animated tabs */}
+      {/* Bottom row: Try Now + tabs */}
       <div className="flex items-end gap-3 mq450:flex-col mq450:items-stretch">
 
         {/* Try Now button */}
         <div className="flex-shrink-0 pb-4 mq450:pb-0 mq450:mb-3">
           <button className="flex items-center gap-2 bg-white border border-[rgba(1,49,134,0.15)] rounded-full px-5 py-3 cursor-pointer hover:shadow-md transition-all whitespace-nowrap">
-            <span className="text-[14px] font-bold text-[#000]">Try Now</span>
+            <span className="text-[14px] font-bold text-[#000]"><a href="book-a-call">Try Now</a></span>
             <span className="w-[26px] h-[26px] rounded-full bg-[#f0f4ff] border border-[rgba(1,49,134,0.1)] flex items-center justify-center">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#013186" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M7 17L17 7M17 7H7M17 7V17"/>
@@ -79,7 +77,7 @@ const ChallengeCard = ({ className = "" }) => {
           </button>
         </div>
 
-        {/* Animated number tabs — horizontal on desktop, vertical list on mobile */}
+        {/* Tabs — fixed height, no layout shift on hover */}
         <div
           className="flex flex-1 w-full"
           style={{
@@ -96,9 +94,11 @@ const ChallengeCard = ({ className = "" }) => {
                 className="cursor-pointer"
                 style={{
                   flex: isMobile ? "none" : 1,
-                  height: isMobile ? "auto" : isActive ? "120px" : "72px",
-                  transition: "all 0.3s cubic-bezier(0.4,0,0.2,1)",
-                  background: isActive ? "rgba(1, 49, 134, 0.08)" : "rgba(1, 49, 134, 0.04)",
+                  /* Fixed height — never changes, no layout shift */
+                  height: isMobile ? "auto" : "90px",
+                  background: isActive
+                    ? "rgba(1, 49, 134, 0.12)"
+                    : "rgba(1, 49, 134, 0.04)",
                   borderRadius: isMobile ? "12px" : "14px 14px 0 0",
                   display: "flex",
                   flexDirection: isMobile ? "row" : "column",
@@ -106,22 +106,36 @@ const ChallengeCard = ({ className = "" }) => {
                   justifyContent: isMobile ? "flex-start" : "flex-end",
                   gap: isMobile ? 12 : 0,
                   padding: isMobile ? "12px 16px" : "0 16px 14px 16px",
+                  /* Only scale the tab up slightly — no height change */
+                  transform: isActive && !isMobile ? "scaleY(1.08)" : "scaleY(1)",
+                  transformOrigin: "bottom",
+                  transition: "background 0.2s ease, transform 0.2s ease",
+                  boxShadow: isActive ? "0 -4px 12px rgba(1,49,134,0.10)" : "none",
                 }}
-                onMouseEnter={() => !isMobile && setActive(i)}
+                onMouseEnter={() => setActive(i)}
+                onMouseLeave={() => setActive(null)}
                 onClick={() => setActive(i)}
               >
                 <span
-                  className="font-bold text-[#111] leading-none transition-all duration-300"
-                  style={{ fontSize: isMobile ? "22px" : isActive ? "32px" : "20px" }}
+                  style={{
+                    fontSize: isMobile ? "22px" : "20px",
+                    fontWeight: 700,
+                    color: isActive ? "#013186" : "#111",
+                    lineHeight: 1,
+                    transition: "color 0.2s ease",
+                  }}
                 >
                   {item.num}
                 </span>
                 <span
-                  className="text-[rgba(0,0,0,0.5)] font-medium whitespace-nowrap overflow-hidden transition-all duration-300"
                   style={{
                     fontSize: isMobile ? "13px" : "12px",
                     marginTop: isMobile ? 0 : 4,
-                    opacity: isMobile ? 1 : isActive ? 1 : 0.7,
+                    fontWeight: 500,
+                    color: isActive ? "#013186" : "rgba(0,0,0,0.5)",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    transition: "color 0.2s ease",
                   }}
                 >
                   {item.label}

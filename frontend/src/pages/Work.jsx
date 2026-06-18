@@ -37,7 +37,7 @@ function ChecklistItem({ q, a }) {
       </button>
       <div className={`grid transition-all duration-300 ${open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
         <div className="overflow-hidden">
-          <p className="m-0 px-6 pb-5 text-[15px] leading-relaxed text-[rgba(0,0,0,0.6)] font-medium">{a}</p>
+          <p className="m-0 px-6 pb-5 text-[15px]   leading-relaxed text-[rgba(0,0,0,0.6)] font-medium">{a}</p>
         </div>
       </div>
     </div>
@@ -59,14 +59,14 @@ import vi5 from "../assets/vi5.avif";
 import vi6 from "../assets/vi6.avif";
 import vi7 from "../assets/vi7.avif";
 import vi8 from "../assets/vi8.avif";
-import sm1 from "../assets/sm1.png";
-import sm2 from "../assets/sm2.png";
-import sm3 from "../assets/sm3.png";
+import sm1 from "../assets/sm1.webp";
+import sm2 from "../assets/sm2.webp";
+import sm3 from "../assets/sm3.webp";
 import sm4 from "../assets/sm4.png";
-import sm5 from "../assets/sm5.png";
-import sm6 from "../assets/sm6.png";
-import sm7 from "../assets/sm7.png";
-import sm8 from "../assets/sm8.png";
+import sm5 from "../assets/sm5.webp";
+import sm6 from "../assets/sm6.webp";
+import sm7 from "../assets/sm7.webp";
+import sm8 from "../assets/sm8.webp";
 import s1 from "../assets/s1.avif";
 import s2 from "../assets/s2.avif";
 import s3 from "../assets/s3.avif";
@@ -140,17 +140,17 @@ export default function Work() {
         }}
       >
         <div className="w-full px-[100px] mq800:px-10 mq450:px-5 pt-20 mq450:pt-12 pb-10 flex flex-col items-center text-center">
-          <h1 className="text-[#013186] font-bold leading-tight m-0" style={{ fontSize: "clamp(38px, 6vw, 84px)" }}>
-            Work Examples
-          </h1>
-          <p className="mt-4 text-[rgba(0,0,0,0.5)] font-semibold max-w-[760px]" style={{ fontSize: "clamp(15px, 1.6vw, 22px)" }}>
+      <h1 className="text-[#013186] font-bold leading-tight m-0 text-[36px] md:text-[80px]">
+  Work Examples
+</h1>
+          <p className="mt-0 text-[rgba(0,0,0,0.5)] font-semibold max-w-[1108px]" style={{ fontSize: "clamp(15px, 1.6vw, 22px)" }}>
             Explore structured, high-quality social media posts designed to keep brands consistent, modern, and visually aligned.
           </p>
         </div>
       </div>
 
       {/* ── Image grid: 3 per row (1 per row on mobile) ── */}
-      <div className="w-full px-[100px] mq800:px-10 mq450:px-5 py-16 flex justify-center">
+      <div className="w-full px-[100px] mq800:px-10 mq450:px-5 mq450:py-0 py-16 flex justify-center">
         <div className="grid grid-cols-3 gap-6 mq800:grid-cols-2 mq450:grid-cols-1 w-full max-w-[1500px]">
           {works.map((src, i) => (
             <div

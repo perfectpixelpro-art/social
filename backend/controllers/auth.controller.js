@@ -30,10 +30,13 @@ const REFRESH_TOKEN_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 const GENERIC_CREDENTIALS_ERROR = "Invalid credentials";
 
 // httpOnly cookie options for the refresh token
+const isProd = process.env.NODE_ENV === "production";
 const refreshCookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production", // secure over HTTPS in prod
-  sameSite: "strict",
+  // In prod the frontend (Vercel) and API (Render) are on different domains, so the
+  // cookie must be SameSite=None + Secure to be sent cross-site. Locally use lax.
+  secure: isProd,
+  sameSite: isProd ? "none" : "lax",
   maxAge: REFRESH_TOKEN_MS,
   path: "/",
 };
@@ -63,7 +66,7 @@ export const signup = async (req, res) => {
   }
 
   try {
-    const { name, email, mobile, password } = req.body;
+    const { name, email, mobile, password, trial } = req.body;
 
     const existing = await User.findOne({ email: email.toLowerCase() });
     if (existing) {
@@ -72,7 +75,13 @@ export const signup = async (req, res) => {
     }
 
     const hashed = await bcrypt.hash(password, 12);
-    const user = await User.create({ name, email, mobile, password: hashed, role: "client" });
+    // Free-trial signups get a trial plan (4 graphics / 4 videos / 1 change, analytics-only).
+    const isFreeTrial = trial === true || trial === "true" || trial === 1;
+    const user = await User.create({
+      name, email, mobile, password: hashed, role: "client",
+      isFreeTrial,
+      ...(isFreeTrial ? { plan: "Trial", service: "marketing" } : {}),
+    });
 
     // Auto-create the client's Google Drive folder structure (don't block signup if it fails)
     try {
@@ -83,7 +92,27 @@ export const signup = async (req, res) => {
       console.error("Drive folder creation failed:", e.message);
     }
 
-    // Send the verification email (don't fail signup if email send hiccups)
+    // If they paid first (guest checkout), link the Stripe subscription by email.
+    // This sets their plan and auto-verifies them so they can log in immediately.
+    let linkedPaid = false;
+    try {
+      const { linkStripeSubscriptionByEmail } = await import("./stripe.controller.js");
+      await linkStripeSubscriptionByEmail(user);
+      linkedPaid = user.isVerified; // verified === they have an active paid subscription
+    } catch (e) {
+      console.error("Stripe link on signup failed:", e.message);
+    }
+
+    if (linkedPaid) {
+      // Paid users skip email verification — they can log in right away.
+      return res.status(201).json({
+        success: true,
+        verified: true,
+        message: "Account created! You can now log in to access your dashboard.",
+      });
+    }
+
+    // Otherwise send the verification email (don't fail signup if email send hiccups)
     try {
       const link = await createVerificationLink(user._id, "signup");
       await sendVerificationEmail(user.email, user.name, link);
@@ -155,7 +184,7 @@ export const login = async (req, res) => {
     return res.json({
       success: true,
       accessToken,
-      user: { id: user._id, name: user.name, email: user.email, isVerified: user.isVerified },
+      user: { id: user._id, name: user.name, email: user.email, isVerified: user.isVerified, isFreeTrial: user.isFreeTrial },
     });
   } catch {
     return res.status(500).json({ success: false, error: "Something went wrong" });
@@ -175,8 +204,8 @@ export const adminLogin = async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email: email.toLowerCase() });
-    // Must exist AND be staff (admin or manager) — otherwise generic error
-    if (!user || (user.role !== "admin" && user.role !== "manager")) {
+    // Must exist AND be staff (admin, manager, or writer) — otherwise generic error
+    if (!user || !["admin", "manager", "writer"].includes(user.role)) {
       return res.status(401).json({ success: false, error: GENERIC_CREDENTIALS_ERROR });
     }
 
@@ -225,7 +254,7 @@ export const adminRefresh = async (req, res) => {
     await RefreshToken.deleteOne({ token });
     const userId = decoded.sub;
     const dbUser = await User.findById(userId).select("role");
-    if (!dbUser || (dbUser.role !== "admin" && dbUser.role !== "manager")) {
+    if (!dbUser || !["admin", "manager", "writer"].includes(dbUser.role)) {
       return res.status(401).json({ success: false, error: "Invalid session" });
     }
     const newAccessToken = signAccessToken(userId, dbUser.role);

@@ -1,12 +1,12 @@
 import socialImage from "../assets/about1.avif";
-import sm1 from "../assets/sm1.png";
-import sm2 from "../assets/sm2.png";
-import sm3 from "../assets/sm3.png";
+import sm1 from "../assets/sm1.webp";
+import sm2 from "../assets/sm2.webp";
+import sm3 from "../assets/sm3.webp";
 import sm4 from "../assets/sm4.png";
-import sm5 from "../assets/sm5.png";
-import sm6 from "../assets/sm6.png";
-import sm7 from "../assets/sm7.png";
-import sm8 from "../assets/sm8.png";
+import sm5 from "../assets/sm5.webp";
+import sm6 from "../assets/sm6.webp";
+import sm7 from "../assets/sm7.webp";
+import sm8 from "../assets/sm8.webp";
 import a1 from "../assets/a1.avif";
 import a2 from "../assets/a2.avif";
 import a3 from "../assets/a3.avif";
@@ -33,24 +33,39 @@ const About = () => {
       >
         <div className="w-full px-[100px] mq800:px-10 mq450:px-5 pt-16 mq450:pt-10 pb-12 flex flex-col items-center text-center">
 
-          {/* Trust badge */}
-          <div className="inline-flex items-center rounded-full bg-white border border-[rgba(1,49,134,0.12)] shadow-[0_4px_20px_rgba(1,49,134,0.08)] px-6 py-3">
-            <span className="text-[15px] mq450:text-[12px] font-semibold text-[#013186]">
-              Trusted by <b className="text-[#3db100]">1450+ Businesses</b> to Boost Engagement and Followers.
-            </span>
-          </div>
+         <div
+  className="
+    inline-flex
+    items-center
+    rounded-full
+    bg-white
+    px-6
+    py-3
+  "
+  style={{
+    border: "1px solid #029df6",
+    boxShadow: `
+      0 0 10px rgba(2,157,246,0.35),
+      0 0 20px rgba(2,157,246,0.20),
+      0 4px 20px rgba(1,49,134,0.08)
+    `,
+  }}
+>
+  <span className="text-[15px] mq450:text-[12px] font-semibold text-[#013186]">
+    Trusted by <b className="text-[#3db100]">1450+ Businesses</b> to Boost Engagement and Followers.
+  </span>
+</div>
 
-          {/* Heading */}
-          <h1 className="text-[#013186] font-bold leading-tight m-0 mt-8" style={{ fontSize: "clamp(40px, 7vw, 96px)" }}>
-            About The Social 99
-          </h1>
+          <h1 className="text-[#013186] font-bold leading-tight m-0 mt-4 text-[32px] md:text-[92px]">
+  About The Social 99
+</h1>
           <p className="mt-3 text-[rgba(0,0,0,0.45)] font-semibold" style={{ fontSize: "clamp(16px, 2vw, 26px)" }}>
             Built to bring structure to digital execution
           </p>
 
           {/* CTA */}
           <a
-            href="/contact"
+            href="/book-a-call"
             className="mt-9 flex items-center gap-3 no-underline border border-[rgba(1,49,134,0.10)] bg-white hover:bg-[rgba(188,214,255,0.37)] transition-colors h-[58px] rounded-[29px] pl-7 pr-[8px] shadow-[0_6px_24px_rgba(1,49,134,0.08)]"
           >
             <b className="text-[17px] mq450:text-[14px] text-[#013186]">Activate Your Plan with The Social 99</b>
@@ -79,7 +94,7 @@ const About = () => {
           We take over the execution side — social media, short-form videos, and basic website support — and turn it into a simple, repeatable system. So instead of figuring things out every week, your brand just keeps showing up the way it should.
         </p>
         <a
-          href="/contact"
+          href="/book-a-call"
           className="inline-flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.10)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[44px] rounded-[22px] pl-5 pr-[6px]"
         >
           <b className="text-[14px] text-[#013186]">Work with Social 99</b>
@@ -174,7 +189,7 @@ const About = () => {
         {/* CTA */}
         <div className="flex justify-center mt-12">
           <a
-            href="/contact"
+            href="/book-a-call"
             className="flex items-center gap-3 no-underline border border-[rgba(1,49,134,0.10)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[56px] rounded-[28px] pl-7 pr-[8px] shadow-[0_6px_24px_rgba(1,49,134,0.08)]"
           >
             <b className="text-[17px] mq450:text-[14px] text-[#013186]">Activate Your Plan Now</b>

@@ -34,3 +34,13 @@ export const requireStaff = (req, res, next) => {
     next();
   });
 };
+
+// Must be authenticated AND able to write articles (admin or writer).
+export const requireArticleAuthor = (req, res, next) => {
+  requireAuth(req, res, () => {
+    if (req.user.role !== "admin" && req.user.role !== "writer") {
+      return res.status(403).json({ success: false, error: "Writer or admin access required" });
+    }
+    next();
+  });
+};

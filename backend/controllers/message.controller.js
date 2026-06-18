@@ -2,6 +2,8 @@ import Message from "../models/message.model.js";
 import User from "../models/user.model.js";
 import { createZoomMeeting } from "../utils/zoom.js";
 import { sendMeetingEmail } from "../utils/email.js";
+import { notify, clientHandlerId } from "../utils/notify.js";
+import { fileToUrl } from "../utils/upload.js";
 
 // Shared: create a Zoom meeting and post it as a chat message
 const scheduleMeeting = async ({ clientId, sender, body }) => {
@@ -48,6 +50,8 @@ const scheduleMeeting = async ({ clientId, sender, body }) => {
 export const scheduleMeetingAsClient = async (req, res) => {
   try {
     const msg = await scheduleMeeting({ clientId: req.user.id, sender: "client", body: req.body });
+    const handler = await clientHandlerId(req.user.id);
+    if (handler) notify(handler, { type: "meeting", title: "Client scheduled a Zoom meeting", body: msg.meeting?.topic || "", link: "/admin/chat" });
     res.status(201).json({ success: true, data: msg });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -58,20 +62,21 @@ export const scheduleMeetingAsAdmin = async (req, res) => {
   try {
     if (!(await staffCanAccess(req, req.params.clientId))) return res.status(403).json({ success: false, error: "Not your client" });
     const msg = await scheduleMeeting({ clientId: req.params.clientId, sender: "admin", body: req.body });
+    notify(req.params.clientId, { type: "meeting", title: "A Zoom meeting was scheduled", body: msg.meeting?.topic || "", link: "/dashboard/chat" });
     res.status(201).json({ success: true, data: msg });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 };
 
-// Build attachment fields from an uploaded file (if any)
-const attachmentFrom = (file) => {
+// Build attachment fields from an uploaded file (if any) — Cloudinary or local.
+const attachmentFrom = async (file) => {
   if (!file) return {};
-  const base = process.env.SERVER_URL || "http://localhost:5001";
   let fileType = "file";
   if (file.mimetype.startsWith("image/")) fileType = "image";
   else if (file.mimetype.startsWith("video/")) fileType = "video";
-  return { fileUrl: `${base}/uploads/${file.filename}`, fileName: file.originalname, fileType };
+  const fileUrl = await fileToUrl(file);
+  return { fileUrl, fileName: file.originalname, fileType };
 };
 
 /* ── CLIENT: my conversation with admin ── */
@@ -90,11 +95,15 @@ export const getMyMessages = async (req, res) => {
 export const sendMessageAsClient = async (req, res) => {
   try {
     const { text } = req.body;
-    const att = attachmentFrom(req.file);
+    const att = await attachmentFrom(req.file);
     if ((!text || !text.trim()) && !att.fileUrl) {
       return res.status(400).json({ success: false, error: "Message cannot be empty" });
     }
     const msg = await Message.create({ client: req.user.id, sender: "client", text: (text || "").trim(), ...att, readByClient: true });
+    // notify the client's handler (manager or admin)
+    const me = await User.findById(req.user.id).select("name");
+    const handler = await clientHandlerId(req.user.id);
+    if (handler) notify(handler, { type: "message", title: `New message from ${me?.name || "a client"}`, body: (text || "Attachment").slice(0, 80), link: "/admin/chat" });
     res.status(201).json({ success: true, data: msg });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -163,12 +172,13 @@ export const sendMessageAsAdmin = async (req, res) => {
     const { clientId } = req.params;
     if (!(await staffCanAccess(req, clientId))) return res.status(403).json({ success: false, error: "Not your client" });
     const { text } = req.body;
-    const att = attachmentFrom(req.file);
+    const att = await attachmentFrom(req.file);
     if ((!text || !text.trim()) && !att.fileUrl) {
       return res.status(400).json({ success: false, error: "Message cannot be empty" });
     }
     const staff = await User.findById(req.user.id).select("name");
     const msg = await Message.create({ client: clientId, sender: "admin", senderName: staff?.name || "Support", text: (text || "").trim(), ...att, readByAdmin: true });
+    notify(clientId, { type: "message", title: `New message from ${staff?.name || "your team"}`, body: (text || "Attachment").slice(0, 80), link: "/dashboard/chat" });
     res.status(201).json({ success: true, data: msg });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });

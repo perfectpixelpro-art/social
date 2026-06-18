@@ -13,6 +13,11 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@calcom/embed-react": "^1.5.3",
+    "@emailjs/browser": "^4.4.1",
+    "@n8n/chat": "^1.25.0",
+    "cal": "^0.0.4",
+    "lucide-react": "^1.17.0",
     "prop-types": "^15.8.1",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",

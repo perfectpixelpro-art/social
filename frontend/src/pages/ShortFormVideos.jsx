@@ -5,14 +5,14 @@ import u3 from "../assets/u3.avif";
 import u4 from "../assets/u4.avif";
 import whyVideo from "../assets/VIDEO1.mp4";
 import whyPoster from "../assets/vi1.avif";
-import scheduleImg from "../assets/ScheduleCard.png";
-import deliverImg from "../assets/table.png";
+import scheduleImg from "../assets/ScheduleCard.webp";
+import deliverImg from "../assets/table.webp";
 import socialImg from "../assets/social-image.avif";
 import QuestionsLayout from "../components/QuestionsLayout";
 import FrameComponent from "../components/FrameComponent";
 import sf1 from "../assets/sf1.avif";
 import sf2 from "../assets/sf2.webp";
-import sf3 from "../assets/sf3.png";
+import sf3 from "../assets/sf3.webp";
 import sf4 from "../assets/sf4.webp";
 import sf5 from "../assets/sf5.webp";
 import sf6 from "../assets/sf6.webp";
@@ -59,17 +59,17 @@ const whyPoints = [
 
 // Floating platform badges around the hero
 const platforms = [
-  { label: "Reels", x: -10, y: 50, type: "reels" },
-  { label: "TikTok", x: 110, y: 54, type: "tiktok" },
-  { label: "Shorts", x: 33, y: 78, type: "shorts" },
+  { label: "Reels", x: -3, y: 44, type: "reels" },
+  { label: "TikTok", x: 102, y: 44, type: "tiktok" },
+  { label: "Shorts", x: 48, y: 88, type: "shorts" },
 ];
 
 // Floating avatar bubbles
 const avatars = [
-  { img: u1, x: 37, y: 22 },
-  { img: u2, x: 84, y: 26 },
-  { img: u3, x: 13, y: 74 },
-  { img: u4, x: 64, y: 82 },
+  { img: u1, x: 28, y: 6 },
+  { img: u2, x: 78, y: 16 },
+  { img: u3, x: 24, y: 87 },
+  { img: u4, x: 76, y: 85 },
 ];
 
 function PlatformBadge({ type, label }) {
@@ -118,7 +118,7 @@ export default function ShortFormVideos() {
           backgroundRepeat: "no-repeat",
         }}
       >
-        <div className="w-full px-[100px] mq800:px-10 mq450:px-5 py-24 mq450:py-14 flex justify-center">
+        <div className="w-full px-[100px] mq800:px-10 mq450:px-5 py-10 mq450:py-14 flex justify-center">
           <div className="relative w-full max-w-[1300px] flex items-center justify-center" style={{ minHeight: "clamp(420px, 52vw, 620px)" }}>
 
             {/* Concentric circles — hidden on mobile */}
@@ -214,7 +214,7 @@ export default function ShortFormVideos() {
               ))}
             </div>
             <a
-              href="/contact"
+              href="/book-a-call"
               className="mt-8 self-start flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[50px] rounded-[25.5px] pl-6 pr-[6px]"
             >
               <b className="text-base text-[#000]">Drive Views</b>
@@ -243,12 +243,12 @@ export default function ShortFormVideos() {
         title="Where We Make Your Brand Shine"
         ctaLabel="Increase Visibility"
         platforms={[
-          { label: "Scriptwriting & Storyboarding", x: 33, y: -9, emoji: "✍️" },
-          { label: "Trend & Audio Research", x: 102, y: 20, emoji: "🎧" },
-          { label: "On-Brand Editing with Captions", x: 96, y: 54, emoji: "💻" },
-          { label: "Ongoing Performance Tracking", x: 50, y: 82, emoji: "📊" },
-          { label: "Platform Optimization", x: -8, y: 60, emoji: "📱" },
-          { label: "Custom Content Strategy", x: -14, y: 30, emoji: "🧠" },
+          { label: "Scriptwriting & Storyboarding", x: 48, y: -8, emoji: "✍️" },
+          { label: "Trend & Audio Research", x: 88, y: 16, emoji: "🎧" },
+          { label: "On-Brand Editing with Captions", x: 92, y: 72, emoji: "💻" },
+          { label: "Ongoing Performance Tracking", x: 50, y: 107, emoji: "📊" },
+          { label: "Platform Optimization", x: 10, y: 72, emoji: "📱" },
+          { label: "Custom Content Strategy", x:11, y: 16, emoji: "🧠" },
         ]}
       />
 

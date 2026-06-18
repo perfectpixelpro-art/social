@@ -14,8 +14,8 @@ import s12 from "../assets/s12.avif";
 import s13 from "../assets/s13.webp";
 import s14 from "../assets/s14.webp";
 import s15 from "../assets/s15.webp";
-import tableImg from "../assets/table.png";
-import ScheduleCard from "../assets/ScheduleCard.png";
+import tableImg from "../assets/table.webp";
+import ScheduleCard from "../assets/ScheduleCard.webp";
 import t1 from "../assets/t1.avif";
 import t2 from "../assets/t2.avif";
 import t3 from "../assets/t3.avif";
@@ -150,31 +150,84 @@ export default function SocialMediaManagement() {
         }}
       >
         <div className="w-full px-[100px] mq800:px-10 mq450:px-5 pt-20 mq450:pt-12 pb-16 flex flex-col items-center text-center">
-          <h1
-            className="text-[#013186] font-bold leading-[1.1] m-0"
-            style={{ fontSize: "clamp(34px, 5.5vw, 80px)" }}
-          >
-            Scroll-Stopping Content<br />
-            Built for Your Brand
-          </h1>
+     <h1
+  className="
+    text-[#013186]
+    font-bold
+    leading-[1.1]
+    md:leading-[1.1]
+    leading-[1.05]
+    m-0
+    text-[32px]
+    md:text-[80px]
+  "
+>
+  <span className="hidden md:inline">
+    Scroll-Stopping Content
+    <br />
+    Built for Your Brand
+  </span>
 
-          {/* Start for $99 button */}
-          <a
-            href="/signup?plan=Starter"
-            className="mt-8 flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[50px] rounded-[25.5px] pl-6 pr-[6px]"
-          >
-            <b className="text-base text-[#000]">Start for $99</b>
-            <span className="h-[38px] w-[38px] rounded-[21px] bg-[rgba(158,202,255,0.39)] flex items-center justify-center">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#013186" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M7 17L17 7M17 7H7M17 7V17" />
-              </svg>
-            </span>
-          </a>
+  <span className="md:hidden">
+    Scroll-Stopping
+    <br />
+    Content Built for Your
+    <br />
+    Brand
+  </span>
+</h1>
+
+      <a
+  href="/book-a-call"
+  className="
+    mt-6 flex items-center
+    gap-3 md:gap-4
+    no-underline
+    border border-[rgba(1,49,134,0.07)]
+    bg-[rgba(188,214,255,0.37)]
+    hover:bg-[rgba(188,214,255,0.6)]
+    transition-colors
+
+    h-[42px] md:h-[52px]
+    rounded-full
+
+    pl-5 md:pl-8
+    pr-2
+  "
+>
+  <b  className="text-[14px] md:text-[20px] text-[#000] whitespace-nowrap">
+    Start for $99
+  </b>
+
+  <span
+    className="
+      h-[30px] w-[30px]
+      md:h-[40px] md:w-[40px]
+      rounded-full
+      bg-[rgba(158,202,255,0.39)]
+      flex items-center justify-center
+    "
+  >
+    <svg
+      width="16"
+      height="16"
+      className="md:w-[18px] md:h-[18px]"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#013186"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M7 17L17 7M17 7H7M17 7V17" />
+    </svg>
+  </span>
+</a>
         </div>
       </div>
 
       {/* ── Post grid: 3 per row (1 per row on mobile) ── */}
-      <div className="w-full px-[100px] mq800:px-10 mq450:px-5 py-16 flex justify-center">
+      <div className="w-full px-[100px] mq800:px-10 mq450:px-5 py-10 flex justify-center mt-4 mq450:mt-0">
         <div className="grid grid-cols-3 gap-6 mq800:grid-cols-2 mq450:grid-cols-1 w-full max-w-[1800px]">
           {posts.map((src, i) => (
             <div
@@ -186,10 +239,12 @@ export default function SocialMediaManagement() {
                 src={src}
                 alt={`Social media post ${i + 1}`}
                 loading="lazy"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-top"
               />
             </div>
+            
           ))}
+          
         </div>
       </div>
 
@@ -217,7 +272,7 @@ export default function SocialMediaManagement() {
       </div>
 
        {/* ── Where We Make Your Brand Shine ── */}
-      <div className="w-full px-[100px] mq800:px-10 mq450:px-5 py-20 flex justify-center">
+      <div className="w-full px-[100px] mq800:px-10 mq450:px-5 py-20 mq450:py-0 flex justify-center">
         <div className="relative w-full max-w-[1100px] flex items-center justify-center" style={{ aspectRatio: "1100 / 620" }}>
 
           {/* Concentric circles background */}
@@ -252,7 +307,7 @@ export default function SocialMediaManagement() {
               Where We Make Your<br />Brand Shine
             </h2>
             <a
-              href="/contact"
+              href="/book-a-call"
               className="mt-7 flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[50px] rounded-[25.5px] pl-6 pr-[6px]"
             >
               <b className="text-base text-[#000]">Book a Free Strategy Call</b>
@@ -301,7 +356,7 @@ export default function SocialMediaManagement() {
 
         {/* CTA button */}
         <a
-          href="/contact"
+          href="/book-a-call"
           className="mt-10 flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[50px] rounded-[25.5px] pl-6 pr-[6px]"
         >
           <b className="text-base text-[#000]">Book a Free Strategy Call</b>
@@ -343,7 +398,7 @@ export default function SocialMediaManagement() {
 
         {/* Start for $99 button */}
         <a
-          href="/signup?plan=Starter"
+          href="/book-a-call"
           className="mt-12 flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[50px] rounded-[25.5px] pl-6 pr-[6px]"
         >
           <b className="text-base text-[#000]">Start for $99</b>
@@ -378,7 +433,7 @@ export default function SocialMediaManagement() {
 
         {/* CTA button */}
         <a
-          href="/contact"
+          href="/book-a-call"
           className="mt-10 flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[50px] rounded-[25.5px] pl-6 pr-[6px]"
         >
           <b className="text-base text-[#000]">Book a Free Strategy Call</b>
@@ -444,7 +499,7 @@ export default function SocialMediaManagement() {
               We bring your brand to life on every platform, in every post. At The Social 99, you're not just outsourcing content; you're gaining a creative partner who sharpens your voice and positions you for real growth through expert social media management services.
             </p>
             <a
-              href="/signup?plan=Starter"
+              href="/book-a-call"
               className="mt-8 flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[50px] rounded-[25.5px] pl-6 pr-[6px]"
             >
               <b className="text-base text-[#000]">Start for $99</b>
@@ -502,7 +557,7 @@ export default function SocialMediaManagement() {
               ))}
             </ul>
             <a
-              href={`/signup?plan=${encodeURIComponent(plans[activePlan].name)}`}
+              href="/book-a-call"
               className="self-end mt-8 flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[48px] rounded-[25.5px] pl-6 pr-[6px]"
             >
               <b className="text-base text-[#000]">Buy Now</b>

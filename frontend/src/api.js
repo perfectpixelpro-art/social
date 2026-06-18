@@ -161,6 +161,23 @@ async function roleFetch(path, role, options = {}, _retried = false) {
 
 // ── Profile (client) ──
 export const getProfile = () => roleFetch("/users/me", "client");
+export const markTourSeen = () => roleFetch("/users/me/tour", "client", { method: "POST" });
+export const saveOnboarding = (payload) => roleFetch("/users/me/onboarding", "client", { method: "POST", body: JSON.stringify(payload) });
+
+// ── Notifications (role = "client" | "admin") ──
+export const getNotifications = (role = "client") => roleFetch("/notifications", role);
+export const markNotificationsRead = (role = "client") => roleFetch("/notifications/read", role, { method: "PUT" });
+export const dismissNotification = (id, role = "client") => roleFetch(`/notifications/${id}`, role, { method: "DELETE" });
+export const broadcastNotification = (payload) => roleFetch("/notifications/broadcast", "admin", { method: "POST", body: JSON.stringify(payload) });
+
+// ── Email automation templates (admin) ──
+export const getEmailTemplates = () => roleFetch("/email/templates", "admin");
+export const saveEmailTemplate = (key, payload) => roleFetch(`/email/templates/${key}`, "admin", { method: "PUT", body: JSON.stringify(payload) });
+export const sendTestEmail = (key, to) => roleFetch(`/email/templates/${key}/test`, "admin", { method: "POST", body: JSON.stringify({ to }) });
+export const sendCustomEmail = (payload) => roleFetch("/email/send-custom", "admin", { method: "POST", body: JSON.stringify(payload) });
+// public — capture abandoned cart from checkout
+export const recordCart = (payload) =>
+  fetch(`${API_URL}/email/cart`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }).catch(() => {});
 export const updateProfile = (payload) =>
   roleFetch("/users/me", "client", { method: "PUT", body: JSON.stringify(payload) });
 
@@ -189,6 +206,128 @@ const chatBody = (text, file) => {
   }
   return JSON.stringify({ text });
 };
+
+// ── Stripe billing ──
+// Logged-in users → authed call (auto-refreshes the token so the backend always
+// recognises them → success goes to the dashboard).
+// Guests → plain call with their email → success goes to signup (email prefilled).
+const guestCheckout = async (email, plan, addons, service) => {
+  const res = await fetch(`${API_URL}/stripe/create-checkout-session`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, plan, addons, service }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || "Could not start checkout");
+  return data;
+};
+
+export const createCheckoutSession = async (email, plan, addons = [], service = "") => {
+  if (getAccessToken()) {
+    try {
+      return await roleFetch("/stripe/create-checkout-session", "client", {
+        method: "POST",
+        body: JSON.stringify({ email, plan, addons, service }),
+      });
+    } catch {
+      // session fully expired → treat as guest if we have an email
+      clearAuth();
+      if (email) return guestCheckout(email, plan, addons, service);
+      throw new Error("Your session expired. Please log in again.");
+    }
+  }
+  return guestCheckout(email, plan, addons, service);
+};
+export const createPortalSession = () => roleFetch("/stripe/create-portal-session", "client", { method: "POST" });
+export const getSubscription = () => roleFetch("/stripe/subscription", "client");
+
+// ── Storefront (one-time add-ons) ──
+export const getStore = () => roleFetch("/stripe/store", "client");
+export const createAddonCheckout = (addons) => roleFetch("/stripe/addon-checkout", "client", { method: "POST", body: JSON.stringify({ addons }) });
+export const confirmAddon = (sessionId) => roleFetch("/stripe/addon-confirm", "client", { method: "POST", body: JSON.stringify({ sessionId }) });
+
+// ── Banners ──
+export const getActiveBanners = () => roleFetch("/banners/active", "client");
+export const adminListBanners = () => roleFetch("/banners", "admin");
+export const adminCreateBanner = (formData) => roleFetch("/banners", "admin", { method: "POST", body: formData });
+export const adminToggleBanner = (id) => roleFetch(`/banners/${id}`, "admin", { method: "PUT" });
+export const adminDeleteBanner = (id) => roleFetch(`/banners/${id}`, "admin", { method: "DELETE" });
+
+// ── YouTube (Google OAuth) connection ──
+export const getYouTubeAuthUrl = () => roleFetch("/auth/youtube/url", "client");
+export const getYouTubeStatus = () => roleFetch("/auth/youtube/status", "client");
+export const disconnectYouTube = () => roleFetch("/auth/youtube/disconnect", "client", { method: "POST" });
+export const getYouTubeAnalytics = () => roleFetch("/auth/youtube/analytics", "client");
+
+// ── Meta (Facebook + Instagram) connection ──
+export const getMetaAuthUrl = () => roleFetch("/auth/meta/url", "client");
+export const getMetaStatus = () => roleFetch("/auth/meta/status", "client");
+export const disconnectMeta = () => roleFetch("/auth/meta/disconnect", "client", { method: "POST" });
+
+// ── LinkedIn connection ──
+export const getLinkedInAuthUrl = () => roleFetch("/auth/linkedin/url", "client");
+export const getLinkedInStatus = () => roleFetch("/auth/linkedin/status", "client");
+export const disconnectLinkedIn = () => roleFetch("/auth/linkedin/disconnect", "client", { method: "POST" });
+
+// ── Scheduler (posts, analytics, summary) ──
+export const listScheduledPosts = () => roleFetch("/scheduler/posts", "client");
+// Create a post — FormData (caption, platforms[], media files, scheduledAt, requiresApproval)
+export const createScheduledPost = (formData) =>
+  roleFetch("/scheduler/posts", "client", { method: "POST", body: formData });
+export const deleteScheduledPost = (id) =>
+  roleFetch(`/scheduler/posts/${id}`, "client", { method: "DELETE" });
+export const getSchedulerAnalytics = (platform = "facebook") =>
+  roleFetch(`/scheduler/analytics?platform=${encodeURIComponent(platform)}`, "client");
+export const getSchedulerSummary = () => roleFetch("/scheduler/summary", "client");
+export const decidePostApproval = (id, decision) =>
+  roleFetch(`/scheduler/posts/${id}/approval`, "client", { method: "PUT", body: JSON.stringify({ decision }) });
+export const submitPostFeedback = (id, text) =>
+  roleFetch(`/scheduler/posts/${id}/feedback`, "client", { method: "POST", body: JSON.stringify({ text }) });
+// back-compat (Home page)
+export const getFacebookAnalytics = () => roleFetch("/scheduler/analytics?platform=facebook", "client");
+
+// ── Staff scheduling (manager/admin compose for a client) ──
+export const staffSchedulerOverview = () => roleFetch("/scheduler/staff/overview", "admin");
+export const staffListClientPosts = (clientId) => roleFetch(`/scheduler/staff/posts?clientId=${clientId}`, "admin");
+export const staffCreateClientPost = (formData) => roleFetch("/scheduler/staff/posts", "admin", { method: "POST", body: formData });
+export const staffDeleteClientPost = (id) => roleFetch(`/scheduler/staff/posts/${id}`, "admin", { method: "DELETE" });
+export const staffClientAnalytics = (clientId, platform = "facebook") =>
+  roleFetch(`/scheduler/staff/analytics?clientId=${clientId}&platform=${platform}`, "admin");
+
+// ── Tickets ──
+// Client side
+export const clientCreateTicket = (formData) =>
+  roleFetch("/tickets/me", "client", { method: "POST", body: formData }); // FormData (files)
+export const clientGetTickets = () => roleFetch("/tickets/me", "client");
+export const clientGetTicket = (id) => roleFetch(`/tickets/me/${id}`, "client");
+export const clientReplyTicket = (id, formData) =>
+  roleFetch(`/tickets/me/${id}/reply`, "client", { method: "POST", body: formData });
+// Staff side (admin or manager → uses admin token)
+export const staffGetTickets = () => roleFetch("/tickets", "admin");
+export const staffGetTicket = (id) => roleFetch(`/tickets/${id}`, "admin");
+export const staffReplyTicket = (id, formData) =>
+  roleFetch(`/tickets/${id}/reply`, "admin", { method: "POST", body: formData });
+export const staffUpdateTicketStatus = (id, status) =>
+  roleFetch(`/tickets/${id}/status`, "admin", { method: "PUT", body: JSON.stringify({ status }) });
+
+// ── Articles (Help) ──
+// Reading works for any logged-in role. We try the client token first, then admin.
+export const getArticles = async (role = "client") => roleFetch("/articles", role);
+export const getArticle = async (id, role = "client") => roleFetch(`/articles/${id}`, role);
+export const createArticle = (formData) =>
+  roleFetch("/articles", "admin", { method: "POST", body: formData }); // FormData (cover)
+export const deleteArticle = (id) => roleFetch(`/articles/${id}`, "admin", { method: "DELETE" });
+
+// ── Deliverables tracker ──
+export const getMyTracker = () => roleFetch("/tracker/me", "client");
+export const staffGetTracker = (clientId) => roleFetch(`/tracker/staff/${clientId}`, "admin");
+export const staffUpdateTrackerItem = (clientId, payload) =>
+  roleFetch(`/tracker/staff/${clientId}/item`, "admin", { method: "PUT", body: JSON.stringify(payload) });
+export const staffResetTracker = (clientId, payload = {}) =>
+  roleFetch(`/tracker/staff/${clientId}/reset`, "admin", { method: "POST", body: JSON.stringify(payload) });
+
+export const adminOverview = () => roleFetch("/admin/overview", "admin");
 
 // ── Admin: managers & client assignment ──
 export const adminCreateManager = (payload) =>
@@ -246,4 +385,5 @@ export default {
   uploadClientFile, getMyFiles, adminGetAllFiles, adminUploadForClient,
   adminCreateManager, adminListManagers, adminListClients, adminAssignClient,
   adminResetManagerPassword, adminDeleteManager,
+  createCheckoutSession, createPortalSession, getSubscription,
 };

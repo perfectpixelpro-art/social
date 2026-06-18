@@ -1,25 +1,64 @@
 import bcrypt from "bcrypt";
 import User from "../models/user.model.js";
+import Ticket from "../models/ticket.model.js";
 
 const publicStaff = (u) => ({ id: u._id, name: u.name, email: u.email, role: u.role });
+
+const PLAN_PRICE = { Starter: 99, Growth: 199, Pro: 299 };
+
+/* ── GET /api/admin/overview ── (admin) — real dashboard stats */
+export const getOverview = async (req, res) => {
+  try {
+    const clients = await User.find({ role: "client" }).select("name email plan service subscriptionStatus isFreeTrial createdAt").sort({ createdAt: -1 }).lean();
+    const active = clients.filter((c) => ["active", "trialing"].includes(c.subscriptionStatus));
+    const monthlyRevenue = active.reduce((sum, c) => sum + (c.isFreeTrial ? 0 : (PLAN_PRICE[c.plan] || 0)), 0);
+    const openTickets = await Ticket.countDocuments({ status: { $in: ["open", "in_progress"] } });
+
+    // plan distribution
+    const dist = {};
+    for (const c of clients) { const k = c.isFreeTrial ? "Trial" : (c.plan || "None"); dist[k] = (dist[k] || 0) + 1; }
+    const planDist = Object.entries(dist).map(([label, count]) => ({ label, count }));
+
+    res.json({
+      success: true,
+      data: {
+        totalClients: clients.length,
+        activeClients: active.length,
+        monthlyRevenue,
+        openTickets,
+        planDist,
+        recentClients: clients.slice(0, 8).map((c) => ({
+          id: c._id, name: c.name, email: c.email,
+          plan: c.isFreeTrial ? "Trial" : (c.plan || "—"),
+          status: c.subscriptionStatus || "none",
+          date: c.createdAt,
+        })),
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
 
 // POST /api/admin/managers — create a manager account (+ optionally assign clients)
 export const createManager = async (req, res) => {
   try {
-    const { name, email, password, clientIds } = req.body;
+    const { name, email, password, clientIds, role } = req.body;
     if (!name || !email || !password) {
       return res.status(400).json({ success: false, error: "Name, email, and password are required" });
     }
     if (password.length < 8) {
       return res.status(400).json({ success: false, error: "Password must be at least 8 characters" });
     }
+    const newRole = role === "writer" ? "writer" : "manager";
     const existing = await User.findOne({ email: email.toLowerCase() });
     if (existing) return res.status(400).json({ success: false, error: "An account with that email already exists" });
 
     const hashed = await bcrypt.hash(password, 12);
-    const manager = await User.create({ name, email, password: hashed, role: "manager", isVerified: true });
+    const manager = await User.create({ name, email, password: hashed, role: newRole, isVerified: true });
 
-    if (Array.isArray(clientIds) && clientIds.length) {
+    // Only managers can have clients assigned.
+    if (newRole === "manager" && Array.isArray(clientIds) && clientIds.length) {
       await User.updateMany({ _id: { $in: clientIds }, role: "client" }, { assignedManager: manager._id });
     }
     res.status(201).json({ success: true, data: publicStaff(manager) });
@@ -31,11 +70,13 @@ export const createManager = async (req, res) => {
 // GET /api/admin/managers — list managers with their assigned clients
 export const listManagers = async (req, res) => {
   try {
-    const managers = await User.find({ role: "manager" }).select("name email").lean();
+    const managers = await User.find({ role: { $in: ["manager", "writer"] } }).select("name email role").lean();
     const withClients = await Promise.all(
       managers.map(async (m) => {
-        const clients = await User.find({ role: "client", assignedManager: m._id }).select("name email").lean();
-        return { ...publicStaff(m), clientCount: clients.length, clients: clients.map((c) => ({ id: c._id, name: c.name, email: c.email })) };
+        const clients = m.role === "manager"
+          ? await User.find({ role: "client", assignedManager: m._id }).select("name email").lean()
+          : [];
+        return { ...publicStaff(m), role: m.role, clientCount: clients.length, clients: clients.map((c) => ({ id: c._id, name: c.name, email: c.email })) };
       })
     );
     res.json({ success: true, data: withClients });
@@ -76,7 +117,10 @@ export const deleteManager = async (req, res) => {
 // GET /api/admin/clients — list all clients with their assigned manager
 export const listClients = async (req, res) => {
   try {
-    const clients = await User.find({ role: "client" })
+    // Managers only see clients assigned to them; admins see all clients.
+    const filter = { role: "client" };
+    if (req.user.role === "manager") filter.assignedManager = req.user.id;
+    const clients = await User.find(filter)
       .select("name email assignedManager")
       .populate("assignedManager", "name email")
       .sort({ createdAt: -1 });

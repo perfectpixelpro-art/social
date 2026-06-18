@@ -50,7 +50,7 @@ const Arrow = () => (
   </svg>
 );
 
-const CtaButton = ({ label = "Start for $99", href = "/signup?plan=Starter" }) => (
+const CtaButton = ({ label = "Start for $99", href = "/book-a-call" }) => (
   <a href={href} className="flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[50px] rounded-[25.5px] pl-6 pr-[6px]">
     <b className="text-base text-[#000]">{label}</b>
     <span className="h-[38px] w-[38px] rounded-[21px] bg-[rgba(158,202,255,0.39)] flex items-center justify-center"><Arrow /></span>
@@ -224,7 +224,7 @@ export function PlansThatFit({ data = plans, subtitle = "Flexible plans designed
               </li>
             ))}
           </ul>
-          <a href={`/signup?plan=${encodeURIComponent(data[active].name)}`} className="self-end mt-8 flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[48px] rounded-[25.5px] pl-6 pr-[6px]">
+          <a href="/book-a-call" className="self-end mt-8 flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[48px] rounded-[25.5px] pl-6 pr-[6px]">
             <b className="text-base text-[#000]">Buy Now</b>
             <span className="h-[36px] w-[36px] rounded-[21px] bg-[rgba(158,202,255,0.39)] flex items-center justify-center"><Arrow /></span>
           </a>
@@ -262,7 +262,7 @@ export function WhyJoin({
           <p className="mt-5 text-[rgba(0,0,0,0.6)] font-medium leading-relaxed" style={{ fontSize: "clamp(15px, 1.4vw, 19px)" }}>
             {text}
           </p>
-          <a href="/signup?plan=Starter" className="mt-8 flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[50px] rounded-[25.5px] pl-6 pr-[6px]">
+          <a href="/book-a-call" className="mt-8 flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[50px] rounded-[25.5px] pl-6 pr-[6px]">
             <b className="text-base text-[#000]">Start for $99</b>
             <span className="h-[38px] w-[38px] rounded-[21px] bg-[rgba(158,202,255,0.39)] flex items-center justify-center"><Arrow /></span>
           </a>

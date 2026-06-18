@@ -1,4 +1,4 @@
-import bgImage from "../assets/light-gradient-bg.png";
+import bgImage from "../assets/light-gradient-bg.webp";
 
 export default function HeroSection() {
   return (

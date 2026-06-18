@@ -1,0 +1,90 @@
+# Render Blueprint — backend API for The Social 99
+# Deploy: Render → New → Blueprint → pick this repo. Fill the secret values in the dashboard.
+services:
+  - type: web
+    name: thesocial99-api
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # ── Core (fill these in the Render dashboard) ──
+      - key: MONGO_URI            # MongoDB Atlas connection string (…/social99)
+        sync: false
+      - key: ACCESS_TOKEN_SECRET
+        sync: false
+      - key: CLIENT_URL          # your Vercel URL, e.g. https://thesocial99.vercel.app
+        sync: false
+      - key: SERVER_URL          # this Render service URL, e.g. https://thesocial99-api.onrender.com
+        sync: false
+      - key: MEDIA_BASE_URL      # same as SERVER_URL (or your Cloudinary is used automatically)
+        sync: false
+      # ── Cloudinary (persistent uploads) ──
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      # ── Email (Resend) ──
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      # ── Stripe ──
+      - key: STRIPE_SECRET_KEY_TEST
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_PRICE_STARTER
+        sync: false
+      - key: STRIPE_PRICE_GROWTH
+        sync: false
+      - key: STRIPE_PRICE_PRO
+        sync: false
+      - key: STRIPE_PRICE_ADDON_VIDEO
+        sync: false
+      - key: STRIPE_PRICE_ADDON_GRAPHIC
+        sync: false
+      - key: STRIPE_PRICE_ADDON_PAGE
+        sync: false
+      # ── Google / YouTube ──
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_CALLBACK_URL   # https://<render>/auth/youtube/callback
+        sync: false
+      # ── Meta (Facebook + Instagram) ──
+      - key: FB_APP_ID
+        sync: false
+      - key: FB_APP_SECRET
+        sync: false
+      - key: FB_CONFIG_ID
+        sync: false
+      - key: FB_SCOPES
+        sync: false
+      - key: FB_CALLBACK_URL       # https://<render>/auth/facebook/callback
+        sync: false
+      # ── LinkedIn ──
+      - key: LINKEDIN_CLIENT_ID
+        sync: false
+      - key: LINKEDIN_CLIENT_SECRET
+        sync: false
+      - key: LINKEDIN_SCOPES
+        sync: false
+      - key: LINKEDIN_CALLBACK_URL # https://<render>/auth/linkedin/callback
+        sync: false
+      # ── Zoom + Google Drive ──
+      - key: ZOOM_CLIENT_ID
+        sync: false
+      - key: ZOOM_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_DRIVE_ROOT_FOLDER_ID
+        sync: false
+      - key: GOOGLE_SERVICE_ACCOUNT_PATH
+        sync: false

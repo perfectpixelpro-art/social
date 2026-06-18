@@ -3,110 +3,217 @@ import Card1 from "../assets/Card1.avif";
 import Card2 from "../assets/Card2.avif";
 import Card3 from "../assets/Card3.avif";
 
-const Pill = ({ emoji, text }) => (
-  <div className="flex items-center gap-1.5 bg-white/80 backdrop-blur-sm rounded-full px-3 py-1.5 border border-[rgba(0,0,0,0.08)] w-fit whitespace-nowrap">
-    <span className="text-xs">{emoji}</span>
-    <span className="text-[12.5px] font-semibold text-[#111]">{text}</span>
-  </div>
-);
-
 const cards = [
   {
     title: "Social Media Management",
-    badge: { text: "+44k", green: false },
     pills: [
       { emoji: "📈", text: "Results-Driven Growth" },
       { emoji: "🎯", text: "Tailored Content Ideas" },
       { emoji: "🔥", text: "Attention-Grabbing Posts" },
     ],
     image: Card1,
-    alt: "Social Media Management",
+    link: "/social-media-management",
   },
   {
     title: "Short-Form Videos",
-    badge: { text: "1.2M Impressions", green: true },
     pills: [
       { emoji: "⚡️", text: "Videos Built for Virality" },
       { emoji: "🎬", text: "Stories That Convert" },
       { emoji: "📊", text: "Proven Engagement Boost" },
     ],
     image: Card2,
-    alt: "Short-Form Videos",
+    link: "/short-form-videos",
   },
   {
     title: "Award-winning Website",
-    badge: { text: "500k in sales", green: true },
     pills: [
-      { emoji: "💼", text: "Conversion-Focused Designs" },
+      { emoji: "🛍️", text: "Conversion-Focused Designs" },
       { emoji: "🚀", text: "Seamless User Experience" },
       { emoji: "💰", text: "ROI-Backed Results" },
     ],
     image: Card3,
-    alt: "Award-winning Website",
+    link: "/services/website",
   },
 ];
 
+const styles = `
+  .service-card {
+    transition: all 0.3s ease;
+  }
+  .service-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(1, 49, 134, 0.15);
+  }
+
+  /* MacBook range */
+  @media (min-width: 1024px) and (max-width: 1440px) {
+    .service-card {
+      height: 360px !important;
+      min-height: 360px !important;
+      max-height: 360px !important;
+    }
+    .card-content {
+      width: 55% !important;
+      padding: 22px !important;
+      height: 360px !important;
+      box-sizing: border-box !important;
+      display: flex !important;
+      flex-direction: column !important;
+      overflow: hidden !important;
+    }
+    .card-image-wrapper {
+      width: 95% !important;
+      height: 140% !important;
+      bottom: -0px !important;
+      top: auto !important;
+      right: -0px !important;
+    }
+    .card-title {
+      font-size: 22px !important;
+      margin-bottom: 14px !important;
+      line-height: 1.2 !important;
+    }
+    .card-pills {
+      gap: 8px !important;
+    }
+    .card-pill-item {
+      padding: 7px 14px !important;
+    }
+    .card-pill-emoji {
+      font-size: 15px !important;
+    }
+    .card-pill-text {
+      font-size: 12px !important;
+    }
+    .explore-btn {
+      padding: 10px 14px !important;
+      width: 100% !important;
+    }
+    .explore-btn-text {
+      font-size: 14px !important;
+    }
+    .explore-btn-icon {
+      width: 28px !important;
+      height: 28px !important;
+      flex-shrink: 0 !important;
+    }
+    .explore-btn-icon svg {
+      width: 12px !important;
+      height: 12px !important;
+    }
+    .card-cta {
+      padding-top: 14px !important;
+      margin-top: auto !important;
+    }
+  }
+
+  /* Mobile fix */
+  @media (max-width: 800px) {
+    .service-card {
+      min-height: 260px !important;
+    }
+    .card-content {
+      width: 50% !important;
+      padding: 18px 14px !important;
+    }
+    .card-image-wrapper {
+      width: 80% !important;
+      height: 140% !important;
+      bottom: 0px !important;
+      top: auto !important;
+      right: 0px !important;
+    }
+    .card-title {
+      font-size: 17px !important;
+      margin-bottom: 8px !important;
+    }
+    .card-cta {
+      padding-top: 10px !important;
+    }
+    .explore-btn {
+      padding: 8px 10px !important;
+      width: 100% !important;
+    }
+    .explore-btn-text {
+      font-size: 13px !important;
+      white-space: nowrap !important;
+    }
+    .explore-btn-icon {
+      width: 22px !important;
+      height: 22px !important;
+      flex-shrink: 0 !important;
+    }
+  }
+`;
+
 const PlanContent = ({ className = "" }) => {
   return (
-    <div className={`w-full font-[Montserrat] ${className}`}>
-      <div className="flex gap-5 mq1125:flex-col">
+    <div className={"w-full font-[Montserrat] " + className}>
+      <style>{styles}</style>
+
+      <div className="grid grid-cols-3 gap-3 mq1125:grid-cols-2 mq800:grid-cols-1">
         {cards.map((card) => (
-          <div
-            key={card.title}
-            className="flex-1 overflow-hidden flex flex-col relative"
-            style={{
-              height: "380px",
-              background: "linear-gradient(180deg, #F2F7FF 0%, #DCEAFF 100%)",
-              border: "1.5px solid rgba(1, 49, 134, 0.18)",
-              borderRadius: "28px",
-              boxShadow: "0 4px 24px rgba(1,49,134,0.08)",
-            }}
-          >
-            {/* Badge */}
-            <div className="absolute top-4 right-4 z-20">
-              {card.badge.green ? (
-                <span className="bg-[#22c55e] text-white text-[11px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap shadow-sm">
-                  {card.badge.text}
-                </span>
-              ) : (
-                <span className="bg-white text-[#000] text-[11px] font-bold px-2.5 py-1 rounded-full border border-[rgba(0,0,0,0.1)] whitespace-nowrap shadow-sm">
-                  {card.badge.text}
-                </span>
-              )}
-            </div>
+          <a key={card.title} href={card.link} className="block no-underline">
+            <div className="service-card relative overflow-hidden rounded-[24px] border border-[rgba(1,49,134,0.18)] bg-gradient-to-b from-[#F2F7FF] to-[#DCEAFF] shadow-[0_4px_24px_rgba(1,49,134,0.08)] min-h-[320px] cursor-pointer">
 
-            {/* Image — large, fills right, overflows top */}
-            <div
-              className="absolute right-0 z-10 pointer-events-none"
-              style={{ width: "90%", top: "-25px", bottom: 0 }}
-            >
-              <img
-                src={card.image}
-                alt={card.alt}
-                className="w-full h-full object-contain"
-                style={{ objectPosition: "right bottom" }}
-              />
-            </div>
-
-            {/* Left content */}
-            <div
-              className="flex flex-col h-full p-5 relative z-20"
-              style={{ width: "52%" }}
-            >
-              <h3 className="text-[15px] font-bold text-[#000] m-0 mb-4 leading-snug">
-                {card.title}
-              </h3>
-              <div className="flex flex-col gap-2 flex-1">
-                {card.pills.map((p) => (
-                  <Pill key={p.text} emoji={p.emoji} text={p.text} />
-                ))}
+              {/* IMAGE */}
+              <div className="card-image-wrapper absolute right-0 bottom-0 w-[90%] h-[150%] pointer-events-none">
+                <img
+                  src={card.image}
+                  alt={card.title}
+                  className="w-full h-full object-contain object-bottom-right"
+                />
               </div>
-              <button className="mt-4 flex items-center gap-2 bg-white/70 border border-[rgba(1,49,134,0.15)] rounded-full px-4 py-2 w-fit cursor-pointer hover:bg-white transition-all">
-                <span className="text-[12px] font-bold text-[#000]">Explore now $99</span>
-                <span className="w-[18px] h-[18px] rounded-full bg-[rgba(158,202,255,0.6)] flex items-center justify-center text-[9px] font-bold text-[#013186] flex-shrink-0">↗</span>
-              </button>
+
+              {/* CONTENT */}
+              <div className="card-content relative z-10 flex flex-col h-full p-5 w-[58%]">
+
+                {/* TITLE */}
+                <h3 className="card-title text-[29px] font-bold text-black leading-[1.2] mb-4">
+                  {card.title}
+                </h3>
+
+                {/* PILLS */}
+                <div className="card-pills flex flex-col gap-2">
+                  {card.pills.map((pill) => (
+                    <div
+                      key={pill.text}
+                      className="card-pill-item flex items-center gap-2 bg-white/90 border border-[rgba(1,49,134,0.10)] shadow-sm rounded-full px-3 py-2 w-fit max-w-full overflow-hidden"
+                    >
+                      <span className="card-pill-emoji text-[14px] shrink-0">{pill.emoji}</span>
+                      <span className="card-pill-text text-[12px] font-semibold text-[#111] leading-none truncate">
+                        {pill.text}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* CTA */}
+                <div className="card-cta mt-auto pt-6">
+                  <div className=" explore-btn flex items-center gap-1 rounded-full border border-[rgba(1,49,134,0.18)] bg-[rgba(188,214,255,0.45)] px-6 py-2 w-full justify-between">
+                    <span className="explore-btn-text text-[18px] font-bold text-[#013186] whitespace-nowrap leading-none">
+                      Explore now $99
+                    </span>
+                    <span className="explore-btn-icon w-8 h-8 rounded-full bg-[rgba(1,49,134,0.10)] flex items-center justify-center shrink-0">
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#013186"
+                        strokeWidth="2.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M7 17L17 7M17 7H7M17 7v10" />
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+
+              </div>
             </div>
-          </div>
+          </a>
         ))}
       </div>
     </div>

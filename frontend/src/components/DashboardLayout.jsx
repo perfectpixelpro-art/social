@@ -1,6 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, NavLink, Outlet, useLocation } from "react-router-dom";
 import { logoutUser } from "../api";
+import DashboardTour from "./DashboardTour";
+import BannerPopup from "./BannerPopup";
+import OnboardingForm from "./OnboardingForm";
+import NotificationBell from "./NotificationBell";
+import GeneralNotice from "./GeneralNotice";
+import ChatWidget, { openS99 } from "./ChatWidget";
 
 /* ── icons ── */
 export const Icon = ({ d, size = 18 }) => (
@@ -21,16 +27,19 @@ export const icons = {
   logout: <><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" /></>,
   files: <><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></>,
   team: <><circle cx="9" cy="8" r="3.5" /><path d="M2 21c0-3.5 3-5.5 7-5.5" /><circle cx="17" cy="9" r="2.5" /><path d="M22 21c0-3-2-4.5-5-4.5" /></>,
+  store: <><path d="M3 9l1-5h16l1 5" /><path d="M4 9v10a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9" /><path d="M3 9h18" /><path d="M9 13h6" /></>,
+  banner: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 9h18" /><circle cx="8" cy="14" r="1.5" /></>,
+  email: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></>,
 };
 
 const nav = [
   { key: "home", label: "Home", to: "/dashboard", end: true },
   { key: "calendar", label: "Scheduling", to: "/dashboard/scheduling" },
+  { key: "store", label: "Store", to: "/dashboard/store" },
   { key: "profile", label: "Profile", to: "/dashboard/profile" },
   { key: "files", label: "Files", to: "/dashboard/files" },
   { key: "chat", label: "Chat", to: "/dashboard/chat" },
-  { key: "ticket", label: "Ticket Support", to: "/dashboard/tickets" },
-  { key: "support", label: "Support", to: "/dashboard/support" },
+  { key: "ticket", label: "Support", to: "/dashboard/tickets" },
   { key: "help", label: "Help", to: "/dashboard/help" },
 ];
 
@@ -38,10 +47,10 @@ const titleByPath = {
   "/dashboard": "Dashboard",
   "/dashboard/chat": "Chat",
   "/dashboard/scheduling": "Scheduling",
+  "/dashboard/store": "Store",
   "/dashboard/profile": "Profile",
   "/dashboard/files": "Files",
-  "/dashboard/tickets": "Ticket Support",
-  "/dashboard/support": "Support",
+  "/dashboard/tickets": "Support",
   "/dashboard/help": "Help",
 };
 
@@ -131,6 +140,13 @@ export default function DashboardLayout() {
               )}
             </NavLink>
           ))}
+
+          {/* Ask S99 chatbot */}
+          <button onClick={openS99}
+            className="mt-1 flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-[14px] font-bold cursor-pointer text-white [background:linear-gradient(135deg,#1463ff,#013186)] hover:opacity-95 transition-opacity">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /><path d="m14 7 1 2 2 1-2 1-1 2-1-2-2-1 2-1z" /></svg>
+            Ask S99
+          </button>
         </nav>
 
         <div className="px-4 py-4 border-t border-[#eef1f6] flex items-center gap-3">
@@ -165,10 +181,7 @@ export default function DashboardLayout() {
           </div>
 
           <div className="flex items-center gap-5">
-            <button className="relative text-[#5b6472] cursor-pointer">
-              <Icon d={icons.bell} size={20} />
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-red-500" />
-            </button>
+            <NotificationBell role="client" />
             <div className="relative" ref={menuRef}>
               <button onClick={() => setMenuOpen((o) => !o)} className="flex items-center gap-2 cursor-pointer">
                 {user.avatar ? (
@@ -211,6 +224,12 @@ export default function DashboardLayout() {
         <div className="flex-1 min-h-0 overflow-hidden">
           <Outlet context={{ user, name, initials }} />
         </div>
+        {/* First-login product tour + onboarding form + promo banner popup */}
+        <DashboardTour />
+        <OnboardingForm user={user} />
+        <BannerPopup />
+        <GeneralNotice />
+        <ChatWidget />
       </div>
     </div>
   );

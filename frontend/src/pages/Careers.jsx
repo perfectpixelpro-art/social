@@ -1,4 +1,11 @@
 import { useState, useRef } from "react";
+import emailjs from "@emailjs/browser";
+
+// ── Replace these 3 values with your EmailJS credentials ──
+const EMAILJS_SERVICE_ID  = "your_service_id";
+const EMAILJS_TEMPLATE_ID = "your_template_id";
+const EMAILJS_PUBLIC_KEY  = "your_public_key";
+// ──────────────────────────────────────────────────────────
 
 const H2 = ({ children }) => (
   <h2 className="text-[#013186] font-bold m-0" style={{ fontSize: "clamp(30px, 5vw, 60px)" }}>{children}</h2>
@@ -24,39 +31,41 @@ const jobs = [
   {
     title: "Social Media Manager",
     description:
-      "We’re looking for a Social Media Manager who can plan and execute structured content across platforms. You’ll manage content calendars, coordinate with designers and editors, maintain brand tone, and ensure consistent publishing. The ideal candidate is organized, strategic, and comfortable handling multiple accounts with clarity and efficiency.",
+      "We're looking for a Social Media Manager who can plan and execute structured content across platforms. You'll manage content calendars, coordinate with designers and editors, maintain brand tone, and ensure consistent publishing. The ideal candidate is organized, strategic, and comfortable handling multiple accounts with clarity and efficiency.",
   },
   {
     title: "Video Editor",
     description:
-      "We’re looking for a Video Editor who can transform raw footage into engaging short-form videos for social platforms. You should understand pacing, storytelling, and audience retention, while delivering polished content within defined timelines.",
+      "We're looking for a Video Editor who can transform raw footage into engaging short-form videos for social platforms. You should understand pacing, storytelling, and audience retention, while delivering polished content within defined timelines.",
   },
   {
     title: "Graphic Designer",
     description:
-      "We’re hiring a Graphic Designer who can create clean, premium, and brand-aligned visuals for digital platforms. You should understand typography, layout, and modern design aesthetics while maintaining consistency across projects. We value simplicity, precision, and strong attention to detail.",
+      "We're hiring a Graphic Designer who can create clean, premium, and brand-aligned visuals for digital platforms. You should understand typography, layout, and modern design aesthetics while maintaining consistency across projects. We value simplicity, precision, and strong attention to detail.",
   },
   {
     title: "Business Development Manager",
     description:
-      "We’re hiring a Business Development Manager who can identify growth opportunities, build strong client relationships, and drive consistent revenue. You should be confident in outreach, pitching, and closing while maintaining a clear understanding of client needs. We value clarity, initiative, and a results-focused approach to growth.",
+      "We're hiring a Business Development Manager who can identify growth opportunities, build strong client relationships, and drive consistent revenue. You should be confident in outreach, pitching, and closing while maintaining a clear understanding of client needs. We value clarity, initiative, and a results-focused approach to growth.",
   },
   {
     title: "SEO Specialist",
     description:
-      "We’re seeking an SEO Specialist to handle keyword research, on-page optimization, and foundational technical improvements. This role requires analytical thinking and a focus on sustainable, long-term visibility.",
+      "We're seeking an SEO Specialist to handle keyword research, on-page optimization, and foundational technical improvements. This role requires analytical thinking and a focus on sustainable, long-term visibility.",
   },
   {
     title: "Backlinking Expert",
     description:
-      "We’re seeking a Backlinking Expert to plan and execute high-quality link-building strategies that improve search visibility and domain authority. You should understand outreach, content placement, and ethical SEO practices while ensuring consistency and relevance across backlinks. This role requires attention to detail, persistence, and a focus on long-term impact.",
+      "We're seeking a Backlinking Expert to plan and execute high-quality link-building strategies that improve search visibility and domain authority. You should understand outreach, content placement, and ethical SEO practices while ensuring consistency and relevance across backlinks. This role requires attention to detail, persistence, and a focus on long-term impact.",
   },
 ];
 
 export default function Careers() {
-  const [openIndex, setOpenIndex] = useState(null);
-  const [formData, setFormData] = useState({ name: "", email: "", role: "", portfolio: null });
-  const [submitted, setSubmitted] = useState(false);
+  const [openIndex, setOpenIndex]   = useState(null);
+  const [formData, setFormData]     = useState({ name: "", email: "", role: "", portfolio: null });
+  const [submitted, setSubmitted]   = useState(false);
+  const [loading, setLoading]       = useState(false);
+  const [error, setError]           = useState("");
   const formRef = useRef(null);
 
   const handleApply = (jobTitle) => {
@@ -66,9 +75,35 @@ export default function Careers() {
     }, 50);
   };
 
-  const handleSubmit = () => {
-    if (!formData.name || !formData.email || !formData.role) return;
-    setSubmitted(true);
+  const handleSubmit = async () => {
+    setError("");
+
+    // Basic validation
+    if (!formData.name.trim())  return setError("Please enter your full name.");
+    if (!formData.email.trim()) return setError("Please enter your email.");
+    if (!formData.role)         return setError("Please select the role you're applying for.");
+
+    setLoading(true);
+
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          from_name:      formData.name,
+          from_email:     formData.email,
+          role:           formData.role,
+          portfolio_name: formData.portfolio ? formData.portfolio.name : "No portfolio attached",
+        },
+        EMAILJS_PUBLIC_KEY
+      );
+      setSubmitted(true);
+    } catch (err) {
+      console.error("EmailJS error:", err);
+      setError("Something went wrong. Please try again or email us directly.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -125,14 +160,12 @@ export default function Careers() {
           <H2>Current Openings</H2>
 
           <div className="flex flex-col mq800:flex-col gap-0 lg:flex-row lg:gap-16 items-start">
-            {/* Left label */}
             <div className="lg:w-[480px] mq800:w-full mq800:mb-6 shrink-0">
               <p className="text-[rgba(0,0,0,0.5)] font-semibold m-0" style={{ fontSize: "clamp(16px, 1.5vw, 21px)" }}>
                 We are currently accepting applications for the following roles:
               </p>
             </div>
 
-            {/* Accordion */}
             <div className="flex-1 w-full flex flex-col">
               {jobs.map((job, i) => {
                 const isOpen = openIndex === i;
@@ -142,10 +175,7 @@ export default function Careers() {
                       onClick={() => setOpenIndex(isOpen ? null : i)}
                       className="w-full flex items-center justify-between py-5 text-left bg-transparent border-none cursor-pointer"
                     >
-                      <span
-                        className="text-[#013186] font-bold"
-                        style={{ fontSize: "clamp(18px, 2vw, 28px)" }}
-                      >
+                      <span className="text-[#013186] font-bold" style={{ fontSize: "clamp(18px, 2vw, 28px)" }}>
                         {job.title}
                       </span>
                       <span className="text-[#013186] text-2xl font-light ml-4 shrink-0">
@@ -189,8 +219,8 @@ export default function Careers() {
             <p className="m-0 text-[#111] font-bold" style={{ fontSize: "clamp(15px, 1.3vw, 18px)" }}>
               Please email your resume, portfolio, and a brief introduction to:
             </p>
-            <a href="mailto:careers@thesocial99.com" className="text-[#013186] font-bold no-underline hover:underline" style={{ fontSize: "clamp(15px, 1.3vw, 18px)" }}>
-              careers@thesocial99.com
+            <a href="mailto:chirag@thesocial99.com" className="text-[#013186] font-bold no-underline hover:underline" style={{ fontSize: "clamp(15px, 1.3vw, 18px)" }}>
+              chirag@thesocial99.com
             </a>
           </div>
 
@@ -202,15 +232,37 @@ export default function Careers() {
             Apply now and become part of a team built on clarity, consistency, and execution.
           </p>
 
+          {/* ── Form / Success ── */}
           {submitted ? (
-            <div className="bg-white rounded-2xl px-8 py-10 text-center flex flex-col gap-3">
-              <p className="text-[#013186] font-bold m-0" style={{ fontSize: "clamp(18px, 2vw, 26px)" }}>Application Submitted!</p>
+
+            /* ── SUCCESS STATE ── */
+            <div className="bg-white rounded-2xl px-8 py-12 text-center flex flex-col items-center gap-4">
+              {/* Checkmark circle */}
+              <div className="w-16 h-16 rounded-full bg-[#013186] flex items-center justify-center">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <p className="text-[#013186] font-bold m-0" style={{ fontSize: "clamp(20px, 2vw, 28px)" }}>
+                Application Submitted!
+              </p>
               <p className="text-[rgba(0,0,0,0.5)] font-semibold m-0" style={{ fontSize: "clamp(14px, 1.3vw, 17px)" }}>
-                Thank you for applying. We'll review your application and get back to you.
+                Thank you, <strong className="text-[#013186]">{formData.name}</strong>! We've received your application for <strong className="text-[#013186]">{formData.role}</strong>. We'll review it and get back to you at <strong className="text-[#013186]">{formData.email}</strong>.
               </p>
             </div>
+
           ) : (
+
+            /* ── FORM ── */
             <div className="flex flex-col gap-4">
+
+              {/* Error message */}
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-xl px-5 py-3">
+                  <p className="text-red-600 font-semibold m-0" style={{ fontSize: "clamp(13px, 1.1vw, 16px)" }}>{error}</p>
+                </div>
+              )}
+
               {/* Name */}
               <input
                 type="text"
@@ -254,7 +306,7 @@ export default function Careers() {
                   type="file"
                   accept=".pdf,.doc,.docx,.zip,.png,.jpg"
                   onChange={(e) => setFormData((p) => ({ ...p, portfolio: e.target.files[0] }))}
-                  className=" bg-white w-[200px] text-[rgba(0,0,0,0.5)] font-semibold"
+                  className="bg-white w-[200px] text-[rgba(0,0,0,0.5)] font-semibold"
                   style={{ fontSize: "clamp(13px, 1.1vw, 16px)" }}
                 />
               </div>
@@ -262,19 +314,28 @@ export default function Careers() {
               {/* Submit */}
               <button
                 onClick={handleSubmit}
-                className="w-full flex items-center justify-between bg-white border border-[rgba(1,49,134,0.15)] rounded-xl px-6 py-4 text-[#111] font-bold cursor-pointer hover:bg-[#013186] hover:text-white hover:border-[#013186] transition-colors group"
+                disabled={loading}
+                className="w-full flex items-center justify-between bg-white border border-[rgba(1,49,134,0.15)] rounded-xl px-6 py-4 text-[#111] font-bold cursor-pointer hover:bg-[#013186] hover:text-white hover:border-[#013186] transition-colors group disabled:opacity-60 disabled:cursor-not-allowed"
                 style={{ fontSize: "clamp(15px, 1.3vw, 18px)" }}
               >
-                Apply Now
+                <span>{loading ? "Sending…" : "Apply Now"}</span>
                 <span className="w-7 h-7 rounded-full border border-[rgba(1,49,134,0.3)] flex items-center justify-center group-hover:border-white transition-colors">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+                  {loading ? (
+                    <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+                    </svg>
+                  ) : (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M7 17L17 7M17 7H7M17 7v10" />
+                    </svg>
+                  )}
                 </span>
               </button>
+
             </div>
           )}
         </div>
 
-   
       </div>
     </div>
   );

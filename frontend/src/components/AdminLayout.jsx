@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, NavLink, Outlet, useLocation } from "react-router-dom";
 import { adminLogout } from "../api";
 import { Icon, icons } from "./DashboardLayout";
+import NotificationBell from "./NotificationBell";
 
 const baseNav = [
   { key: "home", label: "Home", to: "/admin", end: true },
@@ -9,8 +10,10 @@ const baseNav = [
   { key: "team", label: "Team & Clients", to: "/admin/team", adminOnly: true },
   { key: "files", label: "Files", to: "/admin/files" },
   { key: "chat", label: "Chat", to: "/admin/chat" },
-  { key: "ticket", label: "Ticket Support", to: "/admin/tickets" },
-  { key: "support", label: "Support", to: "/admin/support" },
+  { key: "ticket", label: "Support", to: "/admin/tickets" },
+  { key: "banner", label: "Banners", to: "/admin/banners", adminOnly: true },
+  { key: "bell", label: "Notifications", to: "/admin/notifications", adminOnly: true },
+  { key: "email", label: "Email", to: "/admin/email", adminOnly: true },
   { key: "help", label: "Help", to: "/admin/help" },
 ];
 
@@ -21,8 +24,10 @@ const titleByPath = {
   "/admin/files": "Files",
   "/admin/profile": "Profile",
   "/admin/chat": "Chat",
-  "/admin/tickets": "Ticket Support",
-  "/admin/support": "Support",
+  "/admin/tickets": "Support",
+  "/admin/banners": "Banners",
+  "/admin/notifications": "Notifications",
+  "/admin/email": "Email Automation",
   "/admin/help": "Help",
 };
 
@@ -50,12 +55,38 @@ export default function AdminLayout() {
     try { return JSON.parse(localStorage.getItem("adminUser")) || {}; } catch { return {}; }
   })();
   const role = admin.role || "admin";
-  const nav = baseNav.filter((item) => !item.adminOnly || role === "admin");
+  // Role-specific navigation.
+  let nav;
+  if (role === "manager") {
+    // Managers: their assigned clients' home, scheduling, chat, support, help.
+    nav = [
+      { key: "home", label: "Home", to: "/admin", end: true },
+      { key: "calendar", label: "Scheduling", to: "/admin/scheduling" },
+      { key: "chat", label: "Chat", to: "/admin/chat" },
+      { key: "ticket", label: "Support", to: "/admin/tickets" },
+      { key: "help", label: "Help", to: "/admin/help" },
+    ];
+  } else if (role === "writer") {
+    // Writers: only the Help / articles area.
+    nav = [{ key: "help", label: "Help", to: "/admin/help" }];
+  } else {
+    nav = baseNav.filter((item) => !item.adminOnly || role === "admin");
+  }
   const name = admin.name || (role === "manager" ? "Manager" : "Admin");
   const initials = name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
   const crumb = titleByPath[location.pathname] || "Admin Panel";
 
   const handleLogout = async () => { await adminLogout(); navigate("/admin/login"); };
+
+  // Restrict managers and writers to their allowed pages.
+  useEffect(() => {
+    if (role === "manager") {
+      const allowed = ["/admin", "/admin/scheduling", "/admin/chat", "/admin/tickets", "/admin/help"];
+      if (!allowed.includes(location.pathname)) navigate("/admin", { replace: true });
+    } else if (role === "writer") {
+      if (location.pathname !== "/admin/help") navigate("/admin/help", { replace: true });
+    }
+  }, [role, location.pathname, navigate]);
 
   return (
     <div className="w-full min-h-screen bg-white font-[Montserrat] flex">
@@ -113,10 +144,7 @@ export default function AdminLayout() {
           </div>
 
           <div className="flex items-center gap-5">
-            <button className="relative text-[#5b6472] cursor-pointer">
-              <Icon d={icons.bell} size={20} />
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-red-500" />
-            </button>
+            <NotificationBell role="admin" />
             <div className="relative" ref={menuRef}>
               <button onClick={() => setMenuOpen((o) => !o)} className="flex items-center gap-2 cursor-pointer">
                 <span className="w-9 h-9 rounded-full bg-[#013186] text-white flex items-center justify-center text-[13px] font-bold">{initials}</span>
