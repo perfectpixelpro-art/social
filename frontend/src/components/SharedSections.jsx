@@ -185,7 +185,7 @@ export function RealStories({ data = stories }) {
   );
 }
 
-export function PlansThatFit({ data = plans, subtitle = "Flexible plans designed to deliver value and results." }) {
+export function PlansThatFit({ data = plans, subtitle = "Flexible plans designed to deliver value and results.", tab = "Marketing" }) {
   const [active, setActive] = useState(0);
   return (
     <div className="w-full px-[100px] mq800:px-10 mq450:px-5 py-16 flex flex-col items-center font-[Montserrat]">
@@ -224,7 +224,7 @@ export function PlansThatFit({ data = plans, subtitle = "Flexible plans designed
               </li>
             ))}
           </ul>
-          <a href="/book-a-call" className="self-end mt-8 flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[48px] rounded-[25.5px] pl-6 pr-[6px]">
+          <a href={`/checkout?tab=${encodeURIComponent(tab)}&plan=${encodeURIComponent(data[active].name)}`} className="self-end mt-8 flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[48px] rounded-[25.5px] pl-6 pr-[6px]">
             <b className="text-base text-[#000]">Buy Now</b>
             <span className="h-[36px] w-[36px] rounded-[21px] bg-[rgba(158,202,255,0.39)] flex items-center justify-center"><Arrow /></span>
           </a>

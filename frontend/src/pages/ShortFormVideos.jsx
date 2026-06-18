@@ -263,7 +263,7 @@ export default function ShortFormVideos() {
     
 
       {/* ── Shared sections (short-form content) ── */}
-      <PlansThatFit data={sfvPlans} subtitle="Flexible plans designed to deliver value and results." />
+      <PlansThatFit data={sfvPlans} tab="Videos" subtitle="Flexible plans designed to deliver value and results." />
       <RealStories data={sfvStories} />
      
      

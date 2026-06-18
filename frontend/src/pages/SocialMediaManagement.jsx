@@ -557,7 +557,7 @@ export default function SocialMediaManagement() {
               ))}
             </ul>
             <a
-              href="/book-a-call"
+              href={`/checkout?tab=Marketing&plan=${encodeURIComponent(plans[activePlan].name)}`}
               className="self-end mt-8 flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[48px] rounded-[25.5px] pl-6 pr-[6px]"
             >
               <b className="text-base text-[#000]">Buy Now</b>

@@ -118,7 +118,7 @@ function Check({ on, dark }) {
   return <span className="shrink-0 text-[rgba(0,0,0,0.25)] text-[14px] tracking-tighter">····</span>;
 }
 
-function PlanCard({ plan }) {
+function PlanCard({ plan, tab = "Marketing" }) {
   const f = plan.featured;
   return (
     <div
@@ -153,7 +153,7 @@ function PlanCard({ plan }) {
       </ul>
 
       <a
-        href="/book-a-call"
+        href={`/checkout?tab=${encodeURIComponent(tab)}&plan=${encodeURIComponent(plan.name)}`}
         className={`mt-8 h-[52px] rounded-[12px] flex items-center justify-center font-bold text-[16px] no-underline transition-colors ${
           f ? "bg-white text-[#013186] hover:bg-[#e6f0ff]" : "bg-[#013186] text-white hover:bg-[#012270]"
         }`}
@@ -205,7 +205,7 @@ export default function Pricing() {
       <div className="w-full px-[100px] mq800:px-10 mq450:px-5 pb-16">
         <div className="grid grid-cols-3 gap-8 mq1125:grid-cols-1 w-full max-w-[1500px] mx-auto items-start">
           {pricing[active].map((plan) => (
-            <PlanCard key={plan.name} plan={plan} />
+            <PlanCard key={plan.name} plan={plan} tab={active} />
           ))}
         </div>
         

@@ -347,7 +347,7 @@ export default function Website() {
 
       {/* ── Imported shared sections (website-specific content) ── */}
       <WhyJoin rows={webCompareRows} text={webWhyJoinText} />
-      <PlansThatFit data={webPlans} subtitle="Website packages built to launch, rank, and convert." />
+      <PlansThatFit data={webPlans} tab="Website" subtitle="Website packages built to launch, rank, and convert." />
       <RealStories data={webStories} />
 
       {/* ── FAQ (shared with home page) ── */}
