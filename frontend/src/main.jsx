@@ -18,6 +18,8 @@ import Blogs from "./pages/Blogs";
 import BlogDetail from "./pages/BlogDetail";
 import RefundPolicy from "./pages/RefundPolicy";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+
 import Careers from "./pages/Careers";
 import Bookacall from "./pages/Bookacall";
 import MedSpaLandingPage from "./pages/MedSpaLandingPage";
@@ -26,6 +28,7 @@ import SalonsAndBeauty from "./pages/SalonsAndBeauty";
 import Restaurants from "./pages/Restaurants";
 import Bars from "./pages/Bars";
 import ScrollToTop from "./components/ScrollToTop";
+import DataDeletion from "./pages/DeletetionData";
 
 // ── App (auth + dashboards) ──
 import Login from "./pages/Login";
@@ -83,6 +86,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route path="/blogs/:slug" element={<BlogDetail />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
+          
           <Route path="/careers" element={<Careers />} />
           <Route path="/book-a-call" element={<Bookacall />} />
           <Route path="/med-spa" element={<MedSpaLandingPage />} />
@@ -90,6 +96,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route path="/salons-and-beauty" element={<SalonsAndBeauty />} />
           <Route path="/restaurants" element={<Restaurants />} />
           <Route path="/bars" element={<Bars />} />
+          <Route path="/terms-of-service" element = {<TermsOfService/>} />
+          <Route path="/deletion-data" element = {<DataDeletion/>} />
         </Route>
 
         {/* ── Auth (full-screen) ── */}

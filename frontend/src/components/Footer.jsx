@@ -6,6 +6,7 @@ const colCompany = [
   { to: "/careers", label: "Careers" },
   { to: "/refund-policy", label: "Refund Policy" },
   { to: "/pricing", label: "Pricing" },
+  {to: "/deletion-data", label: "Deletion Data"}
 ];
 
 const colServices = [
@@ -13,6 +14,7 @@ const colServices = [
   { to: "/short-form-videos", label: "Short-Form Videos" },
   { to: "/services/website", label: "Award Winning Website" },
   { to: "/privacy-policy", label: "Privacy Policy" },
+  {to:"/terms-of-service", label:"Terms of service "},
   { to: "/book-a-call", label: "Book A Call" },
 ];
 
