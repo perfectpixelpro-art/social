@@ -253,6 +253,30 @@ export const createPortalSession = async (req, res) => {
   }
 };
 
+/* ── POST /api/stripe/refresh-subscription ── (auth required)
+   Re-pulls the latest subscription from Stripe and saves it on the user.
+   Called right after checkout so the new plan appears immediately even when
+   the Stripe webhook isn't running (e.g. local dev). */
+export const refreshSubscription = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ success: false, error: "Account not found" });
+    await linkStripeSubscriptionByEmail(user);
+    res.json({
+      success: true,
+      data: {
+        plan: user.plan || "",
+        status: user.subscriptionStatus || "none",
+        currentPeriodEnd: user.currentPeriodEnd || null,
+        hasCustomer: !!user.stripeCustomerId,
+      },
+    });
+  } catch (err) {
+    console.error("refresh-subscription error:", err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
 /* ── GET /api/stripe/subscription ── (auth required)
    Returns the current user's subscription snapshot for the dashboard. */
 export const getMySubscription = async (req, res) => {

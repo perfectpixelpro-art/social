@@ -29,7 +29,7 @@ export function PlatformBadge({ k, size = 22 }) {
 
 export default function Scheduling() {
   const [tab, setTab] = useState("compose"); // compose | analytics | calendar
-  const [summary, setSummary] = useState({ connected: {}, freeTrial: false });
+  const [summary, setSummary] = useState({ connected: {}, freeTrial: false, schedulingEnabled: false });
 
   useEffect(() => {
     (async () => {
@@ -37,22 +37,30 @@ export default function Scheduling() {
         const r = await getSchedulerSummary();
         const data = r.data || { connected: {} };
         setSummary(data);
-        if (data.freeTrial) setTab("analytics"); // trial users: analytics only
       } catch { /* */ }
     })();
   }, []);
 
-  // Free trial → only Analytics (no composing, no calendar).
-  const tabs = summary.freeTrial
-    ? [["analytics", "Analytics"]]
-    : [["compose", "Schedule"], ["analytics", "Analytics"], ["calendar", "Calendar"]];
+  // All three tabs always show. Scheduling actions only WORK on Growth/Pro plans;
+  // Trial, Basic ($99) and no-plan users see everything but can't actually schedule.
+  const enabled = !!summary.schedulingEnabled;
+  const tabs = [["compose", "Schedule"], ["analytics", "Analytics"], ["calendar", "Calendar"]];
 
   return (
     <main className="h-full overflow-y-auto p-6 mq450:p-4">
       <h1 className="m-0 text-[#013186] font-bold" style={{ fontSize: "clamp(20px, 2.6vw, 28px)" }}>Scheduling</h1>
       <p className="m-0 mt-1 mb-4 text-[13px] text-[#7a8499] font-medium">
-        {summary.freeTrial ? "Free trial — connect your accounts and view analytics. Upgrade to schedule posts." : "Compose posts, view analytics, and manage your content calendar."}
+        Compose posts, view analytics, and manage your content calendar.
       </p>
+
+      {!enabled && (
+        <div className="mb-5 rounded-[12px] bg-[#fff8e6] border border-[#f3e0a0] px-4 py-3 flex items-center gap-3">
+          <span className="text-[18px]">🔒</span>
+          <p className="m-0 text-[13px] font-semibold text-[#8a6d1a]">
+            Scheduling is available on the <b>Growth</b> and <b>Pro</b> plans. You can preview everything here — upgrade to publish and schedule posts.
+          </p>
+        </div>
+      )}
 
       {/* tabs */}
       <div className="flex gap-2 mb-6 border-b border-[#eef1f6]">
@@ -64,15 +72,15 @@ export default function Scheduling() {
         ))}
       </div>
 
-      {!summary.freeTrial && tab === "compose" && <Compose connected={summary.connected} />}
+      {tab === "compose" && <Compose connected={summary.connected} enabled={enabled} />}
       {tab === "analytics" && <Analytics connected={summary.connected} />}
-      {!summary.freeTrial && tab === "calendar" && <Calendar />}
+      {tab === "calendar" && <Calendar enabled={enabled} />}
     </main>
   );
 }
 
 /* ─────────────── COMPOSE (summary + composer + approval) ─────────────── */
-function Compose({ connected }) {
+function Compose({ connected, enabled = true }) {
   const [posts, setPosts] = useState([]);
   const [caption, setCaption] = useState("");
   const [files, setFiles] = useState([]);
@@ -92,6 +100,7 @@ function Compose({ connected }) {
   const removeFile = (i) => setFiles((prev) => prev.filter((_, idx) => idx !== i));
 
   const submit = async () => {
+    if (!enabled) { setMsg({ ok: false, text: "Scheduling is available on the Growth and Pro plans. Please upgrade to schedule posts." }); return; }
     if (!caption.trim() && !files.length) { setMsg({ ok: false, text: "Add a caption or media." }); return; }
     if (!picked.length) { setMsg({ ok: false, text: "Pick at least one platform." }); return; }
     setSaving(true); setMsg({ ok: null, text: "" });
@@ -207,8 +216,8 @@ function Compose({ connected }) {
               <input type="checkbox" checked={approval} onChange={(e) => setApproval(e.target.checked)} className="accent-[#013186]" />
               Send for approval first
             </label>
-            <button onClick={submit} disabled={saving} className="ml-auto h-[44px] px-6 rounded-[10px] bg-[#013186] text-white font-bold text-[14px] hover:bg-[#012270] cursor-pointer disabled:opacity-60">
-              {saving ? "Saving…" : approval ? "Send for approval" : "Schedule post"}
+            <button onClick={submit} disabled={saving || !enabled} title={enabled ? "" : "Upgrade to Growth or Pro to schedule posts"} className="ml-auto h-[44px] px-6 rounded-[10px] bg-[#013186] text-white font-bold text-[14px] hover:bg-[#012270] cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+              {saving ? "Saving…" : !enabled ? "🔒 Upgrade to schedule" : approval ? "Send for approval" : "Schedule post"}
             </button>
           </div>
           {msg.text && <p className={`m-0 mt-3 text-[13px] font-semibold ${msg.ok ? "text-[#16a34a]" : "text-[#dc2626]"}`}>{msg.text}</p>}
@@ -393,7 +402,6 @@ export function AnalyticsPanel({ data, platform }) {
     if (!n || isNaN(n)) n = seedNum(platform + c.label, 500);
     return { ...c, n, series: sparkSeries(hashStr(platform + c.label), n) };
   });
-  const mainChart = data.chart?.length ? data.chart : (cards[0]?.series || []);
 
   const downloadReport = () => generate7DayReport(data, platform, cards);
 
@@ -422,12 +430,6 @@ export function AnalyticsPanel({ data, platform }) {
             <Sparkline values={c.series} color={color} />
           </div>
         ))}
-      </div>
-
-      {/* big growth chart with axes */}
-      <div className="rounded-[12px] border border-[#eef1f6] p-5 mb-6">
-        <p className="m-0 mb-3 text-[14px] font-bold text-[#0b1f44]">Followers growth — last 14 days</p>
-        <LineChart values={mainChart} color={color} labels={dayLabels(mainChart.length)} />
       </div>
 
       {/* a chart per metric */}

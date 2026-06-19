@@ -8,6 +8,7 @@ import {
   getStore,
   createAddonCheckout,
   confirmAddon,
+  refreshSubscription,
 } from "../controllers/stripe.controller.js";
 
 const router = express.Router();
@@ -20,6 +21,9 @@ router.post("/webhook", express.raw({ type: "application/json" }), handleWebhook
 router.post("/create-checkout-session", express.json(), createCheckoutSession);
 router.post("/create-portal-session", express.json(), requireAuth, createPortalSession);
 router.get("/subscription", requireAuth, getMySubscription);
+// Pull the latest subscription straight from Stripe (used right after checkout,
+// so the plan shows up even when the webhook isn't running locally).
+router.post("/refresh-subscription", express.json(), requireAuth, refreshSubscription);
 // Storefront one-time add-ons
 router.get("/store", requireAuth, getStore);
 router.post("/addon-checkout", express.json(), requireAuth, createAddonCheckout);

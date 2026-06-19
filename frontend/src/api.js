@@ -161,6 +161,24 @@ async function roleFetch(path, role, options = {}, _retried = false) {
 
 // ── Profile (client) ──
 export const getProfile = () => roleFetch("/users/me", "client");
+
+// ── Auto-login: restore a session from the 7-day refresh cookie ──
+// Returns the user if the browser still has a valid (≤7-day) refresh cookie,
+// otherwise null. Used to auto-redirect away from the login screen and to
+// show a "Dashboard" button instead of "Sign In" in the navbar.
+export const restoreSession = async () => {
+  try {
+    const token = await refreshAccessToken(); // uses the httpOnly cookie
+    if (!token) return null;
+    const me = await getProfile();
+    const user = me?.data || me?.user || me;
+    if (user) localStorage.setItem("user", JSON.stringify(user));
+    return user || null;
+  } catch {
+    clearAuth();
+    return null;
+  }
+};
 export const markTourSeen = () => roleFetch("/users/me/tour", "client", { method: "POST" });
 export const saveOnboarding = (payload) => roleFetch("/users/me/onboarding", "client", { method: "POST", body: JSON.stringify(payload) });
 
@@ -241,6 +259,7 @@ export const createCheckoutSession = async (email, plan, addons = [], service = 
 };
 export const createPortalSession = () => roleFetch("/stripe/create-portal-session", "client", { method: "POST" });
 export const getSubscription = () => roleFetch("/stripe/subscription", "client");
+export const refreshSubscription = () => roleFetch("/stripe/refresh-subscription", "client", { method: "POST" });
 
 // ── Storefront (one-time add-ons) ──
 export const getStore = () => roleFetch("/stripe/store", "client");
@@ -349,7 +368,9 @@ export const uploadClientFile = (file, folderType) => {
   return roleFetch("/files", "client", { method: "POST", body: fd });
 };
 export const getMyFiles = () => roleFetch("/files/me", "client");
+export const deleteMyFile = (id) => roleFetch(`/files/${id}`, "client", { method: "DELETE" });
 export const adminGetAllFiles = () => roleFetch("/files/all", "admin");
+export const adminDeleteFile = (id) => roleFetch(`/files/${id}`, "admin", { method: "DELETE" });
 export const adminUploadForClient = (clientId, file, folderType) => {
   const fd = new FormData();
   fd.append("file", file);
@@ -373,6 +394,16 @@ export const adminSendMessage = (clientId, text, file) =>
 export const adminScheduleMeeting = (clientId, payload) =>
   roleFetch(`/messages/${clientId}/meeting`, "admin", { method: "POST", body: JSON.stringify(payload) });
 
+// ── Meetings tab ──
+export const getMyMeetings = () => roleFetch("/messages/meetings/me", "client");
+export const adminGetClientMeetings = (clientId) => roleFetch(`/messages/meetings/${clientId}`, "admin");
+export const saveMeetingNotes = (msgId, notes, files = [], role = "client") => {
+  const fd = new FormData();
+  fd.append("notes", notes || "");
+  (files || []).forEach((f) => fd.append("files", f));
+  return roleFetch(`/messages/meetings/${msgId}/notes`, role, { method: "PUT", body: fd });
+};
+
 export default {
   submitContact, subscribeNewsletter, fetchBlogs, fetchBlogBySlug,
   signupUser, loginUser, logoutUser, resendVerification, forgotPassword, resetPassword, authedRequest,
@@ -382,8 +413,9 @@ export default {
   adminGetConversations, adminGetMessages, adminSendMessage,
   getProfile, updateProfile, uploadAvatar,
   clientScheduleMeeting, adminScheduleMeeting,
-  uploadClientFile, getMyFiles, adminGetAllFiles, adminUploadForClient,
+  getMyMeetings, adminGetClientMeetings, saveMeetingNotes,
+  uploadClientFile, getMyFiles, deleteMyFile, adminGetAllFiles, adminDeleteFile, adminUploadForClient,
   adminCreateManager, adminListManagers, adminListClients, adminAssignClient,
   adminResetManagerPassword, adminDeleteManager,
-  createCheckoutSession, createPortalSession, getSubscription,
+  createCheckoutSession, createPortalSession, getSubscription, refreshSubscription,
 };

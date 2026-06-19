@@ -8,10 +8,14 @@ import ScheduleMeetingModal from "../../components/ScheduleMeetingModal";
 const fmtTime = (d) =>
   d ? new Date(d).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "";
 
-const Avatar = ({ label, size = 40, bg = "#dbe9ff", color = "#013186" }) => (
-  <span className="rounded-full font-bold flex items-center justify-center shrink-0" style={{ width: size, height: size, fontSize: size * 0.36, background: bg, color }}>
-    {label}
-  </span>
+const Avatar = ({ label, src, size = 40, bg = "#dbe9ff", color = "#013186" }) => (
+  src ? (
+    <img src={src} alt="" className="rounded-full object-cover shrink-0" style={{ width: size, height: size }} />
+  ) : (
+    <span className="rounded-full font-bold flex items-center justify-center shrink-0" style={{ width: size, height: size, fontSize: size * 0.36, background: bg, color }}>
+      {label}
+    </span>
+  )
 );
 
 export default function Chat() {
@@ -21,13 +25,25 @@ export default function Chat() {
   const [sending, setSending] = useState(false);
   const [file, setFile] = useState(null);
   const [showSchedule, setShowSchedule] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const [handler, setHandler] = useState("Admin team");
+  const [handlerAvatar, setHandlerAvatar] = useState("");
   const fileRef = useRef(null);
   const endRef = useRef(null);
+
+  // Drag & drop images / videos / PDFs / docs straight into the chat.
+  const onDrop = (e) => {
+    e.preventDefault(); setDragOver(false);
+    const f = e.dataTransfer?.files?.[0];
+    if (f) setFile(f);
+  };
 
   const load = useCallback(async () => {
     try {
       const res = await clientGetMessages();
       setMessages(res.data || []);
+      if (res.handler) setHandler(res.handler);
+      setHandlerAvatar(res.handlerAvatar || "");
     } catch { /* ignore poll errors */ }
   }, []);
 
@@ -54,14 +70,22 @@ export default function Chat() {
   };
 
   return (
-    <div className="h-full flex flex-col min-h-0">
+    <div className="h-full flex flex-col min-h-0 relative"
+      onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+      onDragLeave={(e) => { if (e.currentTarget === e.target) setDragOver(false); }}
+      onDrop={onDrop}>
+      {dragOver && (
+        <div className="absolute inset-0 z-30 bg-[#1463ff]/10 border-2 border-dashed border-[#1463ff] rounded-[12px] flex items-center justify-center pointer-events-none">
+          <p className="m-0 text-[15px] font-bold text-[#013186] bg-white/90 rounded-[10px] px-5 py-3 shadow">📎 Drop image, video or PDF to attach</p>
+        </div>
+      )}
       {/* header */}
       <div className="h-[72px] shrink-0 border-b border-[#eef1f6] flex items-center gap-3 px-6 mq450:px-4">
-        <Avatar label="A" bg="#013186" color="#fff" size={42} />
+        <Avatar label="A" src={handlerAvatar} bg="#013186" color="#fff" size={42} />
         <div className="leading-tight">
           <p className="m-0 text-[16px] font-bold text-[#0b1f44]">The Social 99 — Support</p>
           <p className="m-0 text-[12px] text-[#16a34a] font-semibold flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-[#16a34a] inline-block" /> Admin team
+            <span className="w-2 h-2 rounded-full bg-[#16a34a] inline-block" /> Handled by {handler}
           </p>
         </div>
         {/* Schedule Zoom — top right */}
@@ -84,7 +108,7 @@ export default function Chat() {
           const mine = m.sender === "client";
           return (
             <div key={m._id} className={`flex items-end gap-2 ${mine ? "justify-end" : "justify-start"}`}>
-              {!mine && <Avatar label="A" bg="#013186" color="#fff" size={30} />}
+              {!mine && <Avatar label="A" src={handlerAvatar} bg="#013186" color="#fff" size={30} />}
               <div className={`max-w-[60%] mq450:max-w-[78%] px-4 py-2.5 text-[14px] leading-snug flex flex-col gap-2 ${
                 mine ? "bg-[#1463ff] text-white rounded-[16px] rounded-br-[4px]" : "bg-[#eef1f6] text-[#1a2233] rounded-[16px] rounded-bl-[4px]"
               }`}>

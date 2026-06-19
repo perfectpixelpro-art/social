@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { useOutletContext } from "react-router-dom";
-import { getProfile, updateProfile, uploadAvatar, getSubscription, createPortalSession } from "../../api";
+import { useOutletContext, useSearchParams } from "react-router-dom";
+import { getProfile, updateProfile, uploadAvatar, getSubscription, refreshSubscription, createPortalSession } from "../../api";
+import AvatarCropModal from "../../components/AvatarCropModal";
 
 const labelCls = "text-[13px] font-bold text-[#0b1f44] mb-2 block";
 const inputCls =
@@ -24,17 +25,29 @@ export default function Profile() {
   const [status, setStatus] = useState({ loading: false, ok: null, msg: "" });
   const [avatar, setAvatar] = useState(user.avatar || "");
   const [uploading, setUploading] = useState(false);
+  const [cropSrc, setCropSrc] = useState(null);
   const [sub, setSub] = useState(null);
   const [portalLoading, setPortalLoading] = useState(false);
   const fileRef = useRef(null);
   const upd = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  // Load subscription status
+  const [params, setParams] = useSearchParams();
+
+  // Load subscription status. If we just returned from a successful upgrade
+  // (?subscribed=1), pull the latest plan straight from Stripe first so it shows
+  // immediately even without the webhook.
   useEffect(() => {
     (async () => {
-      try { const r = await getSubscription(); setSub(r.data); } catch { /* */ }
+      try {
+        if (params.get("subscribed") === "1") {
+          try { await refreshSubscription(); } catch { /* */ }
+          params.delete("subscribed"); setParams(params, { replace: true });
+        }
+        const r = await getSubscription();
+        setSub(r.data);
+      } catch { /* */ }
     })();
-  }, []);
+  }, []); // eslint-disable-line
 
   const openPortal = async () => {
     setPortalLoading(true);
@@ -66,21 +79,28 @@ export default function Profile() {
     window.dispatchEvent(new Event("profile-updated"));
   };
 
-  const handlePhoto = async (e) => {
+  // Pick a file → open the crop modal (don't upload yet).
+  const handlePhoto = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setCropSrc(URL.createObjectURL(file));
+    e.target.value = "";
+  };
+
+  // Crop modal confirmed → upload the cropped square image.
+  const handleCropped = async (croppedFile) => {
     setUploading(true);
     try {
-      const res = await uploadAvatar(file);
+      const res = await uploadAvatar(croppedFile);
       const url = res.data?.avatar || "";
       setAvatar(url);
       cacheUser({ avatar: url });
       setStatus({ loading: false, ok: true, msg: "Photo updated!" });
+      setCropSrc(null);
     } catch (err) {
       setStatus({ loading: false, ok: false, msg: err.message || "Upload failed." });
     } finally {
       setUploading(false);
-      e.target.value = "";
     }
   };
 
@@ -106,6 +126,15 @@ export default function Profile() {
   };
 
   return (
+    <>
+    {cropSrc && (
+      <AvatarCropModal
+        src={cropSrc}
+        saving={uploading}
+        onCancel={() => { if (!uploading) setCropSrc(null); }}
+        onCropped={handleCropped}
+      />
+    )}
     <main className="h-full overflow-y-auto p-6 mq450:p-4">
       <h1 className="m-0 text-[#0b1f44] font-bold" style={{ fontSize: "clamp(22px, 3vw, 28px)" }}>My Profile</h1>
       <p className="m-0 mt-1 mb-6 text-[14px] text-[#7a8499] font-medium">Your professional identity inside the Black In HR ecosystem.</p>
@@ -205,16 +234,23 @@ export default function Profile() {
 
                 <div className="my-5 border-t border-[#eef1f6]" />
 
-                <button onClick={openPortal} disabled={portalLoading} className="text-[13px] font-bold text-white bg-[#1463ff] rounded-[10px] px-5 py-2.5 hover:bg-[#0d50d8] transition-colors cursor-pointer disabled:opacity-60">
-                  {portalLoading ? "Opening…" : "Manage Subscription"}
-                </button>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <a href="/pricing" className="text-[13px] font-bold text-white bg-[#013186] rounded-[10px] px-5 py-2.5 hover:bg-[#012270] transition-colors cursor-pointer no-underline">
+                    ⬆ Upgrade Plan
+                  </a>
+                  <button onClick={openPortal} disabled={portalLoading} className="text-[13px] font-bold text-[#013186] border border-[#cfe0ff] bg-white rounded-[10px] px-5 py-2.5 hover:bg-[#f0f6ff] transition-colors cursor-pointer disabled:opacity-60">
+                    {portalLoading ? "Opening…" : "Manage Subscription"}
+                  </button>
+                </div>
+                <p className="m-0 mt-2 text-[12px] text-[#9aa3b2]">Upgrade picks a new plan via checkout. Use the billing portal to manage payment or cancel.</p>
               </>
             ) : (
               <>
-                <p className="m-0 text-[14px] text-[#7a8499] font-medium">You don't have an active subscription yet.</p>
-                <a href="/pricing" className="inline-block mt-4 text-[13px] font-bold text-white bg-[#1463ff] rounded-[10px] px-5 py-2.5 hover:bg-[#0d50d8] transition-colors no-underline">
-                  Choose a Plan
+                <p className="m-0 text-[14px] text-[#7a8499] font-medium">You don't have an active paid plan yet.</p>
+                <a href="/pricing" className="inline-block mt-4 text-[13px] font-bold text-white bg-[#013186] rounded-[10px] px-5 py-2.5 hover:bg-[#012270] transition-colors no-underline">
+                  ⬆ Upgrade Plan
                 </a>
+                <p className="m-0 mt-2 text-[12px] text-[#9aa3b2]">Unlock scheduling and more — choose Growth or Pro.</p>
               </>
             )}
           </section>
@@ -276,5 +312,6 @@ export default function Profile() {
         </div>
       </section>
     </main>
+    </>
   );
 }

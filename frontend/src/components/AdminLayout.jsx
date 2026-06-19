@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, NavLink, Outlet, useLocation } from "react-router-dom";
-import { adminLogout } from "../api";
+import { adminLogout, getNotifications } from "../api";
 import { Icon, icons } from "./DashboardLayout";
 import NotificationBell from "./NotificationBell";
 
 const baseNav = [
   { key: "home", label: "Home", to: "/admin", end: true },
   { key: "calendar", label: "Scheduling", to: "/admin/scheduling" },
+  { key: "meeting", label: "Meetings", to: "/admin/meetings" },
   { key: "team", label: "Team & Clients", to: "/admin/team", adminOnly: true },
   { key: "files", label: "Files", to: "/admin/files" },
   { key: "chat", label: "Chat", to: "/admin/chat" },
@@ -21,6 +22,7 @@ const titleByPath = {
   "/admin": "Admin Panel",
   "/admin/scheduling": "Scheduling",
   "/admin/team": "Team & Clients",
+  "/admin/meetings": "Meetings",
   "/admin/files": "Files",
   "/admin/profile": "Profile",
   "/admin/chat": "Chat",
@@ -62,6 +64,8 @@ export default function AdminLayout() {
     nav = [
       { key: "home", label: "Home", to: "/admin", end: true },
       { key: "calendar", label: "Scheduling", to: "/admin/scheduling" },
+      { key: "meeting", label: "Meetings", to: "/admin/meetings" },
+      { key: "files", label: "Files", to: "/admin/files" },
       { key: "chat", label: "Chat", to: "/admin/chat" },
       { key: "ticket", label: "Support", to: "/admin/tickets" },
       { key: "help", label: "Help", to: "/admin/help" },
@@ -81,12 +85,32 @@ export default function AdminLayout() {
   // Restrict managers and writers to their allowed pages.
   useEffect(() => {
     if (role === "manager") {
-      const allowed = ["/admin", "/admin/scheduling", "/admin/chat", "/admin/tickets", "/admin/help"];
+      const allowed = ["/admin", "/admin/scheduling", "/admin/meetings", "/admin/files", "/admin/chat", "/admin/tickets", "/admin/help"];
       if (!allowed.includes(location.pathname)) navigate("/admin", { replace: true });
     } else if (role === "writer") {
       if (location.pathname !== "/admin/help") navigate("/admin/help", { replace: true });
     }
   }, [role, location.pathname, navigate]);
+
+  // Per-tab unread badges from unread notifications by type.
+  const [counts, setCounts] = useState({});
+  useEffect(() => {
+    const map = { message: "chat", meeting: "chat", file: "files", approval: "calendar", feedback: "calendar" };
+    const load = async () => {
+      try {
+        const r = await getNotifications("admin");
+        const c = {};
+        (r.data?.items || []).filter((n) => !n.read).forEach((n) => {
+          const key = map[n.type];
+          if (key) c[key] = (c[key] || 0) + 1;
+        });
+        setCounts(c);
+      } catch { /* */ }
+    };
+    load();
+    const id = setInterval(load, 10000);
+    return () => clearInterval(id);
+  }, [location.pathname]);
 
   return (
     <div className="w-full min-h-screen bg-white font-[Montserrat] flex">
@@ -114,7 +138,11 @@ export default function AdminLayout() {
                 <>
                   <span className={isActive ? "text-[#013186]" : "text-[#9aa3b2]"}><Icon d={icons[item.key]} /></span>
                   {item.label}
-                  {isActive && <span className="ml-auto w-[7px] h-[7px] rounded-full bg-[#013186]" />}
+                  {counts[item.key] > 0 ? (
+                    <span className="ml-auto min-w-[18px] h-[18px] px-1 rounded-full bg-[#dc2626] text-white text-[11px] font-bold flex items-center justify-center">{counts[item.key]}</span>
+                  ) : (
+                    isActive && <span className="ml-auto w-[7px] h-[7px] rounded-full bg-[#013186]" />
+                  )}
                 </>
               )}
             </NavLink>

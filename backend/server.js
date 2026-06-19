@@ -28,6 +28,7 @@ import trackerRoutes from "./routes/tracker.routes.js";
 import bannerRoutes from "./routes/banner.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import { runExpiryCheck } from "./controllers/notification.controller.js";
+import { runMeetingReminders } from "./controllers/message.controller.js";
 import emailRoutes from "./routes/email.routes.js";
 import { runAllEmailAutomations } from "./controllers/email.controller.js";
 
@@ -111,3 +112,6 @@ setInterval(() => { runExpiryCheck().catch((e) => console.error("expiry tick err
 // Email automations (newsletter / trial drip / cart / plan-expiry) — hourly, self-deduped.
 runAllEmailAutomations();
 setInterval(() => { runAllEmailAutomations().catch((e) => console.error("email automation error:", e.message)); }, 3600_000);
+
+// Meeting reminders — every minute, emails 15 min before each meeting (deduped).
+setInterval(() => { runMeetingReminders().catch((e) => console.error("meeting reminder error:", e.message)); }, 60_000);

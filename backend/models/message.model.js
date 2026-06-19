@@ -19,6 +19,9 @@ const messageSchema = new mongoose.Schema(
       duration: Number,
       joinUrl: String,
       meetingId: String,
+      notes: { type: String, default: "" },
+      noteMedia: [{ url: String, name: String, type: String }], // images/videos attached to notes
+      reminderSent: { type: Boolean, default: false },
     },
     readByAdmin: { type: Boolean, default: false },
     readByClient: { type: Boolean, default: false },

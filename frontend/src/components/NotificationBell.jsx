@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getNotifications, markNotificationsRead, dismissNotification } from "../api";
 
 const TYPE_ICON = {
-  message: "💬", meeting: "📅", approval: "✅", feedback: "📋", plan_expiry: "⏳", general: "📢", post: "📝",
+  message: "💬", meeting: "📅", approval: "✅", feedback: "📋", plan_expiry: "⏳", general: "📢", post: "📝", file: "📎",
 };
 const ago = (d) => {
   const s = Math.floor((Date.now() - new Date(d)) / 1000);
@@ -20,6 +20,52 @@ export default function NotificationBell({ role = "client" }) {
   const [unread, setUnread] = useState(0);
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
+  const prevUnread = useRef(null); // null = first load (don't chime)
+  const audioCtx = useRef(null);
+
+  // Create + unlock a single AudioContext on the first user gesture, so the
+  // browser's autoplay policy doesn't silence the chime.
+  useEffect(() => {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    const unlock = () => {
+      if (!audioCtx.current) audioCtx.current = new Ctx();
+      if (audioCtx.current.state === "suspended") audioCtx.current.resume();
+    };
+    window.addEventListener("pointerdown", unlock);
+    window.addEventListener("keydown", unlock);
+    return () => {
+      window.removeEventListener("pointerdown", unlock);
+      window.removeEventListener("keydown", unlock);
+    };
+  }, []);
+
+  // Short "ping" via Web Audio — no asset file needed.
+  const playPing = useCallback(() => {
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      if (!audioCtx.current) audioCtx.current = new Ctx();
+      const ctx = audioCtx.current;
+      if (ctx.state === "suspended") ctx.resume();
+      // Two quick chime tones, louder, for a clearly audible "ding-ding".
+      const blip = (startAt, f1, f2) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(f1, startAt);
+        osc.frequency.exponentialRampToValueAtTime(f2, startAt + 0.12);
+        gain.gain.setValueAtTime(0.0001, startAt);
+        gain.gain.exponentialRampToValueAtTime(0.7, startAt + 0.02); // louder peak
+        gain.gain.exponentialRampToValueAtTime(0.0001, startAt + 0.28);
+        osc.start(startAt); osc.stop(startAt + 0.3);
+      };
+      const t = ctx.currentTime;
+      blip(t, 880, 1320);
+      blip(t + 0.18, 1046, 1568);
+    } catch { /* ignore */ }
+  }, []);
 
   const load = useCallback(async () => {
     try {
@@ -27,9 +73,13 @@ export default function NotificationBell({ role = "client" }) {
       // General notifications show in the bottom bar, not the bell.
       const list = (r.data?.items || []).filter((n) => n.type !== "general");
       setItems(list);
-      setUnread(list.filter((n) => !n.read).length);
+      const u = list.filter((n) => !n.read).length;
+      // Chime when new unread arrives (skip the very first load).
+      if (prevUnread.current !== null && u > prevUnread.current) playPing();
+      prevUnread.current = u;
+      setUnread(u);
     } catch { /* */ }
-  }, [role]);
+  }, [role, playPing]);
 
   useEffect(() => { load(); const id = setInterval(load, 10000); return () => clearInterval(id); }, [load]);
   useEffect(() => {

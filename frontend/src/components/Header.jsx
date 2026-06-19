@@ -18,6 +18,9 @@ const otherLinks = [
 const Header = () => {
   const [open, setOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
+  // Logged-in if this browser has a stored session. Re-evaluated on each render
+  // (route changes re-render the header), so it flips after login/logout.
+  const loggedIn = !!localStorage.getItem("user") || !!localStorage.getItem("accessToken");
 
   return (
     <header
@@ -84,38 +87,51 @@ const Header = () => {
 
         {/* Desktop CTA buttons */}
         <div className="flex items-center gap-2 flex-shrink-0 mq1125:hidden">
-          
           <Link
-            to="/login"
-            className="block px-5 py-3 text-[15px] font-medium text-[#111]  no-underline hover:text-[#013186]"
-          >
-            Sign In
-          </Link>
-           <Link
             to="/book-a-call"
             className="block px-5 py-3 text-[15px] font-medium text-[#111] no-underline hover:text-[#013186]"
           >
             Book a Call
           </Link>
-          <Link
-            to="/signup?trial=1"
-            className="no-underline cursor-pointer border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] h-[43px] rounded-[25.5px] flex items-center gap-2 pl-5 pr-[5px] hover:bg-[rgba(188,214,255,0.6)] transition-colors"
-          >
-            <b className="text-base font-[Montserrat] text-[#000]">Free Trial</b>
-            <div className="h-[35px] w-[35px] rounded-[21px] bg-[rgba(158,202,255,0.39)] flex items-center justify-center flex-shrink-0">
-              <img className="w-[18px] h-[18px] object-contain" alt="" src="/image@2x.png" />
-            </div>
-          </Link>
+          {loggedIn ? (
+            <Link
+              to="/dashboard"
+              className="no-underline cursor-pointer border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] h-[43px] rounded-[25.5px] flex items-center gap-2 pl-5 pr-[5px] hover:bg-[rgba(188,214,255,0.6)] transition-colors"
+            >
+              <b className="text-base font-[Montserrat] text-[#000]">Dashboard</b>
+              <div className="h-[35px] w-[35px] rounded-[21px] bg-[rgba(158,202,255,0.39)] flex items-center justify-center flex-shrink-0">
+                <img className="w-[18px] h-[18px] object-contain" alt="" src="/image@2x.png" />
+              </div>
+            </Link>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="block px-5 py-3 text-[15px] font-medium text-[#111] no-underline hover:text-[#013186]"
+              >
+                Sign In
+              </Link>
+              <Link
+                to="/signup?trial=1"
+                className="no-underline cursor-pointer border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] h-[43px] rounded-[25.5px] flex items-center gap-2 pl-5 pr-[5px] hover:bg-[rgba(188,214,255,0.6)] transition-colors"
+              >
+                <b className="text-base font-[Montserrat] text-[#000]">Free Trial</b>
+                <div className="h-[35px] w-[35px] rounded-[21px] bg-[rgba(158,202,255,0.39)] flex items-center justify-center flex-shrink-0">
+                  <img className="w-[18px] h-[18px] object-contain" alt="" src="/image@2x.png" />
+                </div>
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile: Log In + Hamburger (shown ≤1125px) */}
         <div className="hidden mq1125:flex items-center gap-3 flex-shrink-0">
           <Link
-            to="/login"
+            to={loggedIn ? "/dashboard" : "/login"}
             onClick={() => setOpen(false)}
             className="h-[40px] flex items-center px-5 rounded-[25.5px] bg-[rgba(188,214,255,0.54)] border border-[rgba(1,49,134,0.07)] font-bold text-[#000] text-[14px] no-underline"
           >
-            Sign In
+            {loggedIn ? "Dashboard" : "Sign In"}
           </Link>
           <button
             onClick={() => setOpen((v) => !v)}

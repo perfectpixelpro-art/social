@@ -39,6 +39,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./components/DashboardLayout";
 import DashboardHome from "./pages/dashboard/Home";
 import DashboardScheduling from "./pages/dashboard/Scheduling";
+import DashboardMeetings from "./pages/dashboard/Meetings";
 import DashboardHelp from "./pages/dashboard/Help";
 import DashboardStore from "./pages/dashboard/Store";
 import DashboardChat from "./pages/dashboard/Chat";
@@ -50,6 +51,7 @@ import AdminLayout from "./components/AdminLayout";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminHome from "./pages/admin/Home";
 import AdminScheduling from "./pages/admin/Scheduling";
+import AdminMeetings from "./pages/admin/Meetings";
 import AdminChat from "./pages/admin/Chat";
 import AdminFiles from "./pages/admin/Files";
 import AdminManagers from "./pages/admin/Managers";
@@ -104,6 +106,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/dashboard" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
           <Route index element={<DashboardHome />} />
           <Route path="scheduling" element={<DashboardScheduling />} />
+          <Route path="meetings" element={<DashboardMeetings />} />
           <Route path="help" element={<DashboardHelp />} />
           <Route path="store" element={<DashboardStore />} />
           <Route path="chat" element={<DashboardChat />} />
@@ -118,6 +121,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/admin" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>
           <Route index element={<AdminHome />} />
           <Route path="scheduling" element={<AdminScheduling />} />
+          <Route path="meetings" element={<AdminMeetings />} />
           <Route path="chat" element={<AdminChat />} />
           <Route path="files" element={<AdminFiles />} />
           <Route path="team" element={<AdminManagers />} />

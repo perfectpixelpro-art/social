@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { adminGetAllFiles, adminGetConversations, adminUploadForClient } from "../../api";
+import { adminGetAllFiles, adminGetConversations, adminUploadForClient, adminDeleteFile } from "../../api";
 
 const labelOf = (k) => ({ logo: "Logos", brand: "Brand Guide", product: "Product Images", other: "Other" }[k] || "Other");
 const badge = { logo: "bg-[#eaf1ff] text-[#1463ff]", brand: "bg-[#f0eafe] text-[#7c3aed]", product: "bg-[#e8f8ee] text-[#16a34a]", other: "bg-[#eef1f6] text-[#5b6472]" };
@@ -23,6 +23,12 @@ export default function AdminFiles() {
   const load = useCallback(async () => {
     try { const res = await adminGetAllFiles(); setFiles(res.data || []); } catch { /* */ }
   }, []);
+
+  const del = async (f) => {
+    if (!window.confirm(`Delete "${f.fileName}"? This can't be undone.`)) return;
+    try { await adminDeleteFile(f._id); setFiles((x) => x.filter((y) => y._id !== f._id)); }
+    catch { /* ignore */ }
+  };
   useEffect(() => { load(); }, [load]);
   useEffect(() => {
     (async () => {
@@ -108,16 +114,21 @@ export default function AdminFiles() {
           </div>
           <div className="grid grid-cols-3 mq800:grid-cols-2 mq450:grid-cols-1 gap-3">
             {items.map((f) => (
-              <a key={f._id} href={f.webViewLink} target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-3 rounded-[12px] border border-[#eef1f6] p-3 hover:bg-[#fafbfd] transition-colors no-underline">
-                <span className="w-9 h-9 rounded-[8px] bg-[#eaf1ff] text-[#013186] flex items-center justify-center shrink-0">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /></svg>
-                </span>
-                <div className="min-w-0">
-                  <p className="m-0 text-[13px] font-bold text-[#0b1f44] truncate">{f.fileName}</p>
-                  <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full mt-1 ${badge[f.folderType]}`}>{labelOf(f.folderType)}</span>
-                </div>
-              </a>
+              <div key={f._id} className="relative flex items-center gap-3 rounded-[12px] border border-[#eef1f6] p-3 hover:bg-[#fafbfd] transition-colors">
+                <a href={f.webViewLink} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 min-w-0 flex-1 no-underline">
+                  <span className="w-9 h-9 rounded-[8px] bg-[#eaf1ff] text-[#013186] flex items-center justify-center shrink-0">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /></svg>
+                  </span>
+                  <div className="min-w-0">
+                    <p className="m-0 text-[13px] font-bold text-[#0b1f44] truncate">{f.fileName}</p>
+                    <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full mt-1 ${badge[f.folderType]}`}>{labelOf(f.folderType)}</span>
+                  </div>
+                </a>
+                <button onClick={() => del(f)} title="Delete file"
+                  className="shrink-0 text-[#9aa3b2] hover:text-[#dc2626] cursor-pointer p-1">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /><path d="M10 11v6M14 11v6" /></svg>
+                </button>
+              </div>
             ))}
           </div>
         </section>

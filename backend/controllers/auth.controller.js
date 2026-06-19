@@ -24,7 +24,7 @@ const createVerificationLink = async (userId, purpose) => {
   return `${base}/api/auth/verify-email?token=${token}`;
 };
 
-const ACCESS_TOKEN_TTL = "15m";
+const ACCESS_TOKEN_TTL = "1d";
 const REFRESH_TOKEN_TTL = "7d";
 const REFRESH_TOKEN_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 const GENERIC_CREDENTIALS_ERROR = "Invalid credentials";
@@ -66,12 +66,16 @@ export const signup = async (req, res) => {
   }
 
   try {
-    const { name, email, mobile, password, trial } = req.body;
+    const { name, email, mobile, password, trial, paid } = req.body;
 
     const existing = await User.findOne({ email: email.toLowerCase() });
     if (existing) {
-      // Generic — never reveal that the email already exists.
-      return res.status(400).json({ success: false, error: "Unable to create account" });
+      // Tell the user clearly so they can log in instead of getting stuck.
+      return res.status(409).json({
+        success: false,
+        exists: true,
+        error: "An account with this email already exists. Please log in instead.",
+      });
     }
 
     const hashed = await bcrypt.hash(password, 12);
@@ -92,27 +96,26 @@ export const signup = async (req, res) => {
       console.error("Drive folder creation failed:", e.message);
     }
 
-    // If they paid first (guest checkout), link the Stripe subscription by email.
-    // This sets their plan and auto-verifies them so they can log in immediately.
-    let linkedPaid = false;
-    try {
-      const { linkStripeSubscriptionByEmail } = await import("./stripe.controller.js");
-      await linkStripeSubscriptionByEmail(user);
-      linkedPaid = user.isVerified; // verified === they have an active paid subscription
-    } catch (e) {
-      console.error("Stripe link on signup failed:", e.message);
+    // If they paid first (guest checkout), link the Stripe subscription by email so
+    // their plan + add-ons land on the account. We ONLY do this when the signup
+    // actually came back from a completed checkout (paid flag), so a normal signup
+    // whose email happens to match a stale Stripe subscription isn't affected.
+    // IMPORTANT: paid users STILL verify their email — flow is always
+    // signup → verify email → login (for trial, free, AND paid).
+    const cameFromCheckout = paid === true || paid === "true" || paid === 1;
+    if (!isFreeTrial && cameFromCheckout) {
+      try {
+        const { linkStripeSubscriptionByEmail } = await import("./stripe.controller.js");
+        await linkStripeSubscriptionByEmail(user);
+        // linkStripe… may flip isVerified for active subs — undo it so the user
+        // must still confirm their email before logging in.
+        if (user.isVerified) { user.isVerified = false; await user.save(); }
+      } catch (e) {
+        console.error("Stripe link on signup failed:", e.message);
+      }
     }
 
-    if (linkedPaid) {
-      // Paid users skip email verification — they can log in right away.
-      return res.status(201).json({
-        success: true,
-        verified: true,
-        message: "Account created! You can now log in to access your dashboard.",
-      });
-    }
-
-    // Otherwise send the verification email (don't fail signup if email send hiccups)
+    // Always send the verification email (don't fail signup if email send hiccups)
     try {
       const link = await createVerificationLink(user._id, "signup");
       await sendVerificationEmail(user.email, user.name, link);
@@ -148,6 +151,15 @@ export const login = async (req, res) => {
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
       return res.status(401).json({ success: false, error: GENERIC_CREDENTIALS_ERROR });
+    }
+
+    // Staff (admin/manager/writer) must use the Team login — this page is for clients.
+    if (user.role !== "client") {
+      return res.status(403).json({
+        success: false,
+        code: "STAFF_ACCOUNT",
+        error: "This is a team account. Please sign in from the Team login page.",
+      });
     }
 
     // Block login until the email is verified

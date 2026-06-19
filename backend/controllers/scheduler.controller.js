@@ -590,14 +590,21 @@ export const submitPostFeedback = async (req, res) => {
 /* ── GET /api/scheduler/summary ── (client) — connection + follower overview */
 export const getSummary = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("facebook instagram linkedin youtube isFreeTrial");
+    const user = await User.findById(req.user.id).select("facebook instagram linkedin youtube isFreeTrial plan");
     const connected = {
       facebook: !!user.facebook?.connected,
       instagram: !!user.instagram?.connected,
       linkedin: !!user.linkedin?.connected,
       youtube: !!user.youtube?.connected,
     };
-    res.json({ success: true, data: { connected, freeTrial: !!user.isFreeTrial } });
+    // Scheduling (composing/publishing posts) only works on Growth ($199) and Pro ($299).
+    // Trial, Starter/Basic ($99) and no-plan users see the tabs but can't schedule.
+    const plan = (user.plan || "").toLowerCase();
+    const schedulingEnabled = ["growth", "standard", "pro", "premium"].includes(plan);
+    res.json({
+      success: true,
+      data: { connected, freeTrial: !!user.isFreeTrial, plan: user.plan || "", schedulingEnabled },
+    });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

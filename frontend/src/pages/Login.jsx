@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import AuthShell from "../components/AuthShell";
-import { loginUser, resendVerification } from "../api";
+import { loginUser, resendVerification, restoreSession } from "../api";
 
 const inputCls =
   "w-full rounded-[12px] bg-[#f3f8ff] border border-[#b0c5e7] px-5 py-3.5 text-[15px] font-[Montserrat] text-[#000] outline-none focus:border-[#013186] transition-colors placeholder-[rgba(0,0,0,0.35)]";
@@ -16,7 +16,22 @@ export default function Login() {
   const [status, setStatus] = useState({ loading: false, ok: null, msg: "" });
   const [needsVerify, setNeedsVerify] = useState(false); // show resend button
   const [resend, setResend] = useState({ loading: false, msg: "" });
+  const [checkingSession, setCheckingSession] = useState(true);
   const upd = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  // Auto-login: if this browser still has a valid (≤7-day) session, skip the
+  // form and go straight to the dashboard. After 7 days the cookie expires and
+  // the user lands on the login form as normal.
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const user = await restoreSession();
+      if (alive && user && (user.role === "client" || !user.role)) navigate("/dashboard", { replace: true });
+      else if (alive && user) navigate("/admin", { replace: true }); // staff → team dashboard
+      else if (alive) setCheckingSession(false);
+    })();
+    return () => { alive = false; };
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,6 +49,12 @@ export default function Login() {
       // Backend sends this exact message when the email isn't verified yet
       const unverified = /verify your email/i.test(msg);
       setNeedsVerify(unverified);
+      // Staff account tried the client login → send them to the Team login.
+      if (/team account/i.test(msg)) {
+        setStatus({ loading: false, ok: false, msg: "This is a team account — redirecting you to the Team login…" });
+        setTimeout(() => navigate("/admin/login"), 1400);
+        return;
+      }
       setStatus({ loading: false, ok: false, msg });
     }
   };
@@ -51,6 +72,16 @@ export default function Login() {
       setResend({ loading: false, msg: err.message || "Could not send email." });
     }
   };
+
+  if (checkingSession) {
+    return (
+      <AuthShell>
+        <div className="flex items-center justify-center py-20">
+          <div className="h-10 w-10 rounded-full border-4 border-[#dbe9ff] border-t-[#013186] animate-spin" />
+        </div>
+      </AuthShell>
+    );
+  }
 
   return (
     <AuthShell>

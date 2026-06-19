@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, NavLink, Outlet, useLocation } from "react-router-dom";
-import { logoutUser } from "../api";
+import { logoutUser, getNotifications } from "../api";
 import DashboardTour from "./DashboardTour";
 import BannerPopup from "./BannerPopup";
 import OnboardingForm from "./OnboardingForm";
@@ -17,6 +17,7 @@ export const Icon = ({ d, size = 18 }) => (
 export const icons = {
   home: <><path d="M3 9.5 12 3l9 6.5" /><path d="M5 10v10h14V10" /></>,
   calendar: <><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></>,
+  meeting: <><rect x="3" y="7" width="13" height="10" rx="2" /><path d="M21 8.5v7l-5-3.5z" /></>,
   profile: <><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 4-6 8-6s8 2 8 6" /></>,
   chat: <><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></>,
   ticket: <><path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z" /></>,
@@ -35,6 +36,7 @@ export const icons = {
 const nav = [
   { key: "home", label: "Home", to: "/dashboard", end: true },
   { key: "calendar", label: "Scheduling", to: "/dashboard/scheduling" },
+  { key: "meeting", label: "Meetings", to: "/dashboard/meetings" },
   { key: "store", label: "Store", to: "/dashboard/store" },
   { key: "profile", label: "Profile", to: "/dashboard/profile" },
   { key: "files", label: "Files", to: "/dashboard/files" },
@@ -47,6 +49,7 @@ const titleByPath = {
   "/dashboard": "Dashboard",
   "/dashboard/chat": "Chat",
   "/dashboard/scheduling": "Scheduling",
+  "/dashboard/meetings": "Meetings",
   "/dashboard/store": "Store",
   "/dashboard/profile": "Profile",
   "/dashboard/files": "Files",
@@ -91,6 +94,26 @@ export default function DashboardLayout() {
     return () => window.removeEventListener("profile-updated", refresh);
   }, []);
 
+  // Per-tab unread badges, derived from unread notifications by type.
+  const [counts, setCounts] = useState({});
+  useEffect(() => {
+    const map = { message: "chat", meeting: "chat", file: "files", approval: "calendar", feedback: "calendar" };
+    const load = async () => {
+      try {
+        const r = await getNotifications("client");
+        const c = {};
+        (r.data?.items || []).filter((n) => !n.read).forEach((n) => {
+          const key = map[n.type];
+          if (key) c[key] = (c[key] || 0) + 1;
+        });
+        setCounts(c);
+      } catch { /* */ }
+    };
+    load();
+    const id = setInterval(load, 10000);
+    return () => clearInterval(id);
+  }, [location.pathname]);
+
   const name = user.name || "James Brown";
   const initials = name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
   const crumb = titleByPath[location.pathname] || "Dashboard";
@@ -125,6 +148,7 @@ export default function DashboardLayout() {
               key={item.key}
               to={item.to}
               end={item.end}
+              data-tour={`nav-${item.key}`}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-[14px] font-semibold transition-colors cursor-pointer no-underline ${
                   isActive ? "bg-[#eaf1ff] text-[#013186]" : "text-[#5b6472] hover:bg-[#f5f7fb]"
@@ -135,17 +159,21 @@ export default function DashboardLayout() {
                 <>
                   <span className={isActive ? "text-[#013186]" : "text-[#9aa3b2]"}><Icon d={icons[item.key]} /></span>
                   {item.label}
-                  {isActive && <span className="ml-auto w-[7px] h-[7px] rounded-full bg-[#013186]" />}
+                  {counts[item.key] > 0 ? (
+                    <span className="ml-auto min-w-[18px] h-[18px] px-1 rounded-full bg-[#dc2626] text-white text-[11px] font-bold flex items-center justify-center">{counts[item.key]}</span>
+                  ) : (
+                    isActive && <span className="ml-auto w-[7px] h-[7px] rounded-full bg-[#013186]" />
+                  )}
                 </>
               )}
             </NavLink>
           ))}
 
-          {/* Ask S99 chatbot */}
+          {/* Ask Dot chatbot */}
           <button onClick={openS99}
             className="mt-1 flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-[14px] font-bold cursor-pointer text-white [background:linear-gradient(135deg,#1463ff,#013186)] hover:opacity-95 transition-opacity">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /><path d="m14 7 1 2 2 1-2 1-1 2-1-2-2-1 2-1z" /></svg>
-            Ask S99
+            Ask Dot
           </button>
         </nav>
 
@@ -181,7 +209,7 @@ export default function DashboardLayout() {
           </div>
 
           <div className="flex items-center gap-5">
-            <NotificationBell role="client" />
+            <span data-tour="bell"><NotificationBell role="client" /></span>
             <div className="relative" ref={menuRef}>
               <button onClick={() => setMenuOpen((o) => !o)} className="flex items-center gap-2 cursor-pointer">
                 {user.avatar ? (

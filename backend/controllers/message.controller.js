@@ -1,9 +1,92 @@
 import Message from "../models/message.model.js";
 import User from "../models/user.model.js";
 import { createZoomMeeting } from "../utils/zoom.js";
-import { sendMeetingEmail } from "../utils/email.js";
+import { sendMeetingEmail, sendMeetingReminderEmail } from "../utils/email.js";
 import { notify, clientHandlerId } from "../utils/notify.js";
 import { fileToUrl } from "../utils/upload.js";
+
+// Worker: email a 15-minute reminder before each meeting (runs every minute).
+export async function runMeetingReminders() {
+  const now = Date.now();
+  const soon = new Date(now + 15 * 60 * 1000);
+  const msgs = await Message.find({
+    "meeting.startTime": { $gt: new Date(now), $lte: soon },
+    "meeting.reminderSent": { $ne: true },
+  });
+  for (const msg of msgs) {
+    try {
+      const client = await User.findById(msg.client).select("name email assignedManager");
+      const recipients = [];
+      if (client?.email) recipients.push({ email: client.email, name: client.name });
+      if (client?.assignedManager) {
+        const mgr = await User.findById(client.assignedManager).select("name email");
+        if (mgr?.email) recipients.push({ email: mgr.email, name: mgr.name });
+      }
+      await Promise.all(recipients.map((r) => sendMeetingReminderEmail(r.email, r.name, msg.meeting)));
+      notify(msg.client, { type: "meeting", title: "Meeting in 15 minutes ⏰", body: msg.meeting?.topic || "", link: "/dashboard/meetings" });
+      msg.meeting.reminderSent = true;
+      await msg.save();
+    } catch (e) { console.warn("meeting reminder failed:", e.message); }
+  }
+}
+
+/* ── Meetings tab: list + notes/media ── */
+
+// Map a meeting message → a flat meeting object for the Meetings tab.
+const toMeeting = (m) => ({
+  msgId: m._id,
+  ...(m.meeting?.toObject ? m.meeting.toObject() : m.meeting),
+});
+
+// CLIENT: list my meetings
+export const listMyMeetings = async (req, res) => {
+  try {
+    const msgs = await Message.find({ client: req.user.id, "meeting.startTime": { $ne: null } }).sort({ "meeting.startTime": -1 });
+    res.json({ success: true, data: msgs.map(toMeeting) });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// STAFF: list a client's meetings
+export const listClientMeetings = async (req, res) => {
+  try {
+    if (!(await staffCanAccessClient(req, req.params.clientId))) return res.status(403).json({ success: false, error: "Not your client" });
+    const msgs = await Message.find({ client: req.params.clientId, "meeting.startTime": { $ne: null } }).sort({ "meeting.startTime": -1 });
+    res.json({ success: true, data: msgs.map(toMeeting) });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// Update meeting notes + attach media (client owner OR staff with access).
+export const updateMeetingNotes = async (req, res) => {
+  try {
+    const msg = await Message.findById(req.params.msgId);
+    if (!msg || !msg.meeting) return res.status(404).json({ success: false, error: "Meeting not found" });
+    const isOwner = String(msg.client) === String(req.user.id);
+    const isStaff = req.user.role === "admin" || (req.user.role === "manager" && await staffCanAccessClient(req, msg.client));
+    if (!isOwner && !isStaff) return res.status(403).json({ success: false, error: "Not allowed" });
+
+    if (typeof req.body.notes === "string") msg.meeting.notes = req.body.notes;
+    for (const f of req.files || []) {
+      const url = await fileToUrl(f);
+      const type = f.mimetype.startsWith("video/") ? "video" : f.mimetype.startsWith("image/") ? "image" : "file";
+      msg.meeting.noteMedia.push({ url, name: f.originalname, type });
+    }
+    await msg.save();
+    res.json({ success: true, data: toMeeting(msg) });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// helper: staff access to a client (admin any; manager assigned only)
+const staffCanAccessClient = async (req, clientId) => {
+  if (req.user.role === "admin") return true;
+  const c = await User.findById(clientId).select("assignedManager");
+  return !!c && String(c.assignedManager) === String(req.user.id);
+};
 
 // Shared: create a Zoom meeting and post it as a chat message
 const scheduleMeeting = async ({ clientId, sender, body }) => {
@@ -86,7 +169,16 @@ export const getMyMessages = async (req, res) => {
     const messages = await Message.find({ client: clientId }).sort({ createdAt: 1 });
     // mark admin → client messages as read
     await Message.updateMany({ client: clientId, sender: "admin", readByClient: false }, { readByClient: true });
-    res.json({ success: true, data: messages });
+    // Who handles this client (their manager, else the admin team)?
+    const me = await User.findById(clientId).select("assignedManager").populate("assignedManager", "name avatar");
+    let handler = "Admin team", handlerAvatar = "";
+    if (me?.assignedManager) {
+      handler = me.assignedManager.name; handlerAvatar = me.assignedManager.avatar || "";
+    } else {
+      const admin = await User.findOne({ role: "admin" }).select("name avatar");
+      if (admin) { handler = admin.name || "Admin team"; handlerAvatar = admin.avatar || ""; }
+    }
+    res.json({ success: true, data: messages, handler, handlerAvatar });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -122,7 +214,7 @@ export const getConversations = async (req, res) => {
   try {
     const filter = { role: "client" };
     if (req.user.role === "manager") filter.assignedManager = req.user.id;
-    const clients = await User.find(filter).select("name email assignedManager").populate("assignedManager", "name").lean();
+    const clients = await User.find(filter).select("name email avatar assignedManager").populate("assignedManager", "name").lean();
 
     const convos = await Promise.all(
       clients.map(async (c) => {
@@ -132,6 +224,7 @@ export const getConversations = async (req, res) => {
           clientId: c._id,
           name: c.name,
           email: c.email,
+          avatar: c.avatar || "",
           handler: c.assignedManager ? c.assignedManager.name : "Admin",
           lastMessage: last ? (last.text || (last.meeting ? "📅 Meeting" : last.fileUrl ? "📎 Attachment" : "")) : "",
           lastAt: last ? last.createdAt : null,

@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import AuthShell from "../components/AuthShell";
-import { signupUser } from "../api";
+import { signupUser, restoreSession } from "../api";
 
 const inputCls =
   "w-full rounded-[12px] bg-[#f3f8ff] border border-[#b0c5e7] px-5 py-3.5 text-[15px] font-[Montserrat] text-[#000] outline-none focus:border-[#013186] transition-colors placeholder-[rgba(0,0,0,0.35)]";
@@ -16,11 +16,27 @@ export default function Signup() {
 
   const [form, setForm] = useState({ name: "", email: prefillEmail, mobile: "", password: "", agree: false });
   const [status, setStatus] = useState({ loading: false, ok: null, msg: "" });
+  const [checkingSession, setCheckingSession] = useState(true);
+  const [alreadyExists, setAlreadyExists] = useState(false);
   const upd = (k) => (e) => setForm((f) => ({ ...f, [k]: k === "agree" ? e.target.checked : e.target.value }));
+
+  // Already logged in (≤7-day session)? Skip signup and go to the dashboard.
+  // Don't auto-redirect a "paid" return — that user must still create their account.
+  useEffect(() => {
+    if (paid) { setCheckingSession(false); return; }
+    let alive = true;
+    (async () => {
+      const user = await restoreSession();
+      if (alive && user) navigate("/dashboard", { replace: true });
+      else if (alive) setCheckingSession(false);
+    })();
+    return () => { alive = false; };
+  }, [navigate, paid]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.agree) return;
+    setAlreadyExists(false);
     setStatus({ loading: true, ok: null, msg: "" });
     try {
       const res = await signupUser({
@@ -29,6 +45,7 @@ export default function Signup() {
         mobile: form.mobile,
         password: form.password,
         trial,
+        paid, // only true when returning from a completed checkout (?paid=1)
       });
       // Paid users are auto-verified → straight to login. Others verify by email.
       if (res.verified) {
@@ -40,9 +57,21 @@ export default function Signup() {
       setForm({ name: "", email: "", mobile: "", password: "", agree: false });
       setTimeout(() => navigate("/login"), 2500);
     } catch (err) {
-      setStatus({ loading: false, ok: false, msg: err.message || "Could not create account." });
+      const msg = err.message || "Could not create account.";
+      setAlreadyExists(/already exists/i.test(msg));
+      setStatus({ loading: false, ok: false, msg });
     }
   };
+
+  if (checkingSession) {
+    return (
+      <AuthShell>
+        <div className="flex items-center justify-center py-20">
+          <div className="h-10 w-10 rounded-full border-4 border-[#dbe9ff] border-t-[#013186] animate-spin" />
+        </div>
+      </AuthShell>
+    );
+  }
 
   return (
     <AuthShell>
@@ -94,8 +123,22 @@ export default function Signup() {
           {status.loading ? "Creating account..." : <>Create account <span>›</span></>}
         </button>
 
-        {status.msg && (
+        {status.msg && !alreadyExists && (
           <p className={`text-[14px] font-semibold text-center m-0 ${status.ok ? "text-[#1a8f00]" : "text-[#c0392b]"}`}>{status.msg}</p>
+        )}
+
+        {alreadyExists && (
+          <div className="rounded-[12px] bg-[#fff8e6] border border-[#f3e0a0] px-4 py-3 text-center">
+            <p className="text-[14px] font-semibold text-[#8a6d1a] m-0 mb-2">
+              An account with this email already exists.
+            </p>
+            <Link
+              to={`/login`}
+              className="inline-block text-[14px] font-bold text-white bg-[#013186] hover:bg-[#012270] transition-colors rounded-[10px] px-5 py-2.5 no-underline"
+            >
+              Go to login →
+            </Link>
+          </div>
         )}
       </form>
 

@@ -7,10 +7,14 @@ import ScheduleMeetingModal from "../../components/ScheduleMeetingModal";
 const initialsOf = (name = "?") => name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
 const fmtTime = (d) =>
   d ? new Date(d).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "";
-const Avatar = ({ name, size = 40, bg = "#dbe9ff", color = "#013186" }) => (
-  <span className="rounded-full font-bold flex items-center justify-center shrink-0" style={{ width: size, height: size, fontSize: size * 0.34, background: bg, color }}>
-    {initialsOf(name)}
-  </span>
+const Avatar = ({ name, src, size = 40, bg = "#dbe9ff", color = "#013186" }) => (
+  src ? (
+    <img src={src} alt="" className="rounded-full object-cover shrink-0" style={{ width: size, height: size }} />
+  ) : (
+    <span className="rounded-full font-bold flex items-center justify-center shrink-0" style={{ width: size, height: size, fontSize: size * 0.34, background: bg, color }}>
+      {initialsOf(name)}
+    </span>
+  )
 );
 
 export default function AdminChat() {
@@ -84,7 +88,7 @@ export default function AdminChat() {
               onClick={() => setActive(c)}
               className={`w-full text-left flex gap-3 px-4 py-3 border-b border-[#f4f6fa] cursor-pointer transition-colors ${active?.clientId === c.clientId ? "bg-[#f0f6ff]" : "hover:bg-[#fafbfd]"}`}
             >
-              <Avatar name={c.name} />
+              <Avatar name={c.name} src={c.avatar} />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
                   <p className="m-0 text-[14px] font-bold text-[#0b1f44] truncate">{c.name}</p>
@@ -108,7 +112,7 @@ export default function AdminChat() {
               <button onClick={() => setActive(null)} className="[@media(min-width:801px)]:hidden text-[#5b6472] cursor-pointer mr-1">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
               </button>
-              <Avatar name={active.name} size={42} />
+              <Avatar name={active.name} src={active.avatar} size={42} />
               <div className="leading-tight">
                 <p className="m-0 text-[16px] font-bold text-[#0b1f44]">{active.name}</p>
                 <p className="m-0 text-[12px] text-[#9aa3b2]">{active.email}</p>
@@ -132,7 +136,7 @@ export default function AdminChat() {
                 const mine = m.sender === "admin";
                 return (
                   <div key={m._id} className={`flex items-end gap-2 ${mine ? "justify-end" : "justify-start"}`}>
-                    {!mine && <Avatar name={active.name} size={30} />}
+                    {!mine && <Avatar name={active.name} src={active.avatar} size={30} />}
                     <div className={`max-w-[60%] mq450:max-w-[78%] px-4 py-2.5 text-[14px] leading-snug flex flex-col gap-2 ${
                       mine ? "bg-[#1463ff] text-white rounded-[16px] rounded-br-[4px]" : "bg-[#eef1f6] text-[#1a2233] rounded-[16px] rounded-bl-[4px]"
                     }`}>

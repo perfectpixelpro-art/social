@@ -107,13 +107,34 @@ export async function sendPasswordResetEmail(to, name, link) {
 }
 
 // Sent to both parties when a Zoom meeting is scheduled
+// Build an .ics calendar invite so the meeting drops straight into their calendar.
+function buildIcs(meeting) {
+  const pad = (n) => String(n).padStart(2, "0");
+  const toIcs = (d) => `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}00Z`;
+  const start = new Date(meeting.startTime);
+  const end = new Date(start.getTime() + (Number(meeting.duration) || 30) * 60000);
+  return [
+    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//The Social 99//Meetings//EN",
+    "METHOD:REQUEST", "BEGIN:VEVENT",
+    `UID:${meeting.meetingId || Date.now()}@thesocial99`,
+    `DTSTAMP:${toIcs(new Date())}`,
+    `DTSTART:${toIcs(start)}`,
+    `DTEND:${toIcs(end)}`,
+    `SUMMARY:${meeting.topic || "The Social 99 Meeting"}`,
+    `DESCRIPTION:Join: ${meeting.joinUrl || ""}`,
+    `LOCATION:${meeting.joinUrl || "Online"}`,
+    "BEGIN:VALARM", "TRIGGER:-PT15M", "ACTION:DISPLAY", "DESCRIPTION:Meeting in 15 minutes", "END:VALARM",
+    "END:VEVENT", "END:VCALENDAR",
+  ].join("\r\n");
+}
+
 export async function sendMeetingEmail(to, name, meeting) {
   const dt = new Date(meeting.startTime);
   const when = dt.toLocaleString("en-US", { dateStyle: "full", timeStyle: "short" });
   const html = wrap(
     "Your Zoom meeting is scheduled",
     `<p>Hi ${name || "there"},</p>
-     <p>A Zoom meeting has been scheduled. Here are the details:</p>
+     <p>A Zoom meeting has been scheduled. The calendar invite is attached — open it to add it to your calendar.</p>
      <div style="background:#f5f8ff;border:1px solid #e0e8f5;border-radius:10px;padding:16px;margin:16px 0;">
        <p style="margin:0 0 6px;"><strong>Topic:</strong> ${meeting.topic || "Meeting"}</p>
        <p style="margin:0 0 6px;"><strong>When:</strong> ${when}</p>
@@ -122,5 +143,21 @@ export async function sendMeetingEmail(to, name, meeting) {
      ${button(meeting.joinUrl, "Join Meeting →")}
      <p style="font-size:13px;color:#7c7f81;">Or copy this link: <br>${meeting.joinUrl}</p>`
   );
-  return getResend().emails.send({ from: FROM(), to, subject: `Zoom meeting scheduled · ${meeting.topic || "The Social 99"}`, html });
+  return getResend().emails.send({
+    from: FROM(), to, subject: `Zoom meeting scheduled · ${meeting.topic || "The Social 99"}`, html,
+    attachments: [{ filename: "invite.ics", content: Buffer.from(buildIcs(meeting)).toString("base64") }],
+  });
+}
+
+// 15-minute reminder email before a meeting starts.
+export async function sendMeetingReminderEmail(to, name, meeting) {
+  const dt = new Date(meeting.startTime);
+  const when = dt.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
+  const html = wrap(
+    "Your meeting starts in 15 minutes ⏰",
+    `<p>Hi ${name || "there"},</p>
+     <p>Reminder — <strong>${meeting.topic || "your meeting"}</strong> starts at <strong>${when}</strong> (in about 15 minutes).</p>
+     ${button(meeting.joinUrl, "Join Meeting →")}`
+  );
+  return getResend().emails.send({ from: FROM(), to, subject: `Reminder: ${meeting.topic || "Meeting"} in 15 min`, html });
 }

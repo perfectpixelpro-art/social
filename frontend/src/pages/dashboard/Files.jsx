@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { uploadClientFile, getMyFiles } from "../../api";
+import { uploadClientFile, getMyFiles, deleteMyFile } from "../../api";
 
 const folderTypes = [
   { key: "logo", label: "Logos" },
@@ -27,6 +27,7 @@ export default function Files() {
   const [type, setType] = useState("logo");
   const [uploading, setUploading] = useState(false);
   const [msg, setMsg] = useState("");
+  const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef(null);
 
   const load = useCallback(async () => {
@@ -34,8 +35,7 @@ export default function Files() {
   }, []);
   useEffect(() => { load(); }, [load]);
 
-  const onPick = async (e) => {
-    const file = e.target.files?.[0];
+  const doUpload = async (file) => {
     if (!file) return;
     setUploading(true); setMsg("");
     try {
@@ -44,7 +44,20 @@ export default function Files() {
       load();
     } catch (err) {
       setMsg(err.message || "Upload failed.");
-    } finally { setUploading(false); e.target.value = ""; }
+    } finally { setUploading(false); }
+  };
+
+  const onPick = async (e) => { await doUpload(e.target.files?.[0]); e.target.value = ""; };
+
+  const del = async (file) => {
+    if (!window.confirm(`Delete "${file.fileName}"? This can't be undone.`)) return;
+    try { await deleteMyFile(file._id); setFiles((x) => x.filter((f) => f._id !== file._id)); }
+    catch (err) { setMsg(err.message || "Could not delete file."); }
+  };
+  const onDrop = (e) => {
+    e.preventDefault(); setDragOver(false);
+    const f = e.dataTransfer?.files?.[0];
+    if (f) doUpload(f);
   };
 
   return (
@@ -65,10 +78,13 @@ export default function Files() {
         </div>
         <input ref={inputRef} type="file" className="hidden" onChange={onPick} />
         <button onClick={() => inputRef.current?.click()} disabled={uploading}
-          className="rounded-[12px] border border-dashed border-[#9ec2ff] bg-[#f5f9ff] hover:bg-[#eef6ff] w-full py-6 flex flex-col items-center justify-center cursor-pointer disabled:opacity-60">
+          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={onDrop}
+          className={`rounded-[12px] border border-dashed w-full py-6 flex flex-col items-center justify-center cursor-pointer disabled:opacity-60 transition-colors ${dragOver ? "border-[#1463ff] bg-[#eaf1ff]" : "border-[#9ec2ff] bg-[#f5f9ff] hover:bg-[#eef6ff]"}`}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1463ff" strokeWidth="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><path d="M7 9l5-5 5 5" /><path d="M12 4v12" /></svg>
-          <p className="m-0 mt-2 text-[13px] font-semibold text-[#5b6472]">{uploading ? "Uploading..." : <>Click to upload to <b className="text-[#013186]">{labelOf(type)}</b></>}</p>
-          <p className="m-0 text-[11px] text-[#9aa3b2]">Stored securely in Google Drive · up to 50MB</p>
+          <p className="m-0 mt-2 text-[13px] font-semibold text-[#5b6472]">{uploading ? "Uploading..." : dragOver ? "Drop the file to upload" : <>Click or drag a file to upload to <b className="text-[#013186]">{labelOf(type)}</b></>}</p>
+          <p className="m-0 text-[11px] text-[#9aa3b2]">Images, videos, PDFs & docs · stored securely · up to 50MB</p>
         </button>
         {msg && <p className={`text-[13px] font-semibold mt-3 m-0 ${/success|Uploaded/i.test(msg) ? "text-[#16a34a]" : "text-[#dc2626]"}`}>{msg}</p>}
       </section>
@@ -82,17 +98,22 @@ export default function Files() {
             <h3 className="m-0 mb-3 text-[14px] font-bold text-[#0b1f44]">{f.label} <span className="text-[#9aa3b2] font-semibold">({group.length})</span></h3>
             <div className="grid grid-cols-3 mq800:grid-cols-2 mq450:grid-cols-1 gap-3">
               {group.map((file) => (
-                <a key={file._id} href={file.webViewLink} target="_blank" rel="noopener noreferrer"
-                  className="flex items-center gap-3 rounded-[12px] border border-[#eef1f6] p-3 hover:bg-[#fafbfd] transition-colors no-underline">
-                  <FileIcon mime={file.mimeType} />
-                  <div className="min-w-0">
-                    <p className="m-0 text-[13px] font-bold text-[#0b1f44] truncate">{file.fileName}</p>
-                    <p className="m-0 text-[11px] text-[#9aa3b2]">
-                      {new Date(file.uploadedAt).toLocaleDateString()}
-                      {file.uploadedBy === "admin" && <span className="ml-2 text-[10px] font-semibold text-[#7c3aed] bg-[#f0eafe] rounded-full px-1.5 py-0.5">From Admin</span>}
-                    </p>
-                  </div>
-                </a>
+                <div key={file._id} className="relative flex items-center gap-3 rounded-[12px] border border-[#eef1f6] p-3 hover:bg-[#fafbfd] transition-colors">
+                  <a href={file.webViewLink} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 min-w-0 flex-1 no-underline">
+                    <FileIcon mime={file.mimeType} />
+                    <div className="min-w-0">
+                      <p className="m-0 text-[13px] font-bold text-[#0b1f44] truncate">{file.fileName}</p>
+                      <p className="m-0 text-[11px] text-[#9aa3b2]">
+                        {new Date(file.uploadedAt).toLocaleDateString()}
+                        {file.uploadedBy === "admin" && <span className="ml-2 text-[10px] font-semibold text-[#7c3aed] bg-[#f0eafe] rounded-full px-1.5 py-0.5">From Admin</span>}
+                      </p>
+                    </div>
+                  </a>
+                  <button onClick={() => del(file)} title="Delete file"
+                    className="shrink-0 text-[#9aa3b2] hover:text-[#dc2626] cursor-pointer p-1">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /><path d="M10 11v6M14 11v6" /></svg>
+                  </button>
+                </div>
               ))}
             </div>
           </section>

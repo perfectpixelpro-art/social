@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import FileModel from "../models/file.model.js";
-import { createClientFolders, uploadToFolder, folderIdForType } from "../utils/googleDrive.js";
+import { createClientFolders, uploadToFolder, folderIdForType, deleteFromDrive } from "../utils/googleDrive.js";
+import { notify } from "../utils/notify.js";
 
 // Make sure a client has their Drive folders; create + save them if missing.
 export const ensureClientFolders = async (user) => {
@@ -43,6 +44,12 @@ export const uploadFile = async (req, res) => {
       folderType: req.body.folderType,
       uploadedBy: "client",
     });
+    // Notify the client's handler (manager, else admin) about the new file.
+    try {
+      const me = await User.findById(req.user.id).select("name assignedManager");
+      const handler = me?.assignedManager || (await User.findOne({ role: "admin" }).select("_id"))?._id;
+      if (handler) notify(handler, { type: "file", title: `New file from ${me?.name || "a client"}`, body: record.fileName, link: "/admin/files" });
+    } catch { /* don't fail the upload on notify error */ }
     res.status(201).json({ success: true, data: record });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -65,6 +72,10 @@ export const uploadFileForClient = async (req, res) => {
       folderType: req.body.folderType,
       uploadedBy: "admin",
     });
+    // Notify the client that their team uploaded a file.
+    try {
+      notify(req.params.clientId, { type: "file", title: "Your team uploaded a file", body: record.fileName, link: "/dashboard/files" });
+    } catch { /* don't fail the upload on notify error */ }
     res.status(201).json({ success: true, data: record });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -76,6 +87,32 @@ export const getMyFiles = async (req, res) => {
   try {
     const files = await FileModel.find({ client: req.user.id }).sort({ uploadedAt: -1 });
     res.json({ success: true, data: files });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+// Delete a file (removes from Google Drive + our DB).
+// Client can delete their own files; staff can delete any (manager: their clients').
+export const deleteFile = async (req, res) => {
+  try {
+    const file = await FileModel.findById(req.params.id);
+    if (!file) return res.status(404).json({ success: false, error: "File not found" });
+
+    const isClient = req.user.role === "client";
+    if (isClient && String(file.client) !== String(req.user.id)) {
+      return res.status(403).json({ success: false, error: "Not your file" });
+    }
+    if (req.user.role === "manager") {
+      const c = await User.findById(file.client).select("assignedManager");
+      if (!c || String(c.assignedManager) !== String(req.user.id)) {
+        return res.status(403).json({ success: false, error: "Not your client" });
+      }
+    }
+
+    try { await deleteFromDrive(file.fileId); } catch (e) { console.warn("Drive delete failed:", e.message); }
+    await file.deleteOne();
+    res.json({ success: true });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

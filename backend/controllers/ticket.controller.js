@@ -1,6 +1,19 @@
 import Ticket from "../models/ticket.model.js";
 import User from "../models/user.model.js";
+import Message from "../models/message.model.js";
 import { fileToUrl } from "../utils/upload.js";
+import { notify } from "../utils/notify.js";
+import { sendRawEmail } from "../utils/email.js";
+
+// Resolve who handles a client: their manager (name+email), else any admin.
+const handlerFor = async (clientId) => {
+  const client = await User.findById(clientId).select("assignedManager");
+  if (client?.assignedManager) {
+    const m = await User.findById(client.assignedManager).select("name email");
+    if (m) return m;
+  }
+  return User.findOne({ role: "admin" }).select("name email");
+};
 
 // Build attachment objects from uploaded files (multer .array → req.files) — Cloudinary or local.
 const attachmentsFrom = async (files = []) => {
@@ -25,7 +38,7 @@ export const createTicket = async (req, res) => {
     const { subject, category, priority, description } = req.body;
     if (!subject || !subject.trim()) return res.status(400).json({ success: false, error: "Subject is required" });
 
-    const user = await User.findById(req.user.id).select("name");
+    const user = await User.findById(req.user.id).select("name email");
     const ticket = await Ticket.create({
       ticketNo: `TKT-${Date.now().toString().slice(-6)}`,
       client: req.user.id,
@@ -37,6 +50,30 @@ export const createTicket = async (req, res) => {
       attachments: await attachmentsFrom(req.files),
       status: "open",
     });
+
+    // Surface the new ticket in chat + notify + email the client and their handler.
+    try {
+      const handler = await handlerFor(req.user.id);
+      // 1) Drop a note in the client's chat thread.
+      await Message.create({
+        client: req.user.id,
+        sender: "client",
+        senderName: user?.name || "",
+        text: `🎫 New support ticket ${ticket.ticketNo}: "${ticket.subject}"`,
+        readByClient: true,
+      });
+      // 2) In-app notifications.
+      if (handler) notify(handler._id, { type: "message", title: `New ticket from ${user?.name || "a client"}`, body: ticket.subject, link: "/admin/tickets" });
+      notify(req.user.id, { type: "message", title: "Ticket received", body: `We've logged ${ticket.ticketNo}. We'll be in touch.`, link: "/dashboard/tickets" });
+      // 3) Emails to client + handler (best-effort).
+      const cBody = `<p>Hi ${user?.name || "there"},</p><p>We've received your support ticket <b>${ticket.ticketNo}</b> — "${ticket.subject}". Our team will get back to you shortly.</p>`;
+      if (user?.email) sendRawEmail(user.email, `Ticket received · ${ticket.ticketNo}`, cBody, user.name);
+      if (handler?.email) {
+        const hBody = `<p>Hi ${handler.name || "there"},</p><p>${user?.name || "A client"} raised a new ticket <b>${ticket.ticketNo}</b>:</p><p><b>${ticket.subject}</b><br>${ticket.description || ""}</p>`;
+        sendRawEmail(handler.email, `New ticket · ${ticket.ticketNo}`, hBody, handler.name);
+      }
+    } catch (e) { console.warn("ticket notify/email failed:", e.message); }
+
     res.status(201).json({ success: true, data: ticket });
   } catch (err) {
     console.error("createTicket error:", err.message);
@@ -160,6 +197,27 @@ export const updateStatus = async (req, res) => {
     ticket.handledByName = staff?.name || "";
     ticket.handledByRole = staff?.role || req.user.role;
     await ticket.save();
+
+    // Tell the client when their ticket is resolved/closed (chat + notify + email).
+    if (status === "resolved" || status === "closed") {
+      try {
+        const client = await User.findById(ticket.client).select("name email");
+        const word = status === "resolved" ? "resolved" : "closed";
+        await Message.create({
+          client: ticket.client,
+          sender: "admin",
+          senderName: staff?.name || "Support",
+          text: `🎫 Your ticket ${ticket.ticketNo} ("${ticket.subject}") has been ${word}.`,
+          readByClient: false,
+        });
+        notify(ticket.client, { type: "message", title: `Ticket ${word}`, body: `${ticket.ticketNo}: ${ticket.subject}`, link: "/dashboard/tickets" });
+        if (client?.email) {
+          const body = `<p>Hi ${client.name || "there"},</p><p>Your support ticket <b>${ticket.ticketNo}</b> — "${ticket.subject}" has been <b>${word}</b>. Reply in your dashboard if you need anything else.</p>`;
+          sendRawEmail(client.email, `Ticket ${word} · ${ticket.ticketNo}`, body, client.name);
+        }
+      } catch (e) { console.warn("ticket status notify failed:", e.message); }
+    }
+
     const populated = await ticket.populate("handledBy", "name role");
     res.json({ success: true, data: populated });
   } catch (err) {

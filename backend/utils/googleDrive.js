@@ -90,6 +90,13 @@ export async function uploadToFolder(folderId, { buffer, originalname, mimetype 
   return created.data;
 }
 
+// Delete a file from Google Drive by its file id (best-effort).
+export async function deleteFromDrive(fileId) {
+  if (!fileId) return;
+  const drive = getDrive();
+  await drive.files.delete({ fileId, supportsAllDrives: true });
+}
+
 // Map a folderType to the matching folder id from a user's saved folders
 export function folderIdForType(driveFolders, folderType) {
   const map = {

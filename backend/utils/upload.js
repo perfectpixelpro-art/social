@@ -23,7 +23,14 @@ export async function fileToUrl(file) {
   if (!file) return "";
   if (cloud()) {
     try {
-      const res = await cloudinary.uploader.upload(file.path, { resource_type: "auto", folder: "thesocial99" });
+      // Images/videos use their native pipelines; everything else (PDF, docs) uses
+      // "raw" — Cloudinary blocks PDF delivery from the image pipeline by default,
+      // which causes 401s. Raw delivery has no such restriction.
+      const mime = file.mimetype || "";
+      const resource_type = mime.startsWith("image/") ? "image"
+        : mime.startsWith("video/") ? "video"
+        : "raw";
+      const res = await cloudinary.uploader.upload(file.path, { resource_type, folder: "thesocial99" });
       fs.unlink(file.path, () => {}); // remove the temp local copy
       return res.secure_url;
     } catch (e) {

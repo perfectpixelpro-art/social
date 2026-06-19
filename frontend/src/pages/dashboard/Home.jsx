@@ -35,7 +35,13 @@ export default function Home() {
         const m = await clientGetMessages();
         const now = Date.now();
         const up = (m.data || [])
-          .filter((x) => x.meeting?.startTime && new Date(x.meeting.startTime).getTime() > now)
+          .filter((x) => {
+            if (!x.meeting?.startTime) return false;
+            // Keep meetings that haven't ended yet (include in-progress ones).
+            const start = new Date(x.meeting.startTime).getTime();
+            const end = start + (Number(x.meeting.duration) || 30) * 60 * 1000;
+            return end > now;
+          })
           .map((x) => x.meeting)
           .sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
         setMeetings(up);

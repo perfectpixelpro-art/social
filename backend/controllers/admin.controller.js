@@ -1,6 +1,8 @@
 import bcrypt from "bcrypt";
 import User from "../models/user.model.js";
 import Ticket from "../models/ticket.model.js";
+import Message from "../models/message.model.js";
+import { notify } from "../utils/notify.js";
 
 const publicStaff = (u) => ({ id: u._id, name: u.name, email: u.email, role: u.role });
 
@@ -144,6 +146,34 @@ export const assignClient = async (req, res) => {
       { new: true }
     ).populate("assignedManager", "name email");
     if (!client) return res.status(404).json({ success: false, error: "Client not found" });
+
+    // Let the client know who's now handling their account (notification + chat intro).
+    if (managerId && client.assignedManager) {
+      const mgrName = client.assignedManager.name || "your account manager";
+      try {
+        notify(client._id, {
+          type: "message",
+          title: "You've been assigned an account manager",
+          body: `${mgrName} is now handling your account.`,
+          link: "/dashboard/chat",
+        });
+        await Message.create({
+          client: client._id,
+          sender: "admin",
+          senderName: mgrName,
+          text: `Hi ${client.name || "there"}! I'm ${mgrName}, your account manager at The Social 99. I'll be looking after your account — feel free to message me here anytime. 👋`,
+          readByClient: false,
+        });
+        // Also notify the manager about their new client.
+        notify(client.assignedManager._id, {
+          type: "message",
+          title: "New client assigned",
+          body: `${client.name || client.email} has been assigned to you.`,
+          link: "/admin/chat",
+        });
+      } catch { /* don't fail the assignment on notify error */ }
+    }
+
     res.json({ success: true, data: client });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
