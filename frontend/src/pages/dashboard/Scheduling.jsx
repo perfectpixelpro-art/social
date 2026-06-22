@@ -419,7 +419,7 @@ export function AnalyticsPanel({ data, platform }) {
         </button>
       </div>
 
-      {/* metric cards with sparklines */}
+      {/* metric cards (no sparkline) */}
       <div className="grid grid-cols-4 mq800:grid-cols-2 gap-4 mb-6">
         {cards.map((c) => (
           <div key={c.label} className="rounded-[12px] border border-[#eef1f6] p-4">
@@ -427,7 +427,6 @@ export function AnalyticsPanel({ data, platform }) {
             <p className="m-0 text-[24px] font-bold text-[#0b1f44] flex items-center gap-1">
               {num2(c.n)} <span className={`text-[12px] ${c.up ? "text-[#16a34a]" : "text-[#dc2626]"}`}>{c.up ? "▲" : "▼"}</span>
             </p>
-            <Sparkline values={c.series} color={color} />
           </div>
         ))}
       </div>
