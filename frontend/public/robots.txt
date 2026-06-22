@@ -1,11 +1,21 @@
 User-agent: *
 Allow: /
 
+# Private / app areas — keep out of search results
 Disallow: /cgi-bin/
 Disallow: /login
+Disallow: /sign-in
+Disallow: /signup
+Disallow: /free-trial
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /checkout
+Disallow: /verified
+Disallow: /dashboard
+Disallow: /admin
 Disallow: /items/
 
-# Google AI (Gemini, SGE, AI Overviews)
+# Google AI (Gemini, AI Overviews)
 User-agent: Google-Extended
 Allow: /
 
@@ -14,6 +24,9 @@ User-agent: GPTBot
 Allow: /
 
 User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
 Allow: /
 
 # Anthropic / Claude
@@ -38,8 +51,14 @@ Allow: /
 User-agent: FacebookBot
 Allow: /
 
+User-agent: Meta-ExternalAgent
+Allow: /
+
 # Apple
 User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
 Allow: /
 
 # Common AI scrapers
@@ -50,4 +69,3 @@ User-agent: cohere-ai
 Allow: /
 
 Sitemap: https://thesocial99.com/sitemap.xml
-LLMs: https://thesocial99.com/llms.txt
