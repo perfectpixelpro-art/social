@@ -65,7 +65,7 @@ import AdminNotifications from "./pages/admin/Notifications";
 import AdminEmail from "./pages/admin/Email";
 import ImageViewerHost from "./components/ImageViewer";
 
-ReactDOM.createRoot(document.getElementById("root")).render(
+const app = (
   <React.StrictMode>
     <BrowserRouter>
       <ScrollToTop />
@@ -147,3 +147,13 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     </BrowserRouter>
   </React.StrictMode>
 );
+
+// react-snap pre-renders pages to static HTML at build time. When that HTML is
+// present we hydrate it (attach React to existing markup); otherwise we render
+// fresh (normal SPA boot / dev).
+const rootElement = document.getElementById("root");
+if (rootElement.hasChildNodes()) {
+  ReactDOM.hydrateRoot(rootElement, app);
+} else {
+  ReactDOM.createRoot(rootElement).render(app);
+}
