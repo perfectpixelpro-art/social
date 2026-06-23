@@ -1,5 +1,14 @@
 import mongoose from "mongoose";
 
+// Media attached to meeting notes (image / video / file).
+// Defined as an explicit sub-schema so it becomes a proper DocumentArray —
+// an inline [{...}] nested inside the `meeting` object gets mis-parsed by
+// Mongoose as a string array, which breaks saving objects.
+const noteMediaSchema = new mongoose.Schema(
+  { url: String, name: String, type: String },
+  { _id: false }
+);
+
 // Each message belongs to ONE client's conversation with admin.
 // `client` identifies the conversation; `sender` says who wrote it.
 const messageSchema = new mongoose.Schema(
@@ -20,7 +29,7 @@ const messageSchema = new mongoose.Schema(
       joinUrl: String,
       meetingId: String,
       notes: { type: String, default: "" },
-      noteMedia: [{ url: String, name: String, type: String }], // images/videos attached to notes
+      noteMedia: { type: [noteMediaSchema], default: [] }, // images/videos attached to notes
       reminderSent: { type: Boolean, default: false },
     },
     readByAdmin: { type: Boolean, default: false },
