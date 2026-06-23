@@ -1,3 +1,4 @@
+import Seo from "../components/Seo";
 import teamMain from "../assets/team-main.avif";
 import team1 from "../assets/team1.avif";
 import team2 from "../assets/team2.avif";
@@ -156,6 +157,7 @@ function BadgeIcon({ name }) {
 export default function Website() {
   return (
     <div className="w-full font-[Montserrat] overflow-x-hidden">
+      <Seo path="/website" title="Website Design Services — Built to Convert | The Social 99" description="Conversion-focused, SEO-optimized website design for small businesses. Clean, fast, mobile-friendly sites that turn visitors into customers from $99/month." />
 
       {/* ── Hero ── */}
       <div

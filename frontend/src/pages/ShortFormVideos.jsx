@@ -1,3 +1,4 @@
+import Seo from "../components/Seo";
 import { useState, useRef, useEffect } from "react";
 import u1 from "../assets/u1.avif";
 import u2 from "../assets/u2.avif";
@@ -107,6 +108,7 @@ export default function ShortFormVideos() {
 
   return (
     <div className="w-full font-[Montserrat] overflow-x-hidden">
+      <Seo path="/short-form-videos" title="Short-Form Video Creation — Reels, Shorts & TikTok | The Social 99" description="Scroll-stopping short-form videos built for virality. Professional editing, storyboarding, and captions for Reels, Shorts, and TikTok from $99/month." />
 
       {/* ── Hero ── */}
       <div

@@ -1,3 +1,4 @@
+import Seo from "../components/Seo";
 import PetHero from "../components/PetHero";
 import PetCompetitionSection from "../components/PetCompetitionSection";
 import PetTrustSection from "../components/PetTrustSection";
@@ -9,6 +10,7 @@ import PetTimelineSection from "../components/PetTimelineSection";
 export default function PetGrowthHero() {
   return (
     <>
+      <Seo path="/pet-and-grooming" title="Social Media Marketing for Pet & Grooming Businesses | The Social 99" description="Grow your pet care or grooming business with done-for-you social media management, engaging content, and short-form video from $99/month." />
      <PetHero />
      <PetCompetitionSection />
      <PetTrustSection />

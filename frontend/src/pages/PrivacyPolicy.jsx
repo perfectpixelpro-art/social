@@ -1,3 +1,4 @@
+import Seo from "../components/Seo";
 const H2 = ({ children }) => (
   <h2 className="text-[#013186] font-bold m-0" style={{ fontSize: "clamp(30px, 5vw, 60px)" }}>{children}</h2>
 );
@@ -24,6 +25,7 @@ const Bullets = ({ items }) => (
 export default function PrivacyPolicy() {
   return (
     <div className="w-full font-[Montserrat] overflow-x-hidden">
+      <Seo path="/privacy-policy" title="Privacy Policy | The Social 99" description="How The Social 99 collects, uses, and protects your personal information. Read our full privacy policy." />
 
       {/* Hero */}
       <div className="w-full px-[100px] mq800:px-10 mq450:px-5 pt-12">

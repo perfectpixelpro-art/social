@@ -1,3 +1,4 @@
+import Seo from "../components/Seo";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { findPlan, serviceAddons } from "../data/plans";
@@ -83,6 +84,7 @@ export default function Checkout() {
 
   return (
     <div className="w-full min-h-screen bg-white font-[Montserrat] py-10 px-6 mq450:px-4">
+      <Seo title="Checkout | The Social 99" description="Complete your The Social 99 plan purchase securely." noindex />
       <div className="max-w-[1080px] mx-auto grid grid-cols-[400px_1fr] mq1125:grid-cols-1 gap-6 items-start">
 
         {/* ── Order Summary ── */}

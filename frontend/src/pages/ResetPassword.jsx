@@ -37,7 +37,7 @@ export default function ResetPassword() {
 
   if (!token) {
     return (
-      <AuthShell>
+      <AuthShell title="Reset Your Password | The Social 99">
         <h1 className="text-[#013186] font-bold m-0" style={{ fontSize: "clamp(26px, 4vw, 38px)" }}>Invalid link</h1>
         <p className="mt-3 mb-8 text-[rgba(0,0,0,0.5)] font-semibold text-[15px]">This password reset link is missing or invalid.</p>
         <Link to="/forgot-password" className="text-[#013186] font-bold no-underline hover:underline">Request a new link</Link>
@@ -46,7 +46,7 @@ export default function ResetPassword() {
   }
 
   return (
-    <AuthShell>
+    <AuthShell title="Reset Your Password | The Social 99">
       <h1 className="text-[#013186] font-bold leading-tight m-0" style={{ fontSize: "clamp(30px, 4vw, 44px)" }}>
         Set a new password
       </h1>

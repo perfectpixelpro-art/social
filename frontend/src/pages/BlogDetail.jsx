@@ -1,4 +1,5 @@
 import { useParams, Link } from "react-router-dom";
+import Seo from "../components/Seo";
 import blogs from "../data/blogs";
 import RealROI99 from "./articles/RealROI99";
 import InvisibleSocial2026 from "./articles/InvisibleSocial2026";
@@ -19,8 +20,23 @@ export default function BlogDetail() {
   const { slug } = useParams();
   const blog = blogs.find((b) => b.slug === slug);
 
+  const seo = blog ? (
+    <Seo
+      path={`/blogs/${slug}`}
+      type="article"
+      title={`${blog.title} | The Social 99 Blog`}
+      description={(blog.excerpt || blog.title).replace(/\.{2,}\s*$/, "").slice(0, 160)}
+    />
+  ) : null;
+
   const CustomArticle = customArticles[slug];
-  if (CustomArticle) return <CustomArticle />;
+  if (CustomArticle)
+    return (
+      <>
+        {seo}
+        <CustomArticle />
+      </>
+    );
 
   if (!blog) {
     return (
@@ -33,6 +49,7 @@ export default function BlogDetail() {
 
   return (
     <div className="w-full font-[Montserrat] overflow-x-hidden">
+      {seo}
       <div className="w-full px-[100px] mq800:px-10 mq450:px-5 pt-14 mq450:pt-10 pb-20">
         <div className="w-full max-w-[900px] mx-auto">
 

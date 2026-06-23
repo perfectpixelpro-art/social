@@ -65,7 +65,7 @@ export default function Signup() {
 
   if (checkingSession) {
     return (
-      <AuthShell>
+      <AuthShell title="Create Your Account | The Social 99">
         <div className="flex items-center justify-center py-20">
           <div className="h-10 w-10 rounded-full border-4 border-[#dbe9ff] border-t-[#013186] animate-spin" />
         </div>
@@ -74,7 +74,7 @@ export default function Signup() {
   }
 
   return (
-    <AuthShell>
+    <AuthShell title="Create Your Account | The Social 99">
       <h1 className="text-[#013186] font-bold leading-tight m-0" style={{ fontSize: "clamp(30px, 4vw, 44px)" }}>
         {trial ? "Start your free trial" : "Create your account"}
       </h1>

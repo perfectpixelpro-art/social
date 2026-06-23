@@ -1,3 +1,4 @@
+import Seo from "../components/Seo";
 import socialImage from "../assets/about1.avif";
 import sm1 from "../assets/sm1.webp";
 import sm2 from "../assets/sm2.webp";
@@ -20,6 +21,7 @@ import a9 from "../assets/a9.webp";
 const About = () => {
   return (
     <div className="w-full font-[Montserrat] overflow-x-hidden">
+      <Seo path="/about" title="About The Social 99 — Our Story & Mission" description="Learn about The Social 99: the team helping small businesses grow with affordable, done-for-you social media management, video, and web design." />
 
       {/* ── Hero ── */}
       <div

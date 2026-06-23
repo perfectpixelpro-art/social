@@ -1,3 +1,4 @@
+import Seo from "../components/Seo";
 const H2 = ({ children }) => (
   <h2 className="text-[#013186] font-bold m-0" style={{ fontSize: "clamp(30px, 5vw, 60px)" }}>{children}</h2>
 );
@@ -21,6 +22,7 @@ const Bullets = ({ items }) => (
 export default function RefundPolicy() {
   return (
     <div className="w-full font-[Montserrat] overflow-x-hidden">
+      <Seo path="/refund-policy" title="Refund Policy | The Social 99" description="Read The Social 99's refund policy. Transparent terms for our social media management, video, and website design services." />
 
       {/* Hero */}
       <div className="w-full px-[100px] mq800:px-10 mq450:px-5 pt-12">

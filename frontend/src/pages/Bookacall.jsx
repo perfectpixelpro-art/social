@@ -1,3 +1,4 @@
+import Seo from "../components/Seo";
 import { useEffect } from "react";
 import Cal, { getCalApi } from "@calcom/embed-react";
 
@@ -15,6 +16,7 @@ const Bookacall = () => {
 
   return (
     <div className="w-full font-[Montserrat] overflow-x-hidden">
+      <Seo path="/book-a-call" title="Book a Free Call | The Social 99" description="Schedule a free, no-obligation call with The Social 99 to discuss how we can grow your business on social media." />
       <div
         className="w-full"
         style={{

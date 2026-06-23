@@ -1,10 +1,13 @@
 import { Link } from "react-router-dom";
+import Seo from "./Seo";
 
 // Split-screen auth layout: brand panel on the left, form on the right.
 // `wide` widens the right content area (used by the checkout step).
-export default function AuthShell({ children, wide = false }) {
+export default function AuthShell({ children, wide = false, title = "Sign In | The Social 99" }) {
   return (
     <div className="w-full min-h-screen flex font-[Montserrat] bg-[#021b4a]">
+      <Seo title={title} description="Secure access to your The Social 99 account." noindex />
+
       {/* Left brand panel */}
       <div
         className={`relative ${wide ? "w-[38%] mq1125:hidden" : "w-1/2 mq800:hidden"} p-10 flex flex-col justify-between overflow-hidden`}

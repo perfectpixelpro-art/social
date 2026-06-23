@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Seo from "../components/Seo";
 import QuestionsLayout from "../components/QuestionsLayout";
 import FrameComponent from "../components/FrameComponent";
 
@@ -169,6 +170,11 @@ export default function Pricing() {
 
   return (
     <div className="w-full font-[Montserrat] overflow-x-hidden">
+      <Seo
+        path="/pricing"
+        title="Pricing — Social Media, Video & Website Plans from $99/mo | The Social 99"
+        description="Simple, transparent pricing from The Social 99. Social media management, short-form video, and website design plans starting at $99/month. No setup fee, cancel anytime."
+      />
 
       {/* Hero */}
       <div className="w-full px-[100px] mq800:px-10 mq450:px-5 pt-12 mq450:pt-8 ">

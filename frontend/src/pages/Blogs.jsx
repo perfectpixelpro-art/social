@@ -1,3 +1,4 @@
+import Seo from "../components/Seo";
 import { Link } from "react-router-dom";
 import blogs from "../data/blogs";
 
@@ -35,6 +36,7 @@ function BlogCard({ blog }) {
 export default function Blogs() {
   return (
     <div className="w-full font-[Montserrat] overflow-x-hidden">
+      <Seo path="/blogs" title="Blog — Social Media Marketing Tips | The Social 99" description="Actionable social media marketing tips, content strategy, and growth insights for small businesses from The Social 99." />
       {/* Hero */}
       <div className="w-full px-[100px] mq800:px-10 mq450:px-5 pt-16 mq450:pt-10 pb-10 text-center">
         <h1 className="text-[#013186] font-bold leading-tight m-0" style={{ fontSize: "clamp(38px, 7vw, 92px)" }}>

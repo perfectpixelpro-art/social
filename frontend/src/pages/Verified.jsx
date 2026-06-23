@@ -1,3 +1,4 @@
+import Seo from "../components/Seo";
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
@@ -28,6 +29,7 @@ export default function Verified() {
 
   return (
     <div className="w-full min-h-screen flex items-center justify-center font-[Montserrat] bg-[#f7faff]">
+      <Seo title="Email Verified | The Social 99" description="Your email has been verified." noindex />
       <div className="text-center">
         {ok === "1" ? (
           <>

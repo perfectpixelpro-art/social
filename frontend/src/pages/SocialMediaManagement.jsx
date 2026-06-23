@@ -1,3 +1,4 @@
+import Seo from "../components/Seo";
 import { useState } from "react";
 import s1 from "../assets/s1.avif";
 import s2 from "../assets/s2.avif";
@@ -138,6 +139,7 @@ export default function SocialMediaManagement() {
   const [activePlan, setActivePlan] = useState(0);
   return (
     <div className="w-full font-[Montserrat] overflow-x-hidden">
+      <Seo path="/social-media-management" title="Social Media Management Services from $99/mo | The Social 99" description="Professional, done-for-you social media management: custom content, expert posting, and growth strategy for small businesses. Plans from $99/month." />
 
       {/* ── Hero ── */}
       <div

@@ -1,3 +1,4 @@
+import Seo from "../components/Seo";
 import facial from "../assets/facial.webp";
 import skin from "../assets/skin.webp";
 import facial3 from "../assets/facial_33.webp";
@@ -17,6 +18,7 @@ import ResultsFaqSection from "../components/ResultsFaqSection";
 export default function MedSpaLandingPage() {
   return (
     <>
+      <Seo path="/med-spa" title="Social Media Marketing for Med Spas | The Social 99" description="Specialized social media management and content for med spas. Attract more clients with done-for-you posts, videos, and campaigns from $99/month." />
 
       {/* Hero Section */}
   <section className="w-full  h-[500px] max-[1000px]:min-h-[950px] max-[768px]:min-h-[820px] overflow-hidden mt-20 md:mt-20 max-[750px]:mt-0">

@@ -23,7 +23,7 @@ export default function ForgotPassword() {
   };
 
   return (
-    <AuthShell>
+    <AuthShell title="Forgot Password | The Social 99">
       <h1 className="text-[#013186] font-bold leading-tight m-0" style={{ fontSize: "clamp(30px, 4vw, 44px)" }}>
         Forgot password?
       </h1>

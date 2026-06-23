@@ -1,3 +1,4 @@
+import Seo from "../components/Seo";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function NotFound() {
@@ -12,6 +13,7 @@ export default function NotFound() {
         backgroundRepeat: "no-repeat",
       }}
     >
+      <Seo title="Page Not Found (404) | The Social 99" description="The page you are looking for could not be found." noindex />
       <div className="text-center max-w-[560px]">
         <Link to="/">
           <img src="/Logo@2x.png" alt="The Social 99" className="h-[48px] w-auto object-contain mx-auto mb-8" />

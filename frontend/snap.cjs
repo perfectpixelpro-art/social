@@ -43,6 +43,12 @@ const include = [
   "/salons-and-beauty",
   "/restaurants",
   "/bars",
+  // Blog posts
+  "/blogs/real-roi-99-social-media-management",
+  "/blogs/small-business-invisible-social-media-2026",
+  "/blogs/psychology-customers-buy-businesses-they-follow",
+  "/blogs/from-zero-to-1000-followers-the-small-business-playbook-for-2026",
+  "/blogs/when-to-post-how-to-batch-and-how-to-schedule-30-days-of-social-media-in-one-sitting",
 ];
 
 run({

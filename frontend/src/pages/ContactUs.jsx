@@ -1,3 +1,4 @@
+import Seo from "../components/Seo";
 import Work1 from "../assets/Work1.webp";
 import Work2 from "../assets/Work2.webp";
 import Work3 from "../assets/Work3.webp";
@@ -17,6 +18,7 @@ export default function ContactUs() {
   ];
 
   return (<>
+      <Seo path="/contact" title="Contact The Social 99 — Get in Touch" description="Have questions? Contact The Social 99 to start growing your business with affordable social media management, short-form video, and website design." />
 
 
 

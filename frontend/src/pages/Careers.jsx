@@ -1,3 +1,4 @@
+import Seo from "../components/Seo";
 import { useState, useRef } from "react";
 import emailjs from "@emailjs/browser";
 
@@ -108,6 +109,7 @@ export default function Careers() {
 
   return (
     <div className="w-full font-[Montserrat] overflow-x-hidden">
+      <Seo path="/careers" title="Careers at The Social 99 — Join Our Team" description="Join The Social 99. Explore career opportunities in social media, content creation, video editing, and design with a fast-growing agency." />
 
       {/* Hero */}
       <div className="w-full px-[100px] mq800:px-10 mq450:px-5 pt-12">

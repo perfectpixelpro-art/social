@@ -1,3 +1,4 @@
+import Seo from "../components/Seo";
 const H2 = ({ children }) => (
   <h2 className="text-[#013186] font-bold m-0" style={{ fontSize: "clamp(30px, 5vw, 60px)" }}>{children}</h2>
 );
@@ -24,6 +25,7 @@ const Bullets = ({ items }) => (
 export default function TermsOfService() {
   return (
     <div className="w-full font-[Montserrat] overflow-x-hidden">
+      <Seo path="/terms-of-service" title="Terms of Service | The Social 99" description="The terms and conditions governing your use of The Social 99's services. Please read before getting started." />
 
       {/* Hero */}
       <div className="w-full px-[100px] mq800:px-10 mq450:px-5 pt-12">

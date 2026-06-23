@@ -1,6 +1,8 @@
+import Seo from "../components/Seo";
 const Services = () => {
   return (
     <div className="w-full px-[100px] mq800:px-10 mq450:px-5 py-20">
+      <Seo path="/services" title="Our Services — Social Media, Video & Web Design | The Social 99" description="Explore The Social 99's services: social media management, short-form video creation, and conversion-focused website design for small businesses from $99/month." />
       <h1 className="text-[52px] mq800:text-[38px] mq450:text-[28px] font-bold text-[#013186] mb-6">Our Services</h1>
       <p className="text-xl text-[rgba(0,0,0,0.5)] font-semibold max-w-[600px]">
         We offer end-to-end social media solutions tailored for small businesses — from content creation to full account management.
