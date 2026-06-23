@@ -141,16 +141,17 @@ const styles = `
       padding-top: 10px !important;
     }
     .explore-btn {
-      padding: 8px 10px !important;
-      width: 100% !important;
+      padding: 7px 12px !important;
+      width: fit-content !important;
+      gap: 8px !important;
     }
     .explore-btn-text {
-      font-size: 13px !important;
+      font-size: 12px !important;
       white-space: nowrap !important;
     }
     .explore-btn-icon {
-      width: 22px !important;
-      height: 22px !important;
+      width: 20px !important;
+      height: 20px !important;
       flex-shrink: 0 !important;
     }
   }
@@ -200,7 +201,7 @@ const PlanContent = ({ className = "" }) => {
 
                 {/* CTA */}
                 <div className="card-cta mt-auto pt-6">
-                  <div className=" explore-btn flex items-center gap-1 rounded-full border border-[rgba(1,49,134,0.18)] bg-[rgba(188,214,255,0.45)] px-6 py-2 w-full justify-between">
+                  <div className=" explore-btn flex items-center gap-3 rounded-full border border-[rgba(1,49,134,0.18)] bg-[rgba(188,214,255,0.45)] px-5 py-2 w-fit">
                     <span className="explore-btn-text text-[18px] font-bold text-[#013186] whitespace-nowrap leading-none">
                       Explore now $99
                     </span>
