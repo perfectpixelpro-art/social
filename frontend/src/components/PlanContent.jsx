@@ -113,8 +113,18 @@ const styles = `
       min-height: 260px !important;
     }
     .card-content {
-      width: 50% !important;
+      width: 62% !important;
       padding: 18px 14px !important;
+    }
+    .card-pill-item {
+      overflow: visible !important;
+      white-space: normal !important;
+    }
+    .card-pill-text {
+      white-space: normal !important;
+      overflow: visible !important;
+      text-overflow: clip !important;
+      line-height: 1.25 !important;
     }
     .card-image-wrapper {
       width: 80% !important;

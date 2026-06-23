@@ -8,6 +8,7 @@ const items = [
   { num: "04", label: "Creative Carousel" },
   { num: "05", label: "Captivating Reel" },
   { num: "06", label: "Insightful Carousel" },
+  { num: "07", label: "Targeted Emails" },
 ];
 
 const ChallengeCard = ({ className = "" }) => {

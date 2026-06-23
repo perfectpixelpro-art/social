@@ -136,8 +136,8 @@ const FrameComponent11111 = ({ className = "" }) => {
   stroke="rgba(1,49,134,0.45)"
   strokeWidth="2"
   pathLength="1"
-  strokeDasharray="1"
-  strokeDashoffset={1 - progress}
+  strokeDasharray={`${progress} ${Math.max(0, 1 - progress)}`}
+  strokeDashoffset={0.09}
   strokeLinecap="round"
 />
 </svg>
