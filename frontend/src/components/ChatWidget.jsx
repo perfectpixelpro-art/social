@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-const WEBHOOK_URL = import.meta.env.VITE_CHAT_WEBHOOK_URL || "https://radar-daily-roundup.ngrok-free.dev/webhook/00a6a655-a1c0-4e85-96d6-cc6709177c14/chat";
+const WEBHOOK_URL = import.meta.env.VITE_CHAT_WEBHOOK_URL || "https://n8n.thesocial99.com/webhook/00a6a655-a1c0-4e85-96d6-cc6709177c14/chat";
 
 // Common questions shown as quick-tap chips on the chat screen.
 const FAQS = [
