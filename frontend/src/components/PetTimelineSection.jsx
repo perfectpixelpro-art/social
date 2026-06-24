@@ -144,7 +144,7 @@ export default function PetTimelineSection() {
             {/* Buttons — stack on mobile, row on sm+ */}
             <div className="mt-8 flex flex-col sm:flex-row flex-wrap justify-center items-center gap-3">
               <Link
-                to="/book-a-call"
+                to="/pricing"
                 className="w-full sm:w-auto h-[48px] px-6 bg-white text-[#013186] rounded-[6px] text-[13px] font-semibold inline-flex items-center justify-center transition hover:opacity-90"
               >
                 Start for $99 — No Risk

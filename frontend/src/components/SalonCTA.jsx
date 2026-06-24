@@ -81,7 +81,7 @@ export default function SalonCTA() {
             "
           >
             <Link
-              to="/book-a-call"
+              to="/pricing"
               className="
                 h-[46px]
                 px-6

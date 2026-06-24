@@ -288,7 +288,7 @@ export default function SalonPricingSection() {
 
                 {/* BUTTON */}
                 <Link
-                  to="/book-a-call"
+                  to={`/checkout?tab=Marketing&plan=${encodeURIComponent(plan.name)}`}
                   className={`
                     mt-8
                     h-[46px]

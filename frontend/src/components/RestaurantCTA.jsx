@@ -69,7 +69,7 @@ export default function RestaurantCTA() {
             "
           >
             <Link
-              to="/book-a-call"
+              to="/pricing"
               className="
                 h-[56px]
                 min-w-[260px]
