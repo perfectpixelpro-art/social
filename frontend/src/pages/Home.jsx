@@ -104,7 +104,7 @@ const Home = () => {
     <p
       className="
         mt-3
-        text-[rgba(0,0,0,0.45)]
+        text-[rgba(0,0,0,0.6)]
         font-semibold
         mq450:text-[18px]
         mq450:leading-[1.35]
@@ -153,9 +153,9 @@ const Home = () => {
 </div>
           {/* Desktop */}
 <div className="flex items-center justify-between gap-4 flex-wrap mb-5 mq450:hidden">
-  <h3 className="text-[23px] text-[rgba(0,0,0,0.5)] font-semibold m-0">
+  <h2 className="text-[23px] text-[rgba(0,0,0,0.6)] font-semibold m-0">
     Choose Your Plan at The Social 99
-  </h3>
+  </h2>
 
   <div className="text-sm font-semibold text-right text-[#000] leading-6">
     Trusted by <span className="text-[#3db100]">1450+ Businesses</span> to Boost

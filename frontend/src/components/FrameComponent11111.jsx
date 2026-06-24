@@ -76,9 +76,9 @@ const FrameComponent11111 = ({ className = "" }) => {
   if (isMobile) {
     return (
       <section className={`w-full flex flex-col items-center py-2 px-6 font-[Montserrat]  ${className}`}>
-        <h1 className="text-[40px] mq450:text-[32px] font-bold text-[#013186] leading-tight text-center mb-8">
+        <h2 className="text-[40px] mq450:text-[32px] font-bold text-[#013186] leading-tight text-center mb-8">
           How It Works
-        </h1>
+        </h2>
         <div className="w-full max-w-[420px] flex flex-col gap-4">
           {points.map((p) => (
             <div key={p.id} className="flex items-start gap-4 rounded-[16px] border border-[rgba(1,49,134,0.12)] bg-white p-4">
@@ -180,9 +180,9 @@ top: `${(p.y / 600) * 100}%`,
 
           {/* Center heading */}
           <div className="relative z-10 flex flex-col items-center text-center">
-  <h1 className="text-[88px] font-bold text-[#013186] leading-tight mq800:text-[56px] mq450:text-[40px]">
+  <h2 className="text-[88px] font-bold text-[#013186] leading-tight mq800:text-[56px] mq450:text-[40px]">
   How it Works
-</h1>
+</h2>
           </div>
 
         </div>

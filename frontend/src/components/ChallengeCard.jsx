@@ -52,7 +52,7 @@ const ChallengeCard = ({ className = "" }) => {
         >
           Get Results in Just 7 Days – Risk-Free!
         </h2>
-        <span className="text-[13px] font-semibold text-[rgba(0,0,0,0.4)] whitespace-nowrap mt-1">
+        <span className="text-[13px] font-semibold text-[rgba(0,0,0,0.6)] whitespace-nowrap mt-1">
           the<span className="text-[#013186] font-bold">Social99</span>
         </span>
       </div>
@@ -133,7 +133,7 @@ const ChallengeCard = ({ className = "" }) => {
                     fontSize: isMobile ? "13px" : "12px",
                     marginTop: isMobile ? 0 : 4,
                     fontWeight: 500,
-                    color: isActive ? "#013186" : "rgba(0,0,0,0.5)",
+                    color: isActive ? "#013186" : "rgba(0,0,0,0.62)",
                     whiteSpace: "nowrap",
                     overflow: "hidden",
                     transition: "color 0.2s ease",

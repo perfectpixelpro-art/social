@@ -56,7 +56,7 @@ const FrameComponent11 = ({ className = "" }) => {
         "
       >
         <div className="flex flex-col gap-5 flex-1 max-w-[650px] mq800:max-w-full">
-          <h1
+          <h2
             className="
               m-0 font-bold text-[#013186] leading-[1.05]
               text-[64px] mq1125:text-[54px] mq800:text-[44px] mq600:text-[38px] mq450:text-[30px]
@@ -65,10 +65,10 @@ const FrameComponent11 = ({ className = "" }) => {
             Consistency
             <br />
             Builds Growth
-          </h1>
+          </h2>
           <p
             className="
-              text-[22px] leading-[1.8] text-[#808080]
+              text-[22px] leading-[1.8] text-[#6b6b6b]
               mq800:text-[18px] mq450:text-[16px]
             "
           >
