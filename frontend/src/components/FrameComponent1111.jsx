@@ -16,7 +16,7 @@ const FrameComponent1111 = ({ className = "" }) => {
         />
         <img
           className="absolute top-[44px] left-[0px] w-[295px] h-[295px] object-cover z-[1]"
-          alt=""
+          alt="Social media post design example by The Social 99"
           src="/Artboard-4-52@2x.png"
         />
         <img
@@ -39,7 +39,7 @@ const FrameComponent1111 = ({ className = "" }) => {
         <img
           className="absolute top-[43px] left-[0px] w-[295px] h-[296px] object-cover z-[1]"
           loading="lazy"
-          alt=""
+          alt="Social media post design example by The Social 99"
           src="/Artboard-1-copy-5-1@2x.png"
         />
       </div>
@@ -51,7 +51,7 @@ const FrameComponent1111 = ({ className = "" }) => {
         />
         <img
           className="absolute top-[39.5px] left-[0px] w-[259px] h-[259px] object-cover hidden"
-          alt=""
+          alt="Social media post design example by The Social 99"
           src="/Artboard-4-52@2x.png"
         />
         <img
@@ -62,7 +62,7 @@ const FrameComponent1111 = ({ className = "" }) => {
         <img
           className="absolute top-[39px] left-[0px] w-[259px] h-[259px] object-cover z-[1]"
           loading="lazy"
-          alt=""
+          alt="Social media post design example by The Social 99"
           src="/image-3-1@2x.png"
         />
         <img
@@ -80,7 +80,7 @@ const FrameComponent1111 = ({ className = "" }) => {
         />
         <img
           className="absolute top-[38.5px] left-[0px] w-[259px] h-[259px] object-cover hidden"
-          alt=""
+          alt="Social media post design example by The Social 99"
           src="/Artboard-4-52@2x.png"
         />
         <img
@@ -91,7 +91,7 @@ const FrameComponent1111 = ({ className = "" }) => {
         <img
           className="absolute top-[37px] left-[0px] w-[259px] h-[261px] object-cover z-[2]"
           loading="lazy"
-          alt=""
+          alt="Social media post design example by The Social 99"
           src="/Instagram-post-5-10@2x.png"
         />
         <img

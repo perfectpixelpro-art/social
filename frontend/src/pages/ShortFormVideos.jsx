@@ -148,7 +148,7 @@ export default function ShortFormVideos() {
                 className="absolute mq800:!hidden w-[56px] h-[56px] rounded-full overflow-hidden border-2 border-white shadow-[0_4px_16px_rgba(1,49,134,0.18)]"
                 style={{ left: `${a.x}%`, top: `${a.y}%`, transform: "translate(-50%, -50%)" }}
               >
-                <img src={a.img} alt="" className="w-full h-full object-cover" />
+                <img src={a.img} alt="Short-form video content creator" className="w-full h-full object-cover" />
               </div>
             ))}
 

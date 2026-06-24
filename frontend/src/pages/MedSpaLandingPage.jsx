@@ -138,7 +138,7 @@ export default function MedSpaLandingPage() {
         <div className="relative w-[320px]">
           <img
             src={facial}
-            alt=""
+            alt="Med spa facial treatment result by The Social 99"
             className="w-full object-contain"
           />
 
@@ -167,7 +167,7 @@ export default function MedSpaLandingPage() {
         >
           <img
             src={skin}
-            alt=""
+            alt="Med spa skincare treatment result by The Social 99"
             className="w-full object-contain"
           />
 
@@ -187,7 +187,7 @@ export default function MedSpaLandingPage() {
         <div className="relative w-[200px]">
           <img
             src={facial3}
-            alt=""
+            alt="Med spa aesthetic treatment result by The Social 99"
             className="w-full object-contain relative  -right-[5px]
           -top-[100px] "
             
@@ -212,13 +212,13 @@ export default function MedSpaLandingPage() {
         <div className="relative flex items-center">
           <img
             src={facial}
-            alt=""
+            alt="Med spa facial treatment result by The Social 99"
             className="w-[280px] relative left-0 z-10"
           />
 
           <img
             src={skin}
-            alt=""
+            alt="Med spa skincare treatment result by The Social 99"
             className="
               w-[220px]
               relative
@@ -230,7 +230,7 @@ export default function MedSpaLandingPage() {
 
           <img
             src={facial3}
-            alt=""
+            alt="Med spa aesthetic treatment result by The Social 99"
             className="w-[160px] relative z-20 relative -left-5 top-25"
           />
         </div>
@@ -242,7 +242,7 @@ export default function MedSpaLandingPage() {
 
           <img
             src={facial}
-            alt=""
+            alt="Med spa facial treatment result by The Social 99"
             className="
               absolute
               -left-13
@@ -256,7 +256,7 @@ export default function MedSpaLandingPage() {
 
           <img
             src={skin}
-            alt=""
+            alt="Med spa skincare treatment result by The Social 99"
             className="
               absolute
               left-1/2
@@ -269,7 +269,7 @@ export default function MedSpaLandingPage() {
 
           <img
             src={facial3}
-            alt=""
+            alt="Med spa aesthetic treatment result by The Social 99"
             className="
               absolute
               right-0

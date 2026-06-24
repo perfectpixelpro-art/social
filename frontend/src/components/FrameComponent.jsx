@@ -12,11 +12,26 @@ const FAQS = [
   { q: "Can I upgrade, downgrade, or cancel my plan?", a: "Yes, The Social 99 offers flexible social media management pricing on a month-to-month basis." },
 ];
 
+// FAQPage structured data — lets Google show these Q&As as rich results.
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQS.map((item) => ({
+    "@type": "Question",
+    name: item.q,
+    acceptedAnswer: { "@type": "Answer", text: item.a },
+  })),
+};
+
 const FrameComponent = ({ className = "" }) => {
   const [open, setOpen] = useState(null);
 
   return (
     <section className={`w-full flex justify-center px-2 font-[Montserrat] ${className}`}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <div className="w-full max-w-[1500px] grid grid-cols-2 gap-x-16 gap-y-2 mq800:grid-cols-1 mq800:gap-x-0">
         {FAQS.map((item, i) => {
           const isOpen = open === i;

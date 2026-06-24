@@ -59,24 +59,24 @@ const FrameComponent1 = ({ className = "" }) => {
           />
           <img
             className="cursor-pointer [border:none] p-0 bg-[transparent] h-[25px] w-[25px] relative object-cover"
-            alt=""
+            alt="Social media post design example by The Social 99"
             src="/image-12@2x.png"
           />
           <img
             className="cursor-pointer [border:none] p-0 bg-[transparent] h-[25px] w-[25px] relative object-cover"
-            alt=""
+            alt="Social media post design example by The Social 99"
             src="/image-111@2x.png"
           />
           <img
             className="cursor-pointer [border:none] p-0 bg-[transparent] h-[25px] w-[25px] relative object-cover"
-            alt=""
+            alt="Social media post design example by The Social 99"
             src="/image-10@2x.png"
           />
         </div>
       </div>
       <img
         className="cursor-pointer [border:none] p-0 bg-[transparent] h-[39px] w-[33.1px] absolute !!m-[0 important] bottom-[33px] left-[0px] object-cover shrink-0"
-        alt=""
+        alt="The Social 99"
         src="/Logo2@2x.png"
       />
     </footer>
