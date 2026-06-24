@@ -12,6 +12,7 @@ import SolutionSection from "../components/SolutionSection";
 import WorkExamplesSection from "../components/WorkExamplesSection";
 import ProcessSection from "../components/ProcessSection";
 import ResultsFaqSection from "../components/ResultsFaqSection";
+import SalonPricingSection from "../components/SalonPricingSection";
 
 
 
@@ -299,6 +300,7 @@ export default function MedSpaLandingPage() {
 
       {/* ResultFaq Section */}
       <ResultsFaqSection />
+      <SalonPricingSection />
 
       
       {/* FINAL CTA SECTION */}

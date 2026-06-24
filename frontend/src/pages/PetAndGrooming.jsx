@@ -6,6 +6,7 @@ import WorkExamplesSection from "../components/WorkExampleSecPet";
 import WorkExamplesSecPet from "../components/WorkExampleSecPet";
 import PetServicesSection from "../components/PetServicesSection";
 import PetTimelineSection from "../components/PetTimelineSection";
+import SalonPricingSection from "../components/SalonPricingSection";
 
 export default function PetGrowthHero() {
   return (
@@ -16,7 +17,9 @@ export default function PetGrowthHero() {
      <PetTrustSection />
      <WorkExamplesSecPet/>
      <PetServicesSection />
+     <SalonPricingSection />
      <PetTimelineSection />
+     
     </>
     
   );    ``
