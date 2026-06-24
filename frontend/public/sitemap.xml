@@ -14,6 +14,15 @@
   <url><loc>https://thesocial99.com/contact</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://thesocial99.com/book-a-call</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://thesocial99.com/blogs</loc><lastmod>2026-06-22</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+
+  <!-- Blog posts (auto-generated from src/data/blogs.js by gen-sitemap.cjs - do not edit by hand) -->
+  <!-- BLOGS:START -->
+  <url><loc>https://thesocial99.com/blogs/real-roi-99-social-media-management</loc><lastmod>2026-06-24</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://thesocial99.com/blogs/small-business-invisible-social-media-2026</loc><lastmod>2026-06-24</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://thesocial99.com/blogs/psychology-customers-buy-businesses-they-follow</loc><lastmod>2026-06-24</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://thesocial99.com/blogs/from-zero-to-1000-followers-the-small-business-playbook-for-2026</loc><lastmod>2026-06-24</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://thesocial99.com/blogs/when-to-post-how-to-batch-and-how-to-schedule-30-days-of-social-media-in-one-sitting</loc><lastmod>2026-06-24</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <!-- BLOGS:END -->
   <url><loc>https://thesocial99.com/careers</loc><lastmod>2026-06-22</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
 
   <!-- Industry niches -->

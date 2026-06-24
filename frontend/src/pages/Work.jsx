@@ -129,7 +129,7 @@ function ReelCard({ src, poster }) {
 export default function Work() {
   return (
     <div className="w-full font-[Montserrat] overflow-x-hidden">
-      <Seo path="/work" title="Our Work & Results | The Social 99" description="See real results from The Social 99 — social media campaigns, viral short-form videos, and websites we've built for small businesses." />
+      <Seo path="/work" title="Our Work & Results | The Social 99" description="See real results from The Social 99 - social media campaigns, viral short-form videos, and websites we've built for small businesses." />
 
       {/* ── Hero ── */}
       <div

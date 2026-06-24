@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node snap.cjs",
+    "build": "node gen-sitemap.cjs && vite build && node snap.cjs",
     "build:nossg": "vite build",
     "preview": "vite preview"
   },

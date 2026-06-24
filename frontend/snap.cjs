@@ -11,6 +11,8 @@
  *   build never fails (you just don't get pre-rendering until Chrome exists).
  */
 const { run } = require("react-snap");
+const fs = require("fs");
+const path = require("path");
 
 const chrome =
   process.env.PUPPETEER_EXECUTABLE_PATH ||
@@ -38,6 +40,9 @@ const include = [
   "/deletion-data",
   "/careers",
   "/book-a-call",
+  // Pre-rendered 404 page (copied to dist/404.html below for the server to
+  // serve with a real HTTP 404 status on unknown URLs — fixes soft-404s).
+  "/404",
   "/med-spa",
   "/pet-and-grooming",
   "/salons-and-beauty",
@@ -62,7 +67,21 @@ run({
   fixWebpackChunksIssue: false,
   inlineCss: false,
 })
-  .then(() => console.log("✅ Pre-render complete"))
+  .then(() => {
+    // react-snap writes the catch-all (404) route to dist/404/index.html.
+    // Copy it to dist/404.html so Nginx/Cloudflare can serve it with a real
+    // HTTP 404 status (error_page 404 /404.html) instead of a soft 404.
+    try {
+      const src = path.join("dist", "404", "index.html");
+      if (fs.existsSync(src)) {
+        fs.copyFileSync(src, path.join("dist", "404.html"));
+        console.log("✅ 404.html created from pre-rendered /404");
+      }
+    } catch (e) {
+      console.warn("⚠️  Could not create 404.html:", e.message);
+    }
+    console.log("✅ Pre-render complete");
+  })
   .catch((e) => {
     console.warn("⚠️  Pre-render skipped (build still succeeds):", e.message);
     process.exit(0);

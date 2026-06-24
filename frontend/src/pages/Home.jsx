@@ -64,7 +64,7 @@ const SocialIcons = () => (
 const Home = () => {
   return (
     <div className="w-full flex flex-col font-[Montserrat] overflow-x-hidden">
-      <Seo path="/" title="The Social 99 — Affordable Social Media Management for Small Business" description="Done-for-you social media management, short-form video, and website design starting at $99/month. Trusted by 1,450+ small businesses. No contracts, cancel anytime." />
+      <Seo path="/" title="The Social 99 - Affordable Social Media Management for Small Business" description="Done-for-you social media management, short-form video, and website design starting at $99/month. Trusted by 1,450+ small businesses. No contracts, cancel anytime." />
 
       {/* ── Hero + Social Icons + Plan Cards — one continuous bg ── */}
       <div
