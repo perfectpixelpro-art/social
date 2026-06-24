@@ -140,7 +140,16 @@ export function openS99() {
 // Floating Dot chatbot — marketing pages + client dashboard only.
 export default function ChatWidget() {
   useEffect(() => {
+    // Skip during react-snap pre-render so the chat DOM is NOT baked into the
+    // static HTML. If it were, the hydrated build would see #s99-chat already
+    // present and never call createChat() — leaving a dead toggle button.
+    if (navigator.userAgent === "ReactSnap") return;
+
     injectStyles();
+    // Remove any stale host left over from a previous pre-render before mounting.
+    const stale = document.getElementById("s99-chat");
+    if (stale) stale.remove();
+
     let host = document.getElementById("s99-chat");
     if (!host) {
       host = document.createElement("div");
