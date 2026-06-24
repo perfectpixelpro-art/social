@@ -2,6 +2,7 @@
 const blogs = [
   {
     slug: "real-roi-99-social-media-management",
+    date: "2026-03-10",
     title: "The Real ROI of $99 Social Media Management for Local Businesses",
     excerpt:
       'You have probably heard it before: "You need to be on social media." And you know what? They are right....',
@@ -15,6 +16,7 @@ const blogs = [
   },
   {
     slug: "small-business-invisible-social-media-2026",
+    date: "2026-04-02",
     title: "Why Your Small Business Is Invisible on Social Media in 2026 (And How to Fix It)",
     excerpt:
       "You are already sitting on the most trusted, most persuasive, most cost-effective marketing tool.....",
@@ -28,6 +30,7 @@ const blogs = [
   },
   {
     slug: "psychology-customers-buy-businesses-they-follow",
+    date: "2026-04-21",
     title: "The Psychology Behind Why Customers Buy From Businesses They Follow on Social Media",
     excerpt: "Before a single rupee changes hands, something invisible happens....",
     cover: "The Psychology Behind Why Customers Buy From Businesses They Follow on Social Media",
@@ -40,6 +43,7 @@ const blogs = [
   },
   {
     slug: "from-zero-to-1000-followers-the-small-business-playbook-for-2026",
+    date: "2026-05-12",
     title: "From Zero to 1,000 Followers: The Small Business Playbook for 2026",
     excerpt: "No bots. No paid ads. No agency retainer. Just a repeatable system that gets real people following your business, trusting your......",
     cover: "From Zero to 1,000 Followers: The Small Business Playbook for 2026",
@@ -51,6 +55,7 @@ const blogs = [
   },
   {
     slug: "when-to-post-how-to-batch-and-how-to-schedule-30-days-of-social-media-in-one-sitting",
+    date: "2026-06-03",
     title: "When to Post, How to Batch, and How to Schedule 30 Days of Social Media in One Sitting",
     excerpt: "The definitive 2026 timing guide for Instagram and Facebook, a complete content batching system......",
     cover: "When to Post, How to Batch, and How to Schedule 30 Days of Social Media in One Sitting",

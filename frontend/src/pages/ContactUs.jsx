@@ -18,7 +18,7 @@ export default function ContactUs() {
   ];
 
   return (<>
-      <Seo path="/contact" title="Contact The Social 99 - Get in Touch" description="Have questions? Contact The Social 99 to start growing your business with affordable social media management, short-form video, and website design." />
+      <Seo path="/contact" title="Contact The Social 99 - Get in Touch" description="Have questions? Contact The Social 99 to start growing your business with affordable social media management, short-form video, and website design." breadcrumbs={[{ name: "Home", path: "/" }, { name: "Contact", path: "/contact" }]} />
 
 
 

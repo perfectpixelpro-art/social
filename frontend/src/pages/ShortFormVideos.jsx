@@ -108,7 +108,7 @@ export default function ShortFormVideos() {
 
   return (
     <div className="w-full font-[Montserrat] overflow-x-hidden">
-      <Seo path="/short-form-videos" title="Short-Form Video Creation - Reels, Shorts & TikTok | The Social 99" description="Scroll-stopping short-form videos built for virality. Professional editing, storyboarding, and captions for Reels, Shorts, and TikTok from $99/month." />
+      <Seo path="/short-form-videos" title="Short-Form Video Creation - Reels, Shorts & TikTok | The Social 99" description="Scroll-stopping short-form videos built for virality. Professional editing, storyboarding, and captions for Reels, Shorts, and TikTok from $99/month." breadcrumbs={[{ name: "Home", path: "/" }, { name: "Services", path: "/services" }, { name: "Short-Form Videos", path: "/short-form-videos" }]} />
 
       {/* ── Hero ── */}
       <div

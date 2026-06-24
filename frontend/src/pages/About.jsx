@@ -21,7 +21,7 @@ import a9 from "../assets/a9.webp";
 const About = () => {
   return (
     <div className="w-full font-[Montserrat] overflow-x-hidden">
-      <Seo path="/about" title="About The Social 99 - Our Story & Mission" description="Learn about The Social 99: the team helping small businesses grow with affordable, done-for-you social media management, video, and web design." />
+      <Seo path="/about" title="About The Social 99 - Our Story & Mission" description="Learn about The Social 99: the team helping small businesses grow with affordable, done-for-you social media management, video, and web design." breadcrumbs={[{ name: "Home", path: "/" }, { name: "About", path: "/about" }]} />
 
       {/* ── Hero ── */}
       <div

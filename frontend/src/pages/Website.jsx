@@ -157,7 +157,7 @@ function BadgeIcon({ name }) {
 export default function Website() {
   return (
     <div className="w-full font-[Montserrat] overflow-x-hidden">
-      <Seo path="/website" title="Website Design Services - Built to Convert | The Social 99" description="Conversion-focused, SEO-optimized website design for small businesses. Clean, fast, mobile-friendly sites that turn visitors into customers from $99/month." />
+      <Seo path="/website" title="Website Design Services - Built to Convert | The Social 99" description="Conversion-focused, SEO-optimized website design for small businesses. Clean, fast, mobile-friendly sites that turn visitors into customers from $99/month." breadcrumbs={[{ name: "Home", path: "/" }, { name: "Services", path: "/services" }, { name: "Website Design", path: "/website" }]} />
 
       {/* ── Hero ── */}
       <div

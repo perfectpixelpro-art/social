@@ -19,8 +19,47 @@ export default function Seo({
   image = DEFAULT_IMAGE,
   type = "website",
   noindex = false,
+  breadcrumbs = null,
+  article = null,
 }) {
   const url = `${SITE}${path}`;
+
+  // BreadcrumbList JSON-LD — shows the nav trail (Home › Blog › …) in results.
+  const breadcrumbSchema =
+    breadcrumbs && breadcrumbs.length
+      ? {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: breadcrumbs.map((b, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            name: b.name,
+            item: `${SITE}${b.path}`,
+          })),
+        }
+      : null;
+
+  // Article JSON-LD — marks blog posts as articles (headline, date, author).
+  const articleSchema = article
+    ? {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: article.headline || title,
+        description,
+        image: article.image || image,
+        url,
+        datePublished: article.datePublished,
+        dateModified: article.dateModified || article.datePublished,
+        author: { "@type": "Organization", name: "The Social 99", url: `${SITE}/` },
+        publisher: {
+          "@type": "Organization",
+          name: "The Social 99",
+          logo: { "@type": "ImageObject", url: DEFAULT_IMAGE },
+        },
+        mainEntityOfPage: { "@type": "WebPage", "@id": url },
+      }
+    : null;
+
   return (
     <>
       <title>{title}</title>
@@ -49,6 +88,20 @@ export default function Seo({
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={image} />
+
+      {/* Structured data (JSON-LD) */}
+      {breadcrumbSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        />
+      )}
+      {articleSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+        />
+      )}
     </>
   );
 }
@@ -60,4 +113,13 @@ Seo.propTypes = {
   image: PropTypes.string,
   type: PropTypes.string,
   noindex: PropTypes.bool,
+  breadcrumbs: PropTypes.arrayOf(
+    PropTypes.shape({ name: PropTypes.string, path: PropTypes.string })
+  ),
+  article: PropTypes.shape({
+    headline: PropTypes.string,
+    image: PropTypes.string,
+    datePublished: PropTypes.string,
+    dateModified: PropTypes.string,
+  }),
 };

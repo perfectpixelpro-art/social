@@ -26,6 +26,15 @@ export default function BlogDetail() {
       type="article"
       title={`${blog.title} | The Social 99 Blog`}
       description={(blog.excerpt || blog.title).replace(/\.{2,}\s*$/, "").slice(0, 160)}
+      breadcrumbs={[
+        { name: "Home", path: "/" },
+        { name: "Blog", path: "/blogs" },
+        { name: blog.title, path: `/blogs/${slug}` },
+      ]}
+      article={{
+        headline: blog.title,
+        datePublished: blog.date,
+      }}
     />
   ) : null;
 

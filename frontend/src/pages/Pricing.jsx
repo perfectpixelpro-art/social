@@ -174,6 +174,10 @@ export default function Pricing() {
         path="/pricing"
         title="Pricing - Social Media, Video & Website Plans from $99/mo | The Social 99"
         description="Simple, transparent pricing from The Social 99. Social media management, short-form video, and website design plans starting at $99/month. No setup fee, cancel anytime."
+        breadcrumbs={[
+          { name: "Home", path: "/" },
+          { name: "Pricing", path: "/pricing" },
+        ]}
       />
 
       {/* Hero */}
