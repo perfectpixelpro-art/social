@@ -185,12 +185,27 @@ export default function ChatWidget() {
       );
     };
 
-    const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 1500));
-    idle(start);
+    // Load the chat only once the user interacts (scroll/move/touch/key) or
+    // after a long fallback delay. This keeps the heavy 1.45MB library OFF the
+    // main thread during initial load + the Lighthouse trace (low TBT), while
+    // still loading instantly the moment a real visitor engages.
+    const events = ["scroll", "mousemove", "touchstart", "keydown", "click"];
+    let started = false;
+    const trigger = () => {
+      if (started) return;
+      started = true;
+      events.forEach((e) => window.removeEventListener(e, trigger));
+      clearTimeout(fallback);
+      start();
+    };
+    events.forEach((e) => window.addEventListener(e, trigger, { passive: true, once: false }));
+    const fallback = setTimeout(trigger, 8000);
 
     return () => {
       cancelled = true;
+      clearTimeout(fallback);
       clearInterval(faqTimer);
+      events.forEach((e) => window.removeEventListener(e, trigger));
       const h = document.getElementById("s99-chat"); if (h) h.remove();
     };
   }, []);

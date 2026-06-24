@@ -180,9 +180,9 @@ const PlanContent = ({ className = "" }) => {
               <div className="card-content relative z-10 flex flex-col h-full p-5 w-[58%]">
 
                 {/* TITLE */}
-                <h3 className="card-title text-[29px] font-bold text-black leading-[1.2] mb-4">
+                <h2 className="card-title text-[29px] font-bold text-black leading-[1.2] mb-4">
                   {card.title}
-                </h3>
+                </h2>
 
                 {/* PILLS */}
                 <div className="card-pills flex flex-col gap-2">

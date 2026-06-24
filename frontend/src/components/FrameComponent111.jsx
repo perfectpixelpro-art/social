@@ -35,6 +35,7 @@ const PostCard = ({ src, alt, showLeftArrow, showRightArrow, onPrev, onNext }) =
     {showLeftArrow && (
       <button
         onClick={onPrev}
+        aria-label="Previous"
         style={{
           position: "absolute",
           left: "-18px",
@@ -61,6 +62,7 @@ const PostCard = ({ src, alt, showLeftArrow, showRightArrow, onPrev, onNext }) =
     {showRightArrow && (
       <button
         onClick={onNext}
+        aria-label="Next"
         style={{
           position: "absolute",
           right: "-18px",
@@ -168,6 +170,7 @@ const FrameComponent111 = ({ className = "" }) => {
         <div className="mq450:hidden flex-shrink-0 relative" style={{ marginTop: "5%" }}>
           <button
             onClick={prev}
+            aria-label="Previous"
             className="mq1125:hidden flex"
             style={{
               position: "absolute",
@@ -208,6 +211,7 @@ const FrameComponent111 = ({ className = "" }) => {
           {/* MOBILE LEFT ARROW */}
           <button
             onClick={prev}
+            aria-label="Previous"
             className="hidden mq450:flex"
             style={{
               position: "absolute",
@@ -261,6 +265,7 @@ const FrameComponent111 = ({ className = "" }) => {
           {/* MOBILE RIGHT ARROW */}
           <button
             onClick={next}
+            aria-label="Next"
             className="hidden mq450:flex"
             style={{
               position: "absolute",
@@ -290,6 +295,7 @@ const FrameComponent111 = ({ className = "" }) => {
           <PostCard {...POST_SLIDES[gi(-1)]} />
           <button
             onClick={next}
+            aria-label="Next"
             className="mq1125:hidden flex"
             style={{
               position: "absolute",
