@@ -338,7 +338,7 @@ const FrameComponent111 = ({ className = "" }) => {
           "
         >
           <span className="text-[20px] mq450:text-[10px] font-bold text-black whitespace-nowrap">
-            <a href="book-a-call">Explore now $99</a>
+            <a href="/pricing">Explore now $99</a>
           </span>
           <span className="w-8 h-8 mq450:w-6 mq450:h-6 rounded-full bg-[rgba(158,202,255,0.6)] flex items-center justify-center shrink-0">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#013186" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">

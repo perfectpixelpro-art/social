@@ -204,7 +204,7 @@ export default function PetHero() {
                 transition
               "
             >
-          <a href="book-a-call"> Start for $99</a>     
+          <a href="/pricing"> Start for $99</a>     
 
               <div
                 className="

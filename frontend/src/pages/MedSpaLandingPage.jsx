@@ -114,7 +114,7 @@ export default function MedSpaLandingPage() {
               transition
             "
           >
-            <a href="book-a-call">Start for $99 →</a>
+            <a href="/pricing">Start for $99 →</a>
           </button>
         </div>
 
@@ -395,7 +395,7 @@ export default function MedSpaLandingPage() {
             hover:opacity-90
           "
         >
-          <span><a href="book-a-call">Start for $99</a></span>
+          <span><a href="/pricing">Start for $99</a></span>
           <div
             className="
               w-7
