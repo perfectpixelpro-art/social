@@ -1,4 +1,4 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./index.css";
@@ -31,44 +31,49 @@ import ScrollToTop from "./components/ScrollToTop";
 import DataDeletion from "./pages/DeletetionData";
 
 // ── App (auth + dashboards) ──
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import Checkout from "./pages/Checkout";
-import Verified from "./pages/Verified";
-import NotFound from "./pages/NotFound";
+// These routes are NOT pre-rendered (SPA-only, noindex), so we lazy-load them.
+// This keeps the dashboard/admin/auth code out of the marketing pages' bundle
+// (big "unused JavaScript" win) without affecting pre-rendering/hydration.
 import ProtectedRoute from "./components/ProtectedRoute";
-import DashboardLayout from "./components/DashboardLayout";
-import DashboardHome from "./pages/dashboard/Home";
-import DashboardScheduling from "./pages/dashboard/Scheduling";
-import DashboardMeetings from "./pages/dashboard/Meetings";
-import DashboardHelp from "./pages/dashboard/Help";
-import DashboardStore from "./pages/dashboard/Store";
-import DashboardChat from "./pages/dashboard/Chat";
-import DashboardProfile from "./pages/dashboard/Profile";
-import DashboardTickets from "./pages/dashboard/Tickets";
-import DashboardFiles from "./pages/dashboard/Files";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
-import AdminLayout from "./components/AdminLayout";
-import AdminLogin from "./pages/admin/AdminLogin";
-import AdminHome from "./pages/admin/Home";
-import AdminScheduling from "./pages/admin/Scheduling";
-import AdminMeetings from "./pages/admin/Meetings";
-import AdminChat from "./pages/admin/Chat";
-import AdminFiles from "./pages/admin/Files";
-import AdminManagers from "./pages/admin/Managers";
-import AdminTickets from "./pages/admin/Tickets";
-import AdminHelp from "./pages/admin/Help";
-import AdminBanners from "./pages/admin/Banners";
-import AdminNotifications from "./pages/admin/Notifications";
-import AdminEmail from "./pages/admin/Email";
+import NotFound from "./pages/NotFound";
 import ImageViewerHost from "./components/ImageViewer";
+
+const Login = lazy(() => import("./pages/Login"));
+const Signup = lazy(() => import("./pages/Signup"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+const Verified = lazy(() => import("./pages/Verified"));
+const DashboardLayout = lazy(() => import("./components/DashboardLayout"));
+const DashboardHome = lazy(() => import("./pages/dashboard/Home"));
+const DashboardScheduling = lazy(() => import("./pages/dashboard/Scheduling"));
+const DashboardMeetings = lazy(() => import("./pages/dashboard/Meetings"));
+const DashboardHelp = lazy(() => import("./pages/dashboard/Help"));
+const DashboardStore = lazy(() => import("./pages/dashboard/Store"));
+const DashboardChat = lazy(() => import("./pages/dashboard/Chat"));
+const DashboardProfile = lazy(() => import("./pages/dashboard/Profile"));
+const DashboardTickets = lazy(() => import("./pages/dashboard/Tickets"));
+const DashboardFiles = lazy(() => import("./pages/dashboard/Files"));
+const AdminLayout = lazy(() => import("./components/AdminLayout"));
+const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
+const AdminHome = lazy(() => import("./pages/admin/Home"));
+const AdminScheduling = lazy(() => import("./pages/admin/Scheduling"));
+const AdminMeetings = lazy(() => import("./pages/admin/Meetings"));
+const AdminChat = lazy(() => import("./pages/admin/Chat"));
+const AdminFiles = lazy(() => import("./pages/admin/Files"));
+const AdminManagers = lazy(() => import("./pages/admin/Managers"));
+const AdminTickets = lazy(() => import("./pages/admin/Tickets"));
+const AdminHelp = lazy(() => import("./pages/admin/Help"));
+const AdminBanners = lazy(() => import("./pages/admin/Banners"));
+const AdminNotifications = lazy(() => import("./pages/admin/Notifications"));
+const AdminEmail = lazy(() => import("./pages/admin/Email"));
 
 const app = (
   <React.StrictMode>
     <BrowserRouter>
       <ScrollToTop />
+      <Suspense fallback={<div className="min-h-screen" />}>
       <Routes>
         {/* ── Marketing site ── */}
         <Route element={<Layout />}>
@@ -143,6 +148,7 @@ const app = (
 
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </Suspense>
       <ImageViewerHost />
     </BrowserRouter>
   </React.StrictMode>

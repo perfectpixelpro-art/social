@@ -1,6 +1,4 @@
 import { useEffect } from "react";
-import { createChat } from "@n8n/chat";
-import "@n8n/chat/style.css";
 
 const WEBHOOK_URL = import.meta.env.VITE_CHAT_WEBHOOK_URL || "https://radar-daily-roundup.ngrok-free.dev/webhook/00a6a655-a1c0-4e85-96d6-cc6709177c14/chat";
 
@@ -145,40 +143,53 @@ export default function ChatWidget() {
     // present and never call createChat() — leaving a dead toggle button.
     if (navigator.userAgent === "ReactSnap") return;
 
-    injectStyles();
-    // Remove any stale host left over from a previous pre-render before mounting.
-    const stale = document.getElementById("s99-chat");
-    if (stale) stale.remove();
+    let cancelled = false;
+    let faqTimer;
 
-    let host = document.getElementById("s99-chat");
-    if (!host) {
-      host = document.createElement("div");
-      host.id = "s99-chat";
-      document.body.appendChild(host);
-      createChat({
-        webhookUrl: WEBHOOK_URL,
-        target: "#s99-chat",
-        mode: "window",
-        showWelcomeScreen: false,
-        loadPreviousSession: true,
-        initialMessages: ["Hi! I'm Dot, your assistant from The Social 99. How can I help you today? ✨"],
-        i18n: {
-          en: {
-            title: "Dot",
-            subtitle: "Powered by The Social 99",
-            footer: "",
-            getStarted: "New conversation",
-            inputPlaceholder: "Enter your message…",
-            closeButtonTooltip: "Close chat",
-          },
-        },
-      });
-    }
-    // Keep trying to mount the FAQ chips until the chat window renders.
-    const faqTimer = setInterval(() => { if (mountFaqs()) clearInterval(faqTimer); }, 600);
-    setTimeout(() => clearInterval(faqTimer), 15000);
+    // Lazy-load the heavy @n8n/chat library AFTER first paint so it stays out
+    // of the main bundle (big "unused JS" / "3rd parties" win). Defer to idle.
+    const start = () => {
+      Promise.all([import("@n8n/chat"), import("@n8n/chat/style.css")]).then(
+        ([{ createChat }]) => {
+          if (cancelled) return;
+          injectStyles();
+          // Remove any stale host left over from a previous pre-render.
+          const stale = document.getElementById("s99-chat");
+          if (stale) stale.remove();
+
+          const host = document.createElement("div");
+          host.id = "s99-chat";
+          document.body.appendChild(host);
+          createChat({
+            webhookUrl: WEBHOOK_URL,
+            target: "#s99-chat",
+            mode: "window",
+            showWelcomeScreen: false,
+            loadPreviousSession: true,
+            initialMessages: ["Hi! I'm Dot, your assistant from The Social 99. How can I help you today? ✨"],
+            i18n: {
+              en: {
+                title: "Dot",
+                subtitle: "Powered by The Social 99",
+                footer: "",
+                getStarted: "New conversation",
+                inputPlaceholder: "Enter your message…",
+                closeButtonTooltip: "Close chat",
+              },
+            },
+          });
+          // Keep trying to mount the FAQ chips until the chat window renders.
+          faqTimer = setInterval(() => { if (mountFaqs()) clearInterval(faqTimer); }, 600);
+          setTimeout(() => clearInterval(faqTimer), 15000);
+        }
+      );
+    };
+
+    const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 1500));
+    idle(start);
 
     return () => {
+      cancelled = true;
       clearInterval(faqTimer);
       const h = document.getElementById("s99-chat"); if (h) h.remove();
     };
