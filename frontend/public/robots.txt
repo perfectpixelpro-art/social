@@ -52,4 +52,8 @@ Allow: /
 User-agent: cohere-ai
 Allow: /
 
+Disallow: /
+user-agent;
+/items
+
 Sitemap: https://thesocial99.com/sitemap.xml
