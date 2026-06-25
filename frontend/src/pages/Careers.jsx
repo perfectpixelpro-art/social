@@ -1,12 +1,6 @@
 import Seo from "../components/Seo";
 import { useState, useRef } from "react";
-import emailjs from "@emailjs/browser";
-
-// ── Replace these 3 values with your EmailJS credentials ──
-const EMAILJS_SERVICE_ID  = "your_service_id";
-const EMAILJS_TEMPLATE_ID = "your_template_id";
-const EMAILJS_PUBLIC_KEY  = "your_public_key";
-// ──────────────────────────────────────────────────────────
+import { submitContact } from "../api";
 
 const H2 = ({ children }) => (
   <h2 className="text-[#013186] font-bold m-0" style={{ fontSize: "clamp(30px, 5vw, 60px)" }}>{children}</h2>
@@ -87,20 +81,15 @@ export default function Careers() {
     setLoading(true);
 
     try {
-      await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        {
-          from_name:      formData.name,
-          from_email:     formData.email,
-          role:           formData.role,
-          portfolio_name: formData.portfolio ? formData.portfolio.name : "No portfolio attached",
-        },
-        EMAILJS_PUBLIC_KEY
-      );
+      const portfolio = formData.portfolio ? formData.portfolio.name : "No portfolio attached";
+      await submitContact({
+        name: formData.name,
+        email: formData.email,
+        message: `Job application for: ${formData.role}\nPortfolio: ${portfolio}`,
+      });
       setSubmitted(true);
     } catch (err) {
-      console.error("EmailJS error:", err);
+      console.error("Career application error:", err);
       setError("Something went wrong. Please try again or email us directly.");
     } finally {
       setLoading(false);

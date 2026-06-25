@@ -15,7 +15,6 @@
   "type": "module",
   "dependencies": {
     "@calcom/embed-react": "^1.5.3",
-    "@emailjs/browser": "^4.4.1",
     "@n8n/chat": "^1.25.0",
     "cal": "^0.0.4",
     "lucide-react": "^1.17.0",
