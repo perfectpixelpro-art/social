@@ -1,25 +1,15 @@
 User-agent: *
 Allow: /
 
-# Private / app areas — keep out of search results
-Disallow: /cgi-bin/
-Disallow: /login
-Disallow: /sign-in
-Disallow: /signup
-Disallow: /free-trial
-Disallow: /forgot-password
-Disallow: /reset-password
-Disallow: /checkout
-Disallow: /verified
-Disallow: /dashboard
-Disallow: /admin
-Disallow: /items/
+# Note: private/app areas (/login, /dashboard, /admin, /checkout, etc.) are
+# intentionally NOT listed here. They are protected by authentication and carry
+# a noindex meta tag, so they stay out of search results without advertising
+# their paths to scrapers.
 
-# Google AI (Gemini, AI Overviews)
+# --- AI crawlers: explicitly allowed (we want AI citations) ---
 User-agent: Google-Extended
 Allow: /
 
-# OpenAI / ChatGPT
 User-agent: GPTBot
 Allow: /
 
@@ -29,39 +19,33 @@ Allow: /
 User-agent: OAI-SearchBot
 Allow: /
 
-# Anthropic / Claude
 User-agent: ClaudeBot
 Allow: /
 
 User-agent: Claude-User
 Allow: /
 
-# Perplexity AI
 User-agent: PerplexityBot
 Allow: /
 
-# Microsoft Copilot / Bing AI
 User-agent: Bingbot
 Allow: /
 
 User-agent: msnbot
 Allow: /
 
-# Meta AI
 User-agent: FacebookBot
 Allow: /
 
 User-agent: Meta-ExternalAgent
 Allow: /
 
-# Apple
 User-agent: Applebot
 Allow: /
 
 User-agent: Applebot-Extended
 Allow: /
 
-# Common AI scrapers
 User-agent: CCBot
 Allow: /
 
