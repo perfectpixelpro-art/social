@@ -1,17 +1,21 @@
 import Seo from "../components/Seo";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Cal, { getCalApi } from "@calcom/embed-react";
 
 const Bookacall = () => {
+  // Render the Cal embed ONLY on the client (not during react-snap pre-render).
+  // If react-snap bakes the embed into static HTML, hydration tries to register
+  // the <cal-modal-box> custom element a second time -> "already been used" +
+  // "Cal is not defined", and the calendar never appears. Mounting client-side
+  // only guarantees the embed initialises exactly once.
+  const [showCal, setShowCal] = useState(false);
+
   useEffect(() => {
+    if (navigator.userAgent === "ReactSnap") return;
+    setShowCal(true);
     (async function () {
       const cal = await getCalApi();
-
-      // Don't force month_view — Cal then auto-switches to a mobile-friendly
-      // layout on small screens (month_view alone can render blank on phones).
-      cal("ui", {
-        hideEventTypeDetails: false,
-      });
+      cal("ui", { hideEventTypeDetails: false });
     })();
   }, []);
 
@@ -39,18 +43,14 @@ const Bookacall = () => {
             Schedule a call on Zoom to speak with a member of our team.
           </p>
 
-          <div className="w-full mt-10">
-            <Cal
-              calLink="the-social-99-sstjwg/30min"
-              style={{
-                width: "100%",
-                minHeight: "650px",
-                overflow: "visible",
-              }}
-              config={{
-                useSlotsViewOnSmallScreen: true,
-              }}
-            />
+          <div className="w-full mt-10" style={{ minHeight: "650px" }}>
+            {showCal && (
+              <Cal
+                calLink="the-social-99-sstjwg/30min"
+                style={{ width: "100%", minHeight: "650px", overflow: "visible" }}
+                config={{ useSlotsViewOnSmallScreen: true }}
+              />
+            )}
           </div>
         </div>
       </div>
