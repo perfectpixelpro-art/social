@@ -7,9 +7,10 @@ const Bookacall = () => {
     (async function () {
       const cal = await getCalApi();
 
+      // Don't force month_view — Cal then auto-switches to a mobile-friendly
+      // layout on small screens (month_view alone can render blank on phones).
       cal("ui", {
         hideEventTypeDetails: false,
-        layout: "month_view",
       });
     })();
   }, []);
@@ -43,11 +44,10 @@ const Bookacall = () => {
               calLink="the-social-99-sstjwg/30min"
               style={{
                 width: "100%",
-                minHeight: "800px",
-                overflow: "hidden",
+                minHeight: "650px",
+                overflow: "visible",
               }}
               config={{
-                layout: "month_view",
                 useSlotsViewOnSmallScreen: true,
               }}
             />

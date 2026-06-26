@@ -1,4 +1,5 @@
 import SalonPic1 from "../assets/SalonPic1.webp";
+import StrategyForm from "./StrategyForm";
 import SalonPic2 from "../assets/SalonPic2.webp";
 import SalonPic3 from "../assets/SalonPic3.webp";
 import SalonPic4 from "../assets/SalonPic4.webp";
@@ -240,76 +241,7 @@ export default function WorkExamplesSalSec() {
           plan that actually works.
         </p>
 
-        <div className="mt-6 space-y-4">
-          <input
-            type="text"
-            placeholder="Enter Your Full Name"
-            className="w-full h-[52px] px-4 rounded-[8px] border border-[#C7D4EC] bg-white outline-none"
-          />
-
-          <input
-            type="email"
-            placeholder="Enter your email"
-            className="w-full h-[52px] px-4 rounded-[8px] border border-[#C7D4EC] bg-white outline-none"
-          />
-
-          <input
-            type="text"
-            placeholder="Enter Your Phone Number"
-            className="w-full h-[52px] px-4 rounded-[8px] border border-[#C7D4EC] bg-white outline-none"
-          />
-
-          <textarea
-            placeholder="Tell Us About Your Brand..."
-            rows={5}
-            className="
-              w-full
-              px-4
-              py-4
-              rounded-[8px]
-              border
-              border-[#C7D4EC]
-              bg-white
-              outline-none
-              resize-none
-            "
-          />
-
-          <button
-            className="
-              w-full
-              h-[56px]
-              bg-[#DDE8FF]
-              rounded-[12px]
-              flex
-              items-center
-              justify-between
-              px-5
-              text-[#1D1D1D]
-              font-semibold
-            "
-          >
-            <button
-  onClick={() => window.location.href = "mailto:support@thesocial99.com"}
->
-  <span>Let's get started</span>
-</button>
-
-            <div
-              className="
-                w-10
-                h-10
-                rounded-full
-                bg-[#AFC9FF]
-                flex
-                items-center
-                justify-center
-              "
-            >
-              →
-            </div>
-          </button>
-        </div>
+        <StrategyForm />
       </div>
     </div>
   </div>

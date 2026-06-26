@@ -1,4 +1,5 @@
 import Pet1 from "../assets/Pet1.webp";
+import StrategyForm from "./StrategyForm";
 import Pet2 from "../assets/Pet2.webp";
 import Pet3 from "../assets/Pet3.webp";
 import Pet4 from "../assets/Pet4.webp";
@@ -240,77 +241,7 @@ export default function WorkExamplesSecPet() {
           plan that actually works.
         </p>
 
-        <div className="mt-6 space-y-4">
-          <input
-            type="text"
-            placeholder="Enter Your Full Name"
-            className="w-full h-[52px] px-4 rounded-[8px] border border-[#C7D4EC] bg-white outline-none"
-          />
-
-          <input
-            type="email"
-            placeholder="Enter your email"
-            className="w-full h-[52px] px-4 rounded-[8px] border border-[#C7D4EC] bg-white outline-none"
-          />
-
-          <input
-            type="text"
-            placeholder="Enter Your Phone Number"
-            className="w-full h-[52px] px-4 rounded-[8px] border border-[#C7D4EC] bg-white outline-none"
-          />
-
-          <textarea
-            placeholder="Tell Us About Your Brand..."
-            rows={5}
-            className="
-              w-full
-              px-4
-              py-4
-              rounded-[8px]
-              border
-              border-[#C7D4EC]
-              bg-white
-              outline-none
-              resize-none
-            "
-          />
-
-          <button
-            className="
-              w-full
-              h-[56px]
-              bg-[#DDE8FF]
-              rounded-[12px]
-              flex
-              items-center
-              justify-between
-              px-5
-              text-[#1D1D1D]
-              font-semibold
-            "
-          >
-            <a
-  href="mailto:support@thesocial99.com"
-  className="your-button-classes"
->
-  <span>Let's get started</span>
-</a>
-
-            <div
-              className="
-                w-10
-                h-10
-                rounded-full
-                bg-[#AFC9FF]
-                flex
-                items-center
-                justify-center
-              "
-            >
-              →
-            </div>
-          </button>
-        </div>
+        <StrategyForm />
       </div>
     </div>
   </div>
