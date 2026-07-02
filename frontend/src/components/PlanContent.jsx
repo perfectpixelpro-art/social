@@ -33,6 +33,7 @@ const cards = [
     ],
     image: Card3,
     link: "/services/website",
+    fullBg: true,
   },
 ];
 
@@ -53,13 +54,24 @@ const styles = `
       max-height: 360px !important;
     }
     .card-content {
-      width: 55% !important;
+      width: 60% !important;
       padding: 22px !important;
       height: 360px !important;
       box-sizing: border-box !important;
       display: flex !important;
       flex-direction: column !important;
       overflow: hidden !important;
+    }
+    .card-pill-item {
+      overflow: visible !important;
+      white-space: normal !important;
+      max-width: 100% !important;
+    }
+    .card-pill-text {
+      white-space: normal !important;
+      overflow: visible !important;
+      text-overflow: clip !important;
+      line-height: 1.2 !important;
     }
     .card-image-wrapper {
       width: 95% !important;
@@ -86,8 +98,9 @@ const styles = `
       font-size: 12px !important;
     }
     .explore-btn {
-      padding: 10px 14px !important;
-      width: 100% !important;
+      padding: 10px 16px !important;
+      width: fit-content !important;
+      gap: 10px !important;
     }
     .explore-btn-text {
       font-size: 14px !important;
@@ -168,13 +181,25 @@ const PlanContent = ({ className = "" }) => {
             <div className="service-card relative overflow-hidden rounded-[24px] border border-[rgba(1,49,134,0.18)] bg-gradient-to-b from-[#F2F7FF] to-[#DCEAFF] shadow-[0_4px_24px_rgba(1,49,134,0.08)] min-h-[320px] cursor-pointer">
 
               {/* IMAGE */}
-              <div className="card-image-wrapper absolute right-0 bottom-0 w-[90%] h-[150%] pointer-events-none">
-                <img
-                  src={card.image}
-                  alt={card.title}
-                  className="w-full h-full object-contain object-bottom-right"
-                />
-              </div>
+              {card.fullBg ? (
+                <div className="absolute inset-0 pointer-events-none">
+                  <img
+                    src={card.image}
+                    alt={card.title}
+                    className="w-full h-full object-cover object-center"
+                  />
+                  {/* Light left fade so text stays readable but the faint lines still show */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/55 via-white/10 to-transparent" />
+                </div>
+              ) : (
+                <div className="card-image-wrapper absolute right-0 bottom-0 w-[90%] h-full pointer-events-none">
+                  <img
+                    src={card.image}
+                    alt={card.title}
+                    className="w-full h-full object-contain object-right-bottom"
+                  />
+                </div>
+              )}
 
               {/* CONTENT */}
               <div className="card-content relative z-10 flex flex-col h-full p-5 w-[58%]">
