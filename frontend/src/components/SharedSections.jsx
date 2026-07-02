@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import s10 from "../assets/s10.avif";
 import s11 from "../assets/s11.avif";
 import s12 from "../assets/s12.avif";
@@ -224,10 +225,10 @@ export function PlansThatFit({ data = plans, subtitle = "Flexible plans designed
               </li>
             ))}
           </ul>
-          <a href={`/checkout?tab=${encodeURIComponent(tab)}&plan=${encodeURIComponent(data[active].name)}`} className="self-end mt-8 flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[48px] rounded-[25.5px] pl-6 pr-[6px]">
+          <Link to={`/checkout?tab=${encodeURIComponent(tab)}&plan=${encodeURIComponent(data[active].name)}`} className="self-end mt-8 flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[48px] rounded-[25.5px] pl-6 pr-[6px]">
             <b className="text-base text-[#000]">Buy Now</b>
             <span className="h-[36px] w-[36px] rounded-[21px] bg-[rgba(158,202,255,0.39)] flex items-center justify-center"><Arrow /></span>
-          </a>
+          </Link>
         </div>
       </div>
     </div>

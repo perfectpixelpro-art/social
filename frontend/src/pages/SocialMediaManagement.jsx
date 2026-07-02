@@ -1,5 +1,6 @@
 import Seo from "../components/Seo";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import s1 from "../assets/s1.avif";
 import s2 from "../assets/s2.avif";
 import s3 from "../assets/s3.avif";
@@ -558,15 +559,15 @@ export default function SocialMediaManagement() {
                 </li>
               ))}
             </ul>
-            <a
-              href={`/checkout?tab=Marketing&plan=${encodeURIComponent(plans[activePlan].name)}`}
+            <Link
+              to={`/checkout?tab=Marketing&plan=${encodeURIComponent(plans[activePlan].name)}`}
               className="self-end mt-8 flex items-center gap-2 no-underline border border-[rgba(1,49,134,0.07)] bg-[rgba(188,214,255,0.37)] hover:bg-[rgba(188,214,255,0.6)] transition-colors h-[48px] rounded-[25.5px] pl-6 pr-[6px]"
             >
               <b className="text-base text-[#000]">Buy Now</b>
               <span className="h-[36px] w-[36px] rounded-[21px] bg-[rgba(158,202,255,0.39)] flex items-center justify-center">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#013186" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
               </span>
-            </a>
+            </Link>
           </div>
         </div>
       </div>

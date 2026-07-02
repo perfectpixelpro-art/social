@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import Seo from "../components/Seo";
 import QuestionsLayout from "../components/QuestionsLayout";
 import FrameComponent from "../components/FrameComponent";
@@ -153,14 +154,14 @@ function PlanCard({ plan, tab = "Marketing" }) {
         ))}
       </ul>
 
-      <a
-        href={`/checkout?tab=${encodeURIComponent(tab)}&plan=${encodeURIComponent(plan.name)}`}
+      <Link
+        to={`/checkout?tab=${encodeURIComponent(tab)}&plan=${encodeURIComponent(plan.name)}`}
         className={`mt-8 h-[52px] rounded-[12px] flex items-center justify-center font-bold text-[16px] no-underline transition-colors ${
           f ? "bg-white text-[#013186] hover:bg-[#e6f0ff]" : "bg-[#013186] text-white hover:bg-[#012270]"
         }`}
       >
         Buy Now
-      </a>
+      </Link>
     </div>
   );
 }
